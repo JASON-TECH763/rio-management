@@ -43,7 +43,7 @@ CREATE TABLE `admin` (
 --
 
 INSERT INTO `admin` (`aid`, `fname`, `lname`, `uname`, `email`, `password`, `image`, `date_updated`) VALUES
-(1, 'Nonong', 'Alcantara', 'admin', 'admin123@gmail.com', '123456', NULL, NULL);
+(1, 'Jason', 'Cueva', 'admin', 'admin123@gmail.com', '123456', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -64,24 +64,7 @@ CREATE TABLE `booking_status` (
 --
 
 INSERT INTO `booking_status` (`id`, `booking_id`, `booking_status`, `remarks`, `created`) VALUES
-(1, 0, '1', '<br />\r\n<b>Warning</b>:  Trying to access array offset on value of type null in <b>C:xampphtdocs\riosystemRestroadminconfirm.php</b> on line <b>61</b><br />\r\n', '2024-07-17 22:05:54'),
-(2, 0, '1', '<br />\r\n<b>Warning</b>:  Trying to access array offset on value of type null in <b>C:xampphtdocs\r\niosystemRestroadminconfirm.php</b> on line <b>61</b><br />\r\n', '2024-07-17 22:06:09'),
-(3, 0, '1', '<br />\r\n<b>Warning</b>:  Trying to access array offset on value of type null in <b>C:xampphtdocs\r\niosystemRestroadminconfirm.php</b> on line <b>61</b><br />\r\n', '2024-07-17 22:09:08'),
-(4, 0, '2', '<br />\r\n<b>Warning</b>:  Trying to access array offset on value of type null in <b>C:xampphtdocs\r\niosystemRestroadminconfirm.php</b> on line <b>61</b><br />\r\n', '2024-07-17 22:15:38'),
-(5, 0, '1', '', '2024-07-17 22:23:25'),
-(6, 66835084, '1', '<br />\r\n<b>Warning</b>:  Trying to access array offset on value of type null in <b>C:xampphtdocs\riosystemRestroadminpartialss\\_bookingStatusModal.php</b> on line <b>69</b><br />\r\n', '2024-07-17 22:45:24'),
-(7, 0, '2', '<br />\r\n<b>Warning</b>:  Trying to access array offset on value of type null in <b>C:xampphtdocs\r\niosystemRestroadminconfirm.php</b> on line <b>61</b><br />\r\n', '2024-07-17 23:03:10'),
-(8, 70428330, '1', '<br />\r\n<b>Warning</b>:  Trying to access array offset on value of type null in <b>C:xampphtdocs\riosystemRestroadminpartialss\\_bookingStatusModal.php</b> on line <b>69</b><br />\r\n', '2024-07-17 23:10:08'),
-(9, 40431695, '2', '<br />\r\n<b>Warning</b>:  Trying to access array offset on value of type null in <b>C:xampphtdocs\riosystemRestroadminpartialss\\_bookingStatusModal.php</b> on line <b>69</b><br />\r\n', '2024-07-17 23:21:49'),
-(10, 78449884, '1', '<br />\r\n<b>Warning</b>:  Trying to access array offset on value of type null in <b>C:xampphtdocs\riosystemRestroadminpartialss\\_bookingStatusModal.php</b> on line <b>69</b><br />\r\n', '2024-07-17 23:34:00'),
-(11, 96403933, '1', 'thank u for booking', '2024-07-17 23:35:41'),
-(12, 16959307, '1', 'aa', '2024-07-18 00:36:08'),
-(13, 22050516, '2', 'aaaa', '2024-07-18 00:40:47'),
-(14, 13519839, '1', 'dsgsdg', '2024-07-18 00:42:06'),
-(15, 53691068, '2', 'sdfag', '2024-07-18 00:43:14'),
-(16, 67780820, '2', 'CQ', '2024-07-18 00:44:31'),
-(17, 88620803, '1', 'aaaaaaa', '2024-07-18 00:47:10'),
-(18, 28875714, '1', 'gggg', '2024-07-18 03:30:22');
+
 
 -- --------------------------------------------------------
 
@@ -100,34 +83,6 @@ CREATE TABLE `orders` (
 --
 
 INSERT INTO `orders` (`order_id`, `order_date`, `status`) VALUES
-(1, '2024-07-24 15:38:08', 'Pending'),
-(2, '2024-07-24 15:39:42', 'Pending'),
-(3, '2024-07-24 15:40:04', 'Pending'),
-(4, '2024-07-24 15:41:48', 'Pending'),
-(5, '2024-07-24 15:42:32', 'Pending'),
-(6, '2024-07-24 15:43:48', 'Pending'),
-(7, '2024-07-24 15:49:16', 'Pending'),
-(8, '2024-07-24 15:58:17', 'Pending'),
-(9, '2024-07-24 16:04:32', 'Pending'),
-(10, '2024-07-24 16:08:25', 'Pending'),
-(11, '2024-07-24 16:10:38', 'Pending'),
-(12, '2024-07-24 16:13:23', 'Pending'),
-(13, '2024-07-24 16:13:49', 'Pending'),
-(14, '2024-07-24 16:14:06', 'Paid'),
-(15, '2024-07-24 16:17:31', 'Paid'),
-(16, '2024-07-24 16:22:00', 'Paid'),
-(17, '2024-07-24 16:23:55', 'Paid'),
-(18, '2024-07-24 16:26:19', 'Paid'),
-(19, '2024-07-24 16:29:18', 'Paid'),
-(20, '2024-07-24 16:35:22', 'Paid'),
-(21, '2024-07-24 17:52:53', 'Paid'),
-(22, '2024-07-24 18:01:43', 'Pending'),
-(23, '2024-07-24 18:04:08', 'Pending'),
-(24, '2024-07-24 18:05:55', 'Pending'),
-(25, '2024-07-24 18:06:15', 'Paid'),
-(26, '2024-07-25 06:24:52', 'Paid'),
-(27, '2024-07-25 06:36:48', 'Paid'),
-(28, '2024-07-25 06:43:11', 'Pending');
 
 -- --------------------------------------------------------
 
@@ -286,18 +241,7 @@ CREATE TABLE `rpos_products` (
 --
 
 INSERT INTO `rpos_products` (`prod_id`, `prod_name`, `prod_img`, `prod_price`, `created_at`) VALUES
-(4, 'Aloha pizza', 't.jpeg', '149', '2024-07-10 22:15:48.019279'),
-(7, 'w/ Veggies', 'received_7983281768432512.jpeg', '79', '2024-07-10 22:08:19.931252'),
-(9, 'kamote co', 'h.jpg', '24', '2024-07-24 11:30:46.483059'),
-(54, 'Sizzling Tuna Sisig', 'f.jpeg', '149', '2024-07-10 22:29:53.239489'),
-(79, 'cassava ni jason', 'a.jpg', '150', '2024-07-24 09:16:14.328832'),
-(407, 'Cheese Sandwitch', 'd.jpeg', '69', '2024-07-10 22:05:07.866688'),
-(5025, 'kamote chips', 'a.jpg', '50', '2024-07-24 09:21:20.175306'),
-(6242, 'w/ Bacon Burger', 'j.jpeg', '79', '2024-07-10 22:06:48.061692'),
-(97440, 'French Fries', 'm.jpeg', '59', '2024-07-10 22:28:44.307537'),
-(975411, 'w/ Ham', 'i.jpeg', '79', '2024-07-10 22:07:47.216533'),
-(95866802, 'Meat overload', 'g.jpeg', '200', '2024-07-10 22:18:48.863699'),
-(95866803, 'cassava ni bebe', 'a.jpg', '150', '2024-07-25 06:44:45.753929');
+
 
 --
 -- Indexes for dumped tables
