@@ -17,16 +17,6 @@ $stmt->execute();
 $result = $stmt->get_result();
 $today_sales = $result->fetch_assoc()['total_sales'];
 
-// Get total sales for the past week
-// $sql_week_sales = "SELECT SUM(order_details.prod_price * order_details.quantity) as total_sales
-//                    FROM orders 
-//                    JOIN order_details ON orders.order_id = order_details.order_id 
-//                    WHERE DATE(order_date) >= CURDATE() - INTERVAL 7 DAY";
-// $stmt = $conn->prepare($sql_week_sales);
-// $stmt->execute();
-// $result = $stmt->get_result();
-// $week_sales = $result->fetch_assoc()['total_sales'];
-
 // Get total sales for the past month
 $sql_month_sales = "SELECT SUM(order_details.prod_price * order_details.quantity) as total_sales
                     FROM orders 
@@ -65,8 +55,49 @@ $stmt->execute();
 $result = $stmt->get_result();
 $total_products = $result->fetch_assoc()['total_products'];
 
+// Get monthly sales data for the current year
+$sql_monthly_sales = "SELECT MONTH(order_date) AS month, SUM(order_details.prod_price * order_details.quantity) AS total_sales
+                      FROM orders 
+                      JOIN order_details ON orders.order_id = order_details.order_id 
+                      WHERE YEAR(order_date) = YEAR(CURDATE())
+                      GROUP BY MONTH(order_date)";
+$stmt = $conn->prepare($sql_monthly_sales);
+$stmt->execute();
+$result = $stmt->get_result();
+$monthly_sales_data = [];
+while ($row = $result->fetch_assoc()) {
+    $monthly_sales_data[(int)$row['month']] = $row['total_sales'];
+}
+
 $stmt->close();
+// Get daily sales data for the current week
+$sql_daily_sales = "SELECT DAYOFWEEK(order_date) AS day, SUM(order_details.prod_price * order_details.quantity) AS total_sales
+                    FROM orders 
+                    JOIN order_details ON orders.order_id = order_details.order_id 
+                    WHERE YEARWEEK(order_date, 1) = YEARWEEK(CURDATE(), 1)
+                    GROUP BY DAYOFWEEK(order_date)";
+$stmt = $conn->prepare($sql_daily_sales);
+$stmt->execute();
+$result = $stmt->get_result();
+$daily_sales_data = [];
+while ($row = $result->fetch_assoc()) {
+    $daily_sales_data[(int)$row['day']] = $row['total_sales'];
+}
+// Get monthly bookings data for the current year
+$sql_monthly_bookings = "SELECT MONTH(checkin_date) AS month, COUNT(*) AS total_bookings
+                         FROM reservations
+                         WHERE YEAR(checkin_date) = YEAR(CURDATE())
+                         GROUP BY MONTH(checkin_date)";
+$stmt = $conn->prepare($sql_monthly_bookings);
+$stmt->execute();
+$result = $stmt->get_result();
+$monthly_bookings_data = [];
+while ($row = $result->fetch_assoc()) {
+    $monthly_bookings_data[(int)$row['month']] = $row['total_bookings'];
+}
+
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -101,6 +132,7 @@ $stmt->close();
     <link rel="stylesheet" href="assets/css/plugins.min.css" />
     <link rel="stylesheet" href="assets/css/kaiadmin.min.css" />
     <link rel="stylesheet" href="assets/css/demo.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="wrapper">
@@ -245,7 +277,7 @@ $stmt->close();
                                         </div>
                                         <div class="col col-stats ms-3 ms-sm-0">
                                             <div class="numbers">
-                                                <p class="card-category"  style="color: white;">Total Check-ins</p>
+                                                <p class="card-category"  style="color: white;">Total Check-in</p>
                                                 <h4 class="card-title"  style="color: white;"><?php echo $total_checkins; ?></h4>
                                             </div>
                                         </div>
@@ -253,6 +285,32 @@ $stmt->close();
                                 </div>
                             </div>
                         </div>
+                        <div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <canvas id="monthlySalesChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <canvas id="dailySalesChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="col-md-12">
+    <div class="card">
+        <div class="card-body">
+            <canvas id="monthlyBookingsChart"></canvas>
+        </div>
+    </div>
+</div>
+
+
+
                        
                         <!-- <div class="col-sm-6 col-md-3">
                             <div class="card card-stats card-round">
@@ -276,6 +334,102 @@ $stmt->close();
                     </div>
                 </div>
             </div>
+            <script>
+        // Monthly sales data from PHP
+        const monthlySalesData = <?php echo json_encode($monthly_sales_data); ?>;
+
+        // Prepare data for Chart.js
+        const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const salesData = [];
+        for (let i = 1; i <= 12; i++) {
+            salesData.push(monthlySalesData[i] ? parseFloat(monthlySalesData[i]) : 0);
+        }
+
+        const ctx = document.getElementById('monthlySalesChart').getContext('2d');
+        const myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Total Sales',
+                    data: salesData,
+                    backgroundColor: '#FEA116',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+        // Daily sales data from PHP
+const dailySalesData = <?php echo json_encode($daily_sales_data); ?>;
+
+// Prepare data for Chart.js
+const dailyLabels = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const dailySales = [];
+for (let i = 1; i <= 7; i++) {
+    dailySales.push(dailySalesData[i] ? parseFloat(dailySalesData[i]) : 0);
+}
+
+const ctxDaily = document.getElementById('dailySalesChart').getContext('2d');
+const dailySalesChart = new Chart(ctxDaily, {
+    type: 'bar',
+    data: {
+        labels: dailyLabels,
+        datasets: [{
+            label: 'Total Sales',
+            data: dailySales,
+            backgroundColor: '#FEA116',
+            borderColor: 'rgba(54, 162, 235, 1)',
+            borderWidth: 1
+        }]
+    },
+    options: {
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+ // Monthly bookings data from PHP
+ const monthlyBookingsData = <?php echo json_encode($monthly_bookings_data); ?>;
+
+// Prepare data for Chart.js
+const bookingLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const bookingData = [];
+for (let i = 1; i <= 12; i++) {
+    bookingData.push(monthlyBookingsData[i] ? parseFloat(monthlyBookingsData[i]) : 0);
+}
+
+const ctxBookings = document.getElementById('monthlyBookingsChart').getContext('2d');
+const bookingsChart = new Chart(ctxBookings, {
+    type: 'line',
+    data: {
+        labels: bookingLabels,
+        datasets: [{
+            label: 'Total Bookings',
+            data: bookingData,
+            backgroundColor: '#ff0000',
+            borderColor: '#2a2f5b',
+            borderWidth: 1
+        }]
+    },
+    options: {
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+
+    </script>   
 
             <?php include("include/footer.php") ?>
         </div>
@@ -291,7 +445,7 @@ $stmt->close();
     <script src="assets/js/plugin/chart-circle/circles.min.js"></script>
     <script src="assets/js/plugin/datatables/datatables.min.js"></script>
     <script src="assets/js/kaiadmin.min.js"></script>
-    <script src="assets/js/setting-demo.js"></script>
+    <script src="assets/js/setting-zdemo.js"></script>
     <script src="assets/js/demo.js"></script>
 </body>
 </html>
