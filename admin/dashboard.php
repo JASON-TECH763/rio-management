@@ -382,7 +382,7 @@ const dailySalesChart = new Chart(ctxDaily, {
     data: {
         labels: dailyLabels,
         datasets: [{
-            label: 'Total Sales',
+            label: 'Daily Sales',
             data: dailySales,
             backgroundColor: '#FEA116',
             borderColor: 'rgba(54, 162, 235, 1)',
