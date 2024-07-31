@@ -70,7 +70,7 @@
       }
     </style>
 </head>
-<a href="javascript:history.back()" class="btn btn-light back-button" style="background-color: #1572e8; color: white; padding-left: 2.5rem; padding-right: 2.5rem;">Back</a>
+<a href="javascript:history.back()" class="btn btn-light back-button" style="background-color: #1572e8; color: white;">Back</a>
 <body>
 <section class="vh-100" style="background-color: #2a2f5b; color: white;">
   <div class="container-fluid h-custom">
