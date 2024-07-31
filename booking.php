@@ -290,12 +290,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                             <label for="email">Email</label>
                                         </div>
                                     </div>
-                                     <div class="col-6">
-                                        <div class="form-floating">
-                                           <input type="phone" class="form-control" id="phone" name="phone" placeholder="Phone" required>
-                                            <label for="phone">Phone</label>
-                                        </div>
-                                    </div>
+                                    <div class="col-6">
+                                   <div class="form-floating">
+                                    <input 
+                                     type="tel" 
+                                     class="form-control" 
+                                     id="phone" 
+                                     name="phone" 
+                                     placeholder="Phone" 
+                                     pattern="\d{11}" 
+                                     maxlength="11" 
+                                     required 
+                                    title="Please enter an 11-digit phone number without letters."
+                                      oninput="this.value = this.value.replace(/[^0-9]/g, '');"
+        >
+                                       <label for="phone">Phone</label>
+                                      </div>
+                                  </div>
+
 
                                     <div class="col-md-6">
                                         <div class="form-floating">
