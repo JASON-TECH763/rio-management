@@ -129,6 +129,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 <p><strong>Check-out:</strong> ' . $booking['checkout_date'] . '</p>
                                 <p><strong>Room name:</strong> ' . $booking['r_name'] . '</p>
                                 <p><strong>Amount:</strong> ' . $booking['amount'] . '</p>
+                                 <p><strong>Booking No.:</strong> ' . $booking['booking_id'] . '</p>
+                                
                             </div>
                             <p>Thank you for choosing our GuestHouse.</p>
                             <p>Best regards,<br>Rio Admin</p>
@@ -198,6 +200,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 <p><strong>Check-out:</strong> ' . $booking['checkout_date'] . '</p>
                                 <p><strong>Room name:</strong> ' . $booking['r_name'] . '</p>
                                 <p><strong>Amount:</strong> ' . $booking['amount'] . '</p>
+                                 <p><strong>Booking No.:</strong> ' . $booking['booking_id'] . '</p>
+                                
                             </div>
                             <p>If you have any questions, please contact us.</p>
                             <p>Best regards,<br>Admin</p>
