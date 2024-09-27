@@ -24,7 +24,18 @@
                                 <a href="contact.php" class="nav-item nav-link">Contact</a>
                                 <a href="check_status.php" class="nav-item nav-link">Check Status</a>
                                  
-                                    <a href="admin" class="nav-item nav-link e" >Admin</a>
+                                <li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <!-- Here you can dynamically display the login name -->
+        <span id="loginName">Login</span> 
+    </a>
+    <div class="dropdown-menu" aria-labelledby="userDropdown">
+        <a class="dropdown-item" href="staff">Staff</a>
+        <a class="dropdown-item" href="customer">Customer</a>
+        <a class="dropdown-item" href="admin">Admin</a>
+    </div>
+</li>
+
                                     
                               
                             </div>
