@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 25, 2024 at 02:24 PM
--- Server version: 10.4.28-MariaDB
--- PHP Version: 8.2.4
+-- Generation Time: Sep 27, 2024 at 08:55 AM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -43,7 +43,7 @@ CREATE TABLE `admin` (
 --
 
 INSERT INTO `admin` (`aid`, `fname`, `lname`, `uname`, `email`, `password`, `image`, `date_updated`) VALUES
-(1, 'Jason', 'Cueva', 'admin', 'admin123@gmail.com', '123456', NULL, NULL);
+(1, 'Jason', 'Cueva', 'admin', 'riomanagement123@gmail.com', '123456', NULL, '2024-09-22 13:06:30');
 
 -- --------------------------------------------------------
 
@@ -64,7 +64,34 @@ CREATE TABLE `booking_status` (
 --
 
 INSERT INTO `booking_status` (`id`, `booking_id`, `booking_status`, `remarks`, `created`) VALUES
+(15, 53691068, '2', 'sdfag', '2024-07-18 00:43:14'),
+(16, 67780820, '2', 'CQ', '2024-07-18 00:44:31'),
+(17, 88620803, '1', 'aaaaaaa', '2024-07-18 00:47:10'),
+(18, 28875714, '1', 'gggg', '2024-07-18 03:30:22');
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `customer`
+--
+
+CREATE TABLE `customer` (
+  `id` int(11) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `phone` bigint(11) NOT NULL,
+  `date_created` timestamp NOT NULL DEFAULT current_timestamp(),
+  `verified` tinyint(4) DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `customer`
+--
+
+INSERT INTO `customer` (`id`, `name`, `email`, `password`, `phone`, `date_created`, `verified`) VALUES
+(50, 'Jose Jason Cueva', 'josejasoncueva402@gmail.com', '$2y$10$A5hbC/H.55u5s0bC5slSI.atIzTL3vIYnLbZSUS9/uBByGGFtMdn2', 9887865565, '2024-09-22 18:51:45', 1),
+(52, 'dong', 'fordkylie99@gmail.com', '$2y$10$WwYaEEf1IxH.kcPMb.TFx.ML93nzWndw5eFyhXzQZEGvdXZBYwyIu', 988786554, '2024-09-23 05:44:25', 1);
 
 -- --------------------------------------------------------
 
@@ -83,6 +110,8 @@ CREATE TABLE `orders` (
 --
 
 INSERT INTO `orders` (`order_id`, `order_date`, `status`) VALUES
+(35, '2024-09-16 12:15:33', 'Paid'),
+(36, '2024-09-16 14:54:48', 'Pending');
 
 -- --------------------------------------------------------
 
@@ -104,68 +133,7 @@ CREATE TABLE `order_details` (
 --
 
 INSERT INTO `order_details` (`order_detail_id`, `order_id`, `prod_id`, `prod_name`, `prod_price`, `quantity`) VALUES
-(1, 3, 4, 'Aloha pizza', '149', NULL),
-(2, 3, 7, 'w/ Veggies', '79', NULL),
-(3, 3, 4, 'Aloha pizza', '149', NULL),
-(4, 3, 7, 'w/ Veggies', '79', NULL),
-(5, 3, 7, 'w/ Veggies', '79', NULL),
-(6, 3, 4, 'Aloha pizza', '149', NULL),
-(7, 3, 7, 'w/ Veggies', '79', NULL),
-(8, 3, 4, 'Aloha pizza', '149', NULL),
-(9, 3, 4, 'Aloha pizza', '149', '1'),
-(10, 3, 7, 'w/ Veggies', '79', '1'),
-(11, 3, 7, 'w/ Veggies', '79', '1'),
-(12, 3, 9, 'kamote co', '24', '1'),
-(13, 3, 4, 'Aloha pizza', '149', '1'),
-(14, 3, 4, 'Aloha pizza', '149', '1'),
-(15, 3, 7, 'w/ Veggies', '79', '1'),
-(16, 3, 0, '', '', '1'),
-(17, 3, 4, 'Aloha pizza', '149', '1'),
-(18, 3, 7, 'w/ Veggies', '79', '1'),
-(19, 3, 4, 'Aloha pizza', '149', '1'),
-(20, 4, 5025, 'kamote chips', '50', '1'),
-(21, 4, 9, 'kamote co', '24', '1'),
-(22, 4, 5025, 'kamote chips', '50', '1'),
-(23, 6, 7, 'w/ Veggies', '79', '1'),
-(24, 6, 7, 'w/ Veggies', '79', '1'),
-(25, 7, 975411, 'w/ Ham', '79', '1'),
-(26, 7, 9, 'kamote co', '24', '1'),
-(27, 8, 4, 'Aloha pizza', '149', '2'),
-(28, 8, 4, 'Aloha pizza', '149', '1'),
-(29, 8, 4, 'Aloha pizza', '149', '1'),
-(30, 9, 4, 'Aloha pizza', '149', '2'),
-(31, 9, 7, 'w/ Veggies', '79', '2'),
-(32, 10, 4, 'Aloha pizza', '149', '3'),
-(33, 10, 7, 'w/ Veggies', '79', '2'),
-(34, 11, 54, 'Sizzling Tuna Sisig', '149', '1'),
-(35, 11, 407, 'Cheese Sandwitch', '69', '1'),
-(36, 12, 54, 'Sizzling Tuna Sisig', '149', '2'),
-(37, 12, 4, 'Aloha pizza', '149', '2'),
-(38, 14, 4, 'Aloha pizza', '149', '2'),
-(39, 14, 7, 'w/ Veggies', '79', '3'),
-(40, 15, 4, 'Aloha pizza', '149', '3'),
-(41, 15, 7, 'w/ Veggies', '79', '1'),
-(42, 16, 4, 'Aloha pizza', '149', '3'),
-(43, 17, 4, 'Aloha pizza', '149', '5'),
-(44, 18, 9, 'kamote co', '24', '2'),
-(45, 18, 4, 'Aloha pizza', '149', '3'),
-(46, 19, 4, 'Aloha pizza', '149', '3'),
-(47, 19, 54, 'Sizzling Tuna Sisig', '149', '4'),
-(48, 20, 6242, 'w/ Bacon Burger', '79', '1'),
-(49, 20, 4, 'Aloha pizza', '149', '3'),
-(50, 20, 54, 'Sizzling Tuna Sisig', '149', '1'),
-(51, 20, 407, 'Cheese Sandwitch', '69', '1'),
-(52, 21, 4, 'Aloha pizza', '149', '1'),
-(53, 21, 7, 'w/ Veggies', '79', '1'),
-(54, 22, 975411, 'w/ Ham', '79', '3'),
-(55, 23, 4, 'Aloha pizza', '149', '1'),
-(56, 24, 4, 'Aloha pizza', '149', '2'),
-(57, 25, 4, 'Aloha pizza', '149', '1'),
-(58, 26, 4, 'Aloha pizza', '149', '2'),
-(59, 26, 7, 'w/ Veggies', '79', '4'),
-(60, 26, 54, 'Sizzling Tuna Sisig', '149', '1'),
-(61, 27, 4, 'Aloha pizza', '149', '2'),
-(62, 28, 6242, 'w/ Bacon Burger', '79', '1');
+(67, 35, 95866804, 'd', '34', '2');
 
 -- --------------------------------------------------------
 
@@ -241,7 +209,37 @@ CREATE TABLE `rpos_products` (
 --
 
 INSERT INTO `rpos_products` (`prod_id`, `prod_name`, `prod_img`, `prod_price`, `created_at`) VALUES
+(1, 'Flavored Beer', 'Flavor beer.jpeg', '70', '2024-09-18 06:02:31.092414'),
+(2, 'Hawaiian Pizza Small', 'Hawaiian pizza.jpeg', '149', '2024-09-18 05:32:33.151979'),
+(6, 'Grenade', '451837173_907304558081811_5239184907447010418_n.jpg', '180', '2024-09-18 07:26:58.717920'),
+(8, 'Blue Git', 'j.jpg', '180', '2024-09-18 06:01:32.547378'),
+(52, 'Pancit Bihon', 'Pancit bihon.jpeg', '189', '2024-09-18 05:25:55.615384'),
+(70, 'Hot Silog', 'hot silog.jpeg', '119', '2024-09-18 05:16:01.776840'),
+(77, 'Red Horse', '427770547_401771799170279_5540115988153060509_n.jpg', '140', '2024-09-18 05:21:50.439554'),
+(485, 'Coke Litro', '1l coke.jpg', '60', '2024-09-18 05:31:04.971040'),
+(788, 'w/ Veggies', 'received_7983281768432512.jpeg', '79', '2024-09-18 05:35:38.025140'),
+(30796, 'Pork', 'pork.jpeg', '89', '2024-09-18 06:48:31.119508'),
+(63093, 'Ice Tea Pitcher', 'Ice tea pitcher.jpeg', '60', '2024-09-18 07:26:11.732454'),
+(6908742, 'Yummy Hotdog Medium', 'b.jpeg', '159', '2024-09-18 05:28:57.471844'),
+(8586476, 'Yummy Hotdog Small', 'b.jpeg', '149', '2024-09-18 05:26:54.157595'),
+(600000003, 'Chicken Pastel', 'chicken pastil.jpeg', '89', '2024-09-18 05:13:47.268709'),
+(2147483647, 'Peanut Butter Choco Shake', '450849766_1714368762721890_120875686019331137_n.jpg', '89', '2024-09-18 05:22:47.422189');
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `rpos_staff`
+--
+
+CREATE TABLE `rpos_staff` (
+  `id` int(11) NOT NULL,
+  `staff_name` varchar(255) NOT NULL,
+  `staff_last_name` varchar(255) NOT NULL,
+  `staff_email` varchar(100) NOT NULL,
+  `staff_password` varchar(255) NOT NULL,
+  `staff_gender` enum('Male','Female') NOT NULL,
+  `date_created` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Indexes for dumped tables
@@ -257,6 +255,12 @@ ALTER TABLE `admin`
 -- Indexes for table `booking_status`
 --
 ALTER TABLE `booking_status`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `customer`
+--
+ALTER TABLE `customer`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -291,6 +295,12 @@ ALTER TABLE `rpos_products`
   ADD PRIMARY KEY (`prod_id`);
 
 --
+-- Indexes for table `rpos_staff`
+--
+ALTER TABLE `rpos_staff`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -307,16 +317,22 @@ ALTER TABLE `booking_status`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
+-- AUTO_INCREMENT for table `customer`
+--
+ALTER TABLE `customer`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
+
+--
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
 
 --
 -- AUTO_INCREMENT for table `order_details`
 --
 ALTER TABLE `order_details`
-  MODIFY `order_detail_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=63;
+  MODIFY `order_detail_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=68;
 
 --
 -- AUTO_INCREMENT for table `reservations`
@@ -334,7 +350,13 @@ ALTER TABLE `room`
 -- AUTO_INCREMENT for table `rpos_products`
 --
 ALTER TABLE `rpos_products`
-  MODIFY `prod_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=95866804;
+  MODIFY `prod_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2147483648;
+
+--
+-- AUTO_INCREMENT for table `rpos_staff`
+--
+ALTER TABLE `rpos_staff`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
 -- Constraints for dumped tables
