@@ -41,6 +41,18 @@ $stmt->close();
             border-radius: 10px;
             font-family: Arial, sans-serif;
         }
+        .address-header {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .address-header h2 {
+            margin: 0;
+            font-size: 18px;
+        }
+        .address-header p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
         .receipt h1 {
             text-align: center;
             margin-bottom: 20px;
