@@ -397,8 +397,8 @@ const dailySalesChart = new Chart(ctxDaily, {
         }
     }
 });
- // Monthly bookings data from PHP
- const monthlyBookingsData = <?php echo json_encode($monthly_bookings_data); ?>;
+  // Monthly bookings data from PHP
+const monthlyBookingsData = <?php echo json_encode($monthly_bookings_data); ?>;
 
 // Prepare data for Chart.js
 const bookingLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -423,7 +423,13 @@ const bookingsChart = new Chart(ctxBookings, {
     options: {
         scales: {
             y: {
-                beginAtZero: true
+                beginAtZero: true,
+                ticks: {
+                    callback: function(value) {
+                        return Number.isInteger(value) ? value : null;
+                    },
+                    stepSize: 1
+                }
             }
         }
     }
