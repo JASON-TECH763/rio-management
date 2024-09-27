@@ -87,6 +87,7 @@ $stmt->close();
 <body>
     <div class="receipt">
         <!-- Address Header Section -->
+         <center>
         <div class="address-header">
         <img src="assets/img/a.jpg" alt="navbar brand" class="navbar-brand" height="70">
             <h2>RIO MANAGEMENT</h2>
@@ -95,7 +96,7 @@ $stmt->close();
             <p>Phone: (123) 456-7890</p>
             <p>Email: riomanagement123@gmail.com</p>
         </div>
-
+    </center>
         <table>
             <thead>
                 <tr>
