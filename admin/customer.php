@@ -1,29 +1,33 @@
-<?php
+<?php 
 session_start();
 include("config/connect.php");
 
-if (isset($_GET['delete'])) {
-    // Assuming $conn is your database connection object
+// Ensure $conn is a valid MySQLi connection object
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
 
-    // Sanitize the input to avoid SQL injection (assuming $conn is a PDO object)
+if (isset($_GET['delete'])) {
+    // Sanitize the input to avoid SQL injection
     $customer_id = htmlspecialchars($_GET['delete']);
 
     // Prepare the SQL statement with a placeholder for the ID
-    $sql = "DELETE FROM rpos_customers WHERE customer_id = ?";
+    $sql = "DELETE FROM customer WHERE id = ?";
 
     // Prepare the statement
     $stmt = $conn->prepare($sql);
 
-    // Bind the parameter (ID)
-    $stmt->bind_param('i', $customer_id); // Assuming 'i' for integer type of ID
+    if ($stmt) {
+        // Bind the parameter (ID)
+        $stmt->bind_param('i', $customer_id);
 
-    // Execute the statement
-    if ($stmt->execute()) {
-         echo '<script>
+        // Execute the statement
+        if ($stmt->execute()) {
+            echo '<script>
                     window.onload = function() {
                         Swal.fire({
                             title: "Success!",
-                            text: "Data Deleted successfully",
+                            text: "Customer deleted successfully.",
                             icon: "success"
                         }).then((result) => {
                             if (result.isConfirmed) {
@@ -32,45 +36,41 @@ if (isset($_GET['delete'])) {
                         });
                     };
                   </script>';
-                    
-    } else {
-        echo '<script>
+        } else {
+            echo '<script>
                     window.onload = function() {
                         Swal.fire({
                             title: "Error!",
-                            text: "Failed to delete the data.",
+                            text: "Failed to delete the customer. ' . $stmt->error . '",
                             icon: "error"
                         });
                     };
                   </script>';
+        }
+
+        // Close the statement
+        $stmt->close();
+    } else {
+        echo '<script>
+                window.onload = function() {
+                    Swal.fire({
+                        title: "Error!",
+                        text: "Failed to prepare the SQL statement.",
+                        icon: "error"
+                    });
+                };
+              </script>';
     }
-
-    // Close the statement
-    $stmt->close();
-} else {
-    echo "No delete parameter provided";
-}
-
-
-
-
-
-
+} 
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <title>Rio Management System</title>
-    <meta
-      content="width=device-width, initial-scale=1.0, shrink-to-fit=no"
-      name="viewport"
-    />
-    <link
-      rel="icon"
-      href="assets/img/a.jpg"
-      type="image/x-icon"
-    />
+    <meta content="width=device-width, initial-scale=1.0, shrink-to-fit=no" name="viewport"/>
+    <link rel="icon" href="assets/img/a.jpg" type="image/x-icon"/>
 
     <!-- Fonts and icons -->
     <script src="assets/js/plugin/webfont/webfont.min.js"></script>
@@ -96,16 +96,14 @@ if (isset($_GET['delete'])) {
     <link rel="stylesheet" href="assets/css/bootstrap.min.css" />
     <link rel="stylesheet" href="assets/css/plugins.min.css" />
     <link rel="stylesheet" href="assets/css/kaiadmin.min.css" />
-<link rel="stylesheet" href="assets/css/demo.css" />
-   
-  </head>
-  <body>
-    <div class="wrapper">
-      <!-- Sidebar -->
-      <?php include("include/sidenavigation.php");?>
+    <link rel="stylesheet" href="assets/css/demo.css" />
+</head>
+<body>
+<div class="wrapper">
+    <!-- Sidebar -->
+    <?php include("include/sidenavigation.php");?>
 
-      <div class="main-panel">
-        
+    <div class="main-panel">
         <?php include("include/header.php");?>
 
         <div class="container">
@@ -115,20 +113,14 @@ if (isset($_GET['delete'])) {
                 <h3 class="fw-bold mb-3">Customer List</h3>
                 <h6 class="op-7 mb-2">Information</h6>
               </div>
-            
-              </div>
             </div>
+          </div>
           <div class="row">
               <div class="col-md-12">
                 <div class="card">
                   <div class="card-header">
-                    
-                     <div class="d-flex align-items-center">
-                      <h4 class="card-title">Manage Customer</h4>
-<!--                       <button onclick="location.href='add-room.php'" class="btn btn-primary btn-round ms-auto">
-                        <i class="fa fa-plus"></i>
-                        Add Room
-                      </button> -->
+                    <div class="d-flex align-items-center">
+                      <h4 class="card-title mb-0">Manage Customers</h4>
                     </div>
                   </div>
                   <div class="card-body">
@@ -138,180 +130,92 @@ if (isset($_GET['delete'])) {
                         class="display table table-striped table-hover" style="width: 100%;">
                         <thead>
                           <tr>
-                                        <th>#</th>
-                                        <!-- <th>Booking No.</th> -->
-                                        <th>Name</th>
-                                        
-                                        
-                                        
-                                       
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                 
-                                   <?php
-                                    $sql = "SELECT customer_id, customer_name FROM rpos_customers";
-                                    $result = $conn->query($sql);
-                                    $cnt = 1;
-                                    if ($result->num_rows > 0) {
-  // output data of each row
-                                    while($row = $result->fetch_assoc()) {
-
-                                    ?>
-                <tr>
-                    <td><?php echo $cnt; ?></td>
-                    <td><?php echo $row['customer_name']; ?></td>
-                    
-                   
-                    
-                    
-                   
-                         
-                    <td>
-                        <div class="btn-group dropstart">
-                        <button
-                          type="button"
-                          class="btn btn-primary btn-border dropdown-toggle"
-                          data-bs-toggle="dropdown"
-                          aria-haspopup="true"
-                          aria-expanded="false"
-                        >
-                          Action
-                        </button>
-                        <ul class="dropdown-menu" role="menu">
-                          <li>
-                            <a class="dropdown-item" href="update_room.php?id=<?php echo $row['id']; ?>"
-                              ><button class="btn btn-info btn-sm"><i class="fa fa-info"></i> Edit</button></a>
-                            
-                            <div class="dropdown-divider"></div>
-                       
-                           
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="customer.php?delete=<?php echo $row['customer_id']; ?>"
-                              ><button type="submit" class="btn btn-danger btn-sm"><i class="fa fa-times"></i> Delete</button></a>
-                          </li>
-                        </ul>
-                      </div>
-                           
-
-                    </td>
-                </tr>
-                <?php  $cnt = $cnt+1; } } $conn->close(); ?>
-            
-
-                        
-                       
-                                </tbody>
-                            </table>
+                            <th>#</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Action</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <?php
+                          // Change to customer table query to show only verified customers
+                          $sql = "SELECT id, name, email, phone FROM customer WHERE verified = 1";
+                          $result = $conn->query($sql);
+                          $cnt = 1;
+                          if ($result->num_rows > 0) {
+                              while ($row = $result->fetch_assoc()) {
+                          ?>
+                              <tr>
+                                  <td><?php echo $cnt; ?></td>
+                                  <td><?php echo $row['name']; ?></td>
+                                  <td><?php echo $row['email']; ?></td>
+                                  <td><?php echo $row['phone']; ?></td>
+                                  <td>
+                                      <div class="btn-group dropstart">
+                                      <button
+                                        type="button"
+                                        class="btn btn-primary btn-border dropdown-toggle"
+                                        data-bs-toggle="dropdown"
+                                        aria-haspopup="true"
+                                        aria-expanded="false"
+                                      >
+                                        Action
+                                      </button>
+                                      <ul class="dropdown-menu" role="menu">
+                                        <li>
+                                        <a class="dropdown-item" href="update_customer.php?id=<?php echo $row['id']; ?>">
+                                        <button class="btn btn-info btn-sm"><i class="fa fa-info"></i> Edit</button></a>
+                                          <div class="dropdown-divider"></div>
+                                          <a class="dropdown-item" href="customer.php?delete=<?php echo $row['id']; ?>">
+                                            <button type="button" class="btn btn-danger btn-sm"><i class="fa fa-times"></i> Delete</button></a>
+                                        </li>
+                                      </ul>
+                                    </div>
+                                  </td>
+                              </tr>
+                          <?php
+                              $cnt++;
+                              }
+                          } else {
+                              echo '<tr><td colspan="5">No verified customers found.</td></tr>';
+                          }
+                          $conn->close();
+                          ?>
+                        </tbody>
+                    </table>
                     </div>
                   </div>
                 </div>
               </div>
-           
-     
-      </div>
- <?php include("include/footer.php");?>
-        
-      <!-- Custom template | don't include it in your project! -->
-    
-      <!-- End Custom template -->
+          </div>
+          <?php include("include/footer.php");?>
     </div>
 </div>
 </div>
-    <!--   Core JS Files   -->
-    <script src="assets/js/core/jquery-3.7.1.min.js"></script>
-    <script src="assets/js/core/popper.min.js"></script>
-    <script src="assets/js/core/bootstrap.min.js"></script>
 
-    <!-- jQuery Scrollbar -->
-    <script src="assets/js/plugin/jquery-scrollbar/jquery.scrollbar.min.js"></script>
+<!--   Core JS Files   -->
+<script src="assets/js/core/jquery-3.7.1.min.js"></script>
+<script src="assets/js/core/popper.min.js"></script>
+<script src="assets/js/core/bootstrap.min.js"></script>
 
-    <!-- Chart JS -->
-    <script src="assets/js/plugin/chart.js/chart.min.js"></script>
+<!-- jQuery Scrollbar -->
+<script src="assets/js/plugin/jquery-scrollbar/jquery.scrollbar.min.js"></script>
 
-    <!-- jQuery Sparkline -->
-    <script src="assets/js/plugin/jquery.sparkline/jquery.sparkline.min.js"></script>
+<!-- Datatables -->
+<script src="assets/js/plugin/datatables/datatables.min.js"></script>
 
-    <!-- Chart Circle -->
-    <script src="assets/js/plugin/chart-circle/circles.min.js"></script>
+<!-- Sweet Alert -->
+<script src="assets/js/plugin/sweetalert/sweetalert.min.js"></script>
 
-    <!-- Datatables -->
-    <script src="assets/js/plugin/datatables/datatables.min.js"></script>
+<!-- Kaiadmin JS -->
+<script src="assets/js/kaiadmin.min.js"></script>
 
-    <!-- Bootstrap Notify -->
-   
+<script>
+  $(document).ready(function () {
+    $("#basic-datatables").DataTable({});
+  });
+</script>
 
-    <!-- jQuery Vector Maps -->
-    <script src="assets/js/plugin/jsvectormap/jsvectormap.min.js"></script>
-    <script src="assets/js/plugin/jsvectormap/world.js"></script>
-
-    <!-- Sweet Alert -->
-    <script src="assets/js/plugin/sweetalert/sweetalert.min.js"></script>
-
-    <!-- Kaiadmin JS -->
-    <script src="assets/js/kaiadmin.min.js"></script>
-
-    <!-- Kaiadmin DEMO methods, don't include it in your project! -->
-   
-    <script src="assets/js/sweetalert.js"></script>
-    <script>
-      $(document).ready(function () {
-        $("#basic-datatables").DataTable({});
-
-        $("#multi-filter-select").DataTable({
-          pageLength: 5,
-          initComplete: function () {
-            this.api()
-              .columns()
-              .every(function () {
-                var column = this;
-                var select = $(
-                  '<select class="form-select"><option value=""></option></select>'
-                )
-                  .appendTo($(column.footer()).empty())
-                  .on("change", function () {
-                    var val = $.fn.dataTable.util.escapeRegex($(this).val());
-
-                    column
-                      .search(val ? "^" + val + "$" : "", true, false)
-                      .draw();
-                  });
-
-                column
-                  .data()
-                  .unique()
-                  .sort()
-                  .each(function (d, j) {
-                    select.append(
-                      '<option value="' + d + '">' + d + "</option>"
-                    );
-                  });
-              });
-          },
-        });
-
-        // Add Row
-        $("#add-row").DataTable({
-          pageLength: 5,
-        });
-
-        var action =
-          '<td> <div class="form-button-action"> <button type="button" data-bs-toggle="tooltip" title="" class="btn btn-link btn-primary btn-lg" data-original-title="Edit Task"> <i class="fa fa-edit"></i> </button> <button type="button" data-bs-toggle="tooltip" title="" class="btn btn-link btn-danger" data-original-title="Remove"> <i class="fa fa-times"></i> </button> </div> </td>';
-
-        $("#addRowButton").click(function () {
-          $("#add-row")
-            .dataTable()
-            .fnAddData([
-              $("#addName").val(),
-              $("#addPosition").val(),
-              $("#addOffice").val(),
-              action,
-            ]);
-          $("#addRowModal").modal("hide");
-        });
-      });
-    </script>
-
-  </body>
+</body>
 </html>
