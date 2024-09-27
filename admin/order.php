@@ -2,6 +2,11 @@
 session_start();
 include("config/connect.php");
 
+if (!isset($_SESSION['uname'])) {
+    header("location:index.php");
+    exit();
+  }
+
 // Initialize the orders session if not set
 if (!isset($_SESSION['orders'])) {
     $_SESSION['orders'] = [];

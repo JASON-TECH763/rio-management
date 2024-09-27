@@ -2,6 +2,11 @@
 session_start();
 include("config/connect.php");
 
+if (!isset($_SESSION['uname'])) {
+  header("location:index.php");
+  exit();
+}
+
 // Ensure $conn is a valid MySQLi connection object
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
