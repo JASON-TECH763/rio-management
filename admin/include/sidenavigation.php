@@ -61,6 +61,21 @@
                  
                 </a>
               </li>
+              </li>
+              <li class="nav-item">
+                <a  href="staff.php">
+                  <i class="fas fa-user-secret"></i>
+                  <p>Manage Staff</p>
+                 
+                </a>
+              </li>
+              <li class="nav-item">
+                <a  href="customer.php">
+                  <i class="fas fa-user"></i>
+                  <p>Manage Customer</p>
+                 
+                </a>
+              </li>
               <!--  <li class="nav-item">
                 <a  href="customer.php">
                   <i class="fas fa-users"></i>
