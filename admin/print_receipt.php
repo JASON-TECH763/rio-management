@@ -2,11 +2,6 @@
 session_start();
 include("config/connect.php");
 
-if (!isset($_SESSION['uname'])) {
-    header("location:index.php");
-    exit();
-  }
-
 if (!isset($_GET['order_id']) || !isset($_GET['payment_amount']) || !isset($_GET['change'])) {
     die("Invalid request.");
 }
