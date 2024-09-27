@@ -74,7 +74,16 @@ $stmt->close();
 </head>
 <body>
     <div class="receipt">
-        <h1>Receipt</h1>
+        <!-- Address Header Section -->
+        <div class="address-header">
+        <img src="assets/img/a.jpg" alt="navbar brand" class="navbar-brand" height="70">
+            <h2>RIO MANAGEMENT</h2>
+       
+            <p>Poblacion, Madridejos, Cebu</p>
+            <p>Phone: (123) 456-7890</p>
+            <p>Email: riomanagement123@gmail.com</p>
+        </div>
+
         <table>
             <thead>
                 <tr>
