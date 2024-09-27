@@ -129,7 +129,7 @@ if (isset($_POST['place_order'])) {
                             <div class="d-flex align-items-center">
                                 
                                <form method="post" action="">
-                                <button type="submit" name="place_order" class="btn btn-primary"> <i class="fas fa-cart-plus" ></i> Place Order</button>
+                                <button type="submit" name="place_order" class="btn btn-primary"> <i class="fas fa-cart-plus" ></i> Reserve Order</button>
 
                             </form>
                             </div>
