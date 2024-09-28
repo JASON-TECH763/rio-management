@@ -199,24 +199,7 @@ if (isset($_GET['delete'])) {
 // Close connection
 $conn->close();
 ?>
-<?php
-session_start();
-include("config/connect.php");
 
-// Initialize the counter
-$cnt = 1;
-
-// Fetch bookings from the database
-$sql = "SELECT id, booking_id, checkin_date, checkout_date, r_name, amount, first_name, last_name, email, phone, country, payment, status FROM reservations ORDER BY created_at DESC";
-$result = $conn->query($sql);
-
-$bookings = array();
-if ($result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
-        $bookings[] = $row;
-    }
-}
-?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
