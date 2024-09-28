@@ -48,10 +48,7 @@ if (isset($_GET['delete'])) {
 
     // Close the statement
     $stmt->close();
-} else {
-    echo "No delete parameter provided";
-}
-
+} 
 
 
 
