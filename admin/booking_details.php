@@ -56,13 +56,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $mail->isSMTP();                                            // Send using SMTP
             $mail->Host       = 'smtp.gmail.com';                        // Set the SMTP server to send through
             $mail->SMTPAuth   = true;                                   // Enable SMTP authentication
-            $mail->Username   = getenv('riomanagement123@gmail.com';)                 // SMTP username
-            $mail->Password   = getenv('vilenbrazfimbkbl';)                        // SMTP password
+            $mail->Username   = 'riomanagement123@gmail.com';                // SMTP username
+            $mail->Password   = 'vilenbrazfimbkbl';                        // SMTP password
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;         // Enable TLS encryption; `PHPMailer::ENCRYPTION_SMTPS` also accepted
             $mail->Port       = 465;                                    // TCP port to connect to
 
             // Recipients
-            $mail->setFrom(getenv('riomanagement123@gmail.com'), 'RMS-Admin');
+            $mail->setFrom('riomanagement123@gmail.com', 'RMS-Admin');
             $mail->addAddress($booking['email'], htmlspecialchars ($booking['first_name'].''.$booking['last_name']));    // Add a recipient
 
             // Email content
