@@ -56,14 +56,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $mail->isSMTP();                                            // Send using SMTP
             $mail->Host       = 'smtp.gmail.com';                        // Set the SMTP server to send through
             $mail->SMTPAuth   = true;                                   // Enable SMTP authentication
-            $mail->Username   = 'riomanagement123@gmail.com';                  // SMTP username
-            $mail->Password   = 'vilenbrazfimbkbl';                        // SMTP password
+            $mail->Username   = getenv('riomanagement123@gmail.com';)                 // SMTP username
+            $mail->Password   = getenv('vilenbrazfimbkbl';)                        // SMTP password
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;         // Enable TLS encryption; `PHPMailer::ENCRYPTION_SMTPS` also accepted
             $mail->Port       = 465;                                    // TCP port to connect to
 
             // Recipients
-            $mail->setFrom('riomanagement123@gmail.com', 'RMS-Admin');
-            $mail->addAddress($booking['email'], $booking['first_name'].''.$booking['last_name']);    // Add a recipient
+            $mail->setFrom(getenv('riomanagement123@gmail.com'), 'RMS-Admin');
+            $mail->addAddress($booking['email'], htmlspecialchars ($booking['first_name'].''.$booking['last_name']));    // Add a recipient
 
             // Email content
             $mail->isHTML(true);                                        // Set email format to HTML
@@ -121,15 +121,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 <img src="localhost://RIO/admin/assets/img/a.jpg" alt="Logo">
                             </div>
                             <h2>Booking Confirmed</h2>
-                            <p>Dear ' . $booking['first_name'] .''.$booking['last_name']. ',</p>
+                            <p>Dear ' .  htmlspecialchars($booking['first_name'] .''.$booking['last_name']). ',</p>
                             <p>Your booking has been confirmed. We look forward to welcoming you!</p>
                             <div class="booking-details">
                                 <p><strong>Booking Details:</strong></p>
-                                <p><strong>Check-in:</strong> ' . $booking['checkin_date'] . '</p>
-                                <p><strong>Check-out:</strong> ' . $booking['checkout_date'] . '</p>
-                                <p><strong>Room name:</strong> ' . $booking['r_name'] . '</p>
-                                <p><strong>Amount:</strong> ' . $booking['amount'] . '</p>
-                                 <p><strong>Booking No.:</strong> ' . $booking['booking_id'] . '</p>
+                                <p><strong>Check-in:</strong> ' .  htmlspecialchars($booking['checkin_date']) . '</p>
+                                <p><strong>Check-out:</strong> ' .  htmlspecialchars($booking['checkout_date']) . '</p>
+                                <p><strong>Room name:</strong> ' .  htmlspecialchars($booking['r_name']) . '</p>
+                                <p><strong>Amount:</strong> ' .  htmlspecialchars($booking['amount']) . '</p>
+                                 <p><strong>Booking No.:</strong> ' .  htmlspecialchars($booking['booking_id']) . '</p>
                                 
                             </div>
                             <p>Thank you for choosing our GuestHouse.</p>
@@ -192,15 +192,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                <img src="localhost://RIO/admin/assets/img/a.jpg" alt="Logo">
                             </div>
                             <h2>Booking Rejected</h2>
-                            <p>Dear ' . $booking['first_name'] .''.$booking['last_name']. ',</p>
+                            <p>Dear ' .  htmlspecialchars($booking['first_name'] .''.$booking['last_name']). ',</p>
                             <p>We regret to inform you that your booking has been rejected.</p>
                             <div class="booking-details">
                                 <p><strong>Booking Details:</strong></p>
-                                <p><strong>Check-in:</strong> ' . $booking['checkin_date'] . '</p>
-                                <p><strong>Check-out:</strong> ' . $booking['checkout_date'] . '</p>
-                                <p><strong>Room name:</strong> ' . $booking['r_name'] . '</p>
-                                <p><strong>Amount:</strong> ' . $booking['amount'] . '</p>
-                                 <p><strong>Booking No.:</strong> ' . $booking['booking_id'] . '</p>
+                                <p><strong>Check-in:</strong> ' .  htmlspecialchars($booking['checkin_date']) . '</p>
+                                <p><strong>Check-out:</strong> ' .  htmlspecialchars($booking['checkout_date']) . '</p>
+                                <p><strong>Room name:</strong> ' .  htmlspecialchars($booking['r_name']) . '</p>
+                                <p><strong>Amount:</strong> ' .  htmlspecialchars($booking['amount']) . '</p>
+                                 <p><strong>Booking No.:</strong> ' .  htmlspecialchars($booking['booking_id']) . '</p>
                                 
                             </div>
                             <p>If you have any questions, please contact us.</p>
@@ -405,15 +405,13 @@ if (isset($_GET['delete']))   {
                                  
                                     <?php foreach ($bookings as $booking): ?>
                 <tr>
-                    <td><?php echo $cnt; ?></td>
-                  
-                    <td><?php echo $booking['checkin_date']; ?></td>
-                    <td><?php echo $booking['checkout_date']; ?></td>
-                    <td><?php echo $booking['r_name']; ?></td>
-                    <td><?php echo $booking['amount']; ?></td>
-                    <td><?php echo $booking['first_name'].' '.$booking['last_name']; ?></td>
-                    <td><?php echo $booking['email']; ?></td>
-                   
+              <td><?php echo htmlspecialchars($cnt); ?></td>
+              <td><?php echo htmlspecialchars($booking['checkin_date']); ?></td>
+              <td><?php echo htmlspecialchars($booking['checkout_date']); ?></td>
+              <td><?php echo htmlspecialchars($booking['r_name']); ?></td>
+              <td><?php echo htmlspecialchars($booking['amount']); ?></td>
+              <td><?php echo htmlspecialchars($booking['first_name'].' '.$booking['last_name']); ?></td>
+              <td><?php echo htmlspecialchars($booking['email']); ?></td>
                     
                     
                     <td >
