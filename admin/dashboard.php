@@ -351,7 +351,7 @@ while ($row = $result->fetch_assoc()) {
             data: {
                 labels: labels,
                 datasets: [{
-                    label: 'Total Sales',
+                    label: 'Monthly Sales',
                     data: salesData,
                     backgroundColor: '#FEA116',
                     borderColor: 'rgba(75, 192, 192, 1)',
@@ -366,7 +366,7 @@ while ($row = $result->fetch_assoc()) {
                 }
             }
         });
-           // Daily sales data from PHP
+        // Daily sales data from PHP
 const dailySalesData = <?php echo json_encode($daily_sales_data); ?>;
 
 // Prepare data for Chart.js
@@ -398,7 +398,8 @@ const dailySalesChart = new Chart(ctxDaily, {
     }
 });
 
-  // Monthly bookings data from PHP
+
+ // Monthly bookings data from PHP
 const monthlyBookingsData = <?php echo json_encode($monthly_bookings_data); ?>;
 
 // Prepare data for Chart.js
@@ -435,6 +436,7 @@ const bookingsChart = new Chart(ctxBookings, {
         }
     }
 });
+
 
     </script>   
 
