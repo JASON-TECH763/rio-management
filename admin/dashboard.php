@@ -366,14 +366,14 @@ while ($row = $result->fetch_assoc()) {
                 }
             }
         });
-        // Daily sales data from PHP
+           // Daily sales data from PHP
 const dailySalesData = <?php echo json_encode($daily_sales_data); ?>;
 
 // Prepare data for Chart.js
 const dailyLabels = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 const dailySales = [];
 for (let i = 1; i <= 7; i++) {
-    dailySales.push(dailySalesData[i] ? parseFloat(dailySalesData[i]) : 0);
+    dailySales.push(dailySalesData[i] ? Math.round(dailySalesData[i]) : 0); // Convert to whole numbers
 }
 
 const ctxDaily = document.getElementById('dailySalesChart').getContext('2d');
@@ -392,11 +392,12 @@ const dailySalesChart = new Chart(ctxDaily, {
     options: {
         scales: {
             y: {
-                beginAtZero: true
+                beginAtZero: true, // Start y-axis at 0
             }
         }
     }
 });
+
   // Monthly bookings data from PHP
 const monthlyBookingsData = <?php echo json_encode($monthly_bookings_data); ?>;
 
