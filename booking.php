@@ -2,20 +2,40 @@
 session_start();
 include('config/connect.php');
 
+header("Content-Security-Policy: default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; img-src 'self' data:;");
+
+// At the start of the session
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
+// In the form
+?>
+<input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+<?php
+
+// Before processing the form submission
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    if (!hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+        die('Invalid CSRF token');
+    }
+    // Proceed with booking processing
+}
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $booking_id = mt_rand(10000000,99999999);
-    $checkin_date = $_POST['checkin_date'];
-    $checkout_date = $_POST['checkout_date'];
-    $r_name = $_POST['r_name'];
-    $amount = $_POST['amount'];
+    $checkin_date = htmlspecialchars($_POST['checkin_date'], ENT_QUOTES, 'UTF-8');
+    $checkout_date = htmlspecialchars($_POST['checkout_date'], ENT_QUOTES, 'UTF-8');
+    $r_name = htmlspecialchars($_POST['r_name'], ENT_QUOTES, 'UTF-8');
+    $amount = htmlspecialchars($_POST['amount'], ENT_QUOTES, 'UTF-8');
     
-    $first_name = $_POST['first_name'];
-    $last_name = $_POST['last_name'];
-    $email = $_POST['email'];
-    $phone = $_POST['phone'];
-    $country = $_POST['country'];
-    $payment = $_POST['payment'];
-
+    $first_name = htmlspecialchars($_POST['first_name'], ENT_QUOTES, 'UTF-8');
+    $last_name = htmlspecialchars($_POST['last_name'], ENT_QUOTES, 'UTF-8');
+    $email = htmlspecialchars($_POST['email'], ENT_QUOTES, 'UTF-8');
+    $phone = htmlspecialchars($_POST['phone'], ENT_QUOTES, 'UTF-8');
+    $country = htmlspecialchars($_POST['country'], ENT_QUOTES, 'UTF-8');
+    $payment = htmlspecialchars($_POST['payment'], ENT_QUOTES, 'UTF-8');
+    
    // $sql="insert into reservations (booking_id,checkin_date,checkout_date,amount,title,first_name,last_name,email,phone,country,payment) values('$booking_id','$checkin_date','$checkout_date','$amount','$title','$first_name','$last_name','$email','$phone','$country','$payment')";
 
    $sql = "INSERT INTO reservations (booking_id, checkin_date, checkout_date, r_name, amount, first_name, last_name , email, phone, country, payment, status)
@@ -382,6 +402,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 
   <script>
+
         function calculateAmount() {
            
             var guestCountSingle = parseInt(document.getElementById("guest-count-single").value);
@@ -447,6 +468,46 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         document.onselectstart = function (e) {
             e.preventDefault();
         };
+</script>
+<script>
+document.querySelector('form').addEventListener('submit', function(e) {
+    var checkinDate = document.getElementById("checkin_date").value;
+    var checkoutDate = document.getElementById("checkout_date").value;
+    var email = document.getElementById("email").value;
+    var phone = document.getElementById("phone").value;
+
+    if (new Date(checkinDate) >= new Date(checkoutDate)) {
+        e.preventDefault();
+        Swal.fire({
+            title: "Error!",
+            text: "Check-out date must be after check-in date.",
+            icon: "error"
+        });
+        return false;
+    }
+
+    var emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailPattern.test(email)) {
+        e.preventDefault();
+        Swal.fire({
+            title: "Error!",
+            text: "Please enter a valid email address.",
+            icon: "error"
+        });
+        return false;
+    }
+
+    var phonePattern = /^\d{11}$/;
+    if (!phonePattern.test(phone)) {
+        e.preventDefault();
+        Swal.fire({
+            title: "Error!",
+            text: "Please enter a valid 11-digit phone number.",
+            icon: "error"
+        });
+        return false;
+    }
+});
 </script>
 </body>
 
