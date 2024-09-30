@@ -9,8 +9,6 @@ if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
-
-
 // Before processing the form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Check if the CSRF token is present in the form submission
@@ -21,6 +19,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } else {
         die('CSRF token missing');
     }
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $booking_id = mt_rand(10000000,99999999);
     $checkin_date = htmlspecialchars($_POST['checkin_date'], ENT_QUOTES, 'UTF-8');
