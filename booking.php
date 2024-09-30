@@ -9,20 +9,18 @@ if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
-// In the form
-?>
-<input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
-<?php
+
 
 // Before processing the form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    if (!hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
-        die('Invalid CSRF token');
+    // Check if the CSRF token is present in the form submission
+    if (isset($_POST['csrf_token'])) {
+        if (!hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+            die('Invalid CSRF token');
+        }
+    } else {
+        die('CSRF token missing');
     }
-} else {
-    die('CSRF token missing');
-}
-
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $booking_id = mt_rand(10000000,99999999);
     $checkin_date = htmlspecialchars($_POST['checkin_date'], ENT_QUOTES, 'UTF-8');
