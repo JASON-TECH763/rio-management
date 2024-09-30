@@ -19,6 +19,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } else {
         die('CSRF token missing');
     }
+}
+
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $booking_id = mt_rand(10000000,99999999);
