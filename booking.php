@@ -19,7 +19,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } else {
         die('CSRF token missing');
     }
-}
 
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -76,7 +75,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 }
 
-
+}
 ?>
 
 
