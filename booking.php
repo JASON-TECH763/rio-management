@@ -19,7 +19,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (!hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
         die('Invalid CSRF token');
     }
-    // Proceed with booking processing
+} else {
+    die('CSRF token missing');
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -268,6 +269,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <div class="col-lg-4">
                         <div class="wow fadeInUp" data-wow-delay="0.2s">
                             <form method="POST">
+                            <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
                                 <div class="row g-3">
                                      <div class="form-floating">
                                             <input type="date" name="checkin_date" class="form-control" id="checkin_date" placeholder="Check-in Date" value="<?php echo date('Y-m-d'); ?>" min="<?php echo date('Y-m-d'); ?>" required>
@@ -357,6 +359,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     </div>
                                 </div>
                             </form>
+                            
                         </div>
                     </div>
 
