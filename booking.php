@@ -358,14 +358,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                    
                                     <div class="col-md-6">
                                         <div class="form-floating">
-                                           <input type="text" class="form-control" id="fname" name="first_name" placeholder="Enter Firstname"  required>
-                                            <label for="first_name">First Name</label>
+                                        <input type="text" class="form-control" id="fname" name="first_name" placeholder="Enter Firstname" required oninput="validateInput()" pattern="[A-Za-z\s'-]+">
+                                        <label for="first_name">First Name</label>
                                         </div>
                                     </div>
                                     <div class="col-6">
                                          <div class="form-floating">
-                                           <input type="text" class="form-control" id="lname" name="last_name" placeholder="Enter Lastname"  required>
-                                            <label for="last_name">Last Name</label>
+                                         <input type="text" class="form-control" id="lname" name="last_name" placeholder="Enter Lastname" required oninput="validateInputs()" pattern="[A-Za-z\s'-]+">
+                                         <label for="last_name">Last Name</label>
                                         </div>
                                     </div>
                                     <div class="col-12">
