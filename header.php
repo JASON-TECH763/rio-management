@@ -30,8 +30,8 @@
         <span id="loginName">Login</span> 
     </a>
     <div class="dropdown-menu" aria-labelledby="userDropdown">
-        <a class="dropdown-item" href="staff">Staff</a>
-        <a class="dropdown-item" href="customer">Customer</a>
+        <!-- <a class="dropdown-item" href="staff">Staff</a>
+        <a class="dropdown-item" href="customer">Customer</a>-->
         <a class="dropdown-item" href="admin">Admin</a>
     </div>
 </li>
