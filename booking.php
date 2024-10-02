@@ -357,7 +357,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     </div>
                                    
                                    
-                                    
+                                    <div class="col-6">
                                     <div class="form-floating">
         <input type="text" class="form-control" id="fname" name="first_name" placeholder="Enter Firstname" required oninput="validateInput()" pattern="[A-Za-z\s'-]+">
                         <label for="first_name">First Name</label>
