@@ -50,9 +50,6 @@ if (isset($_GET['delete'])) {
     $stmt->close();
 }
 
-
-
-
 ?>
 
 
