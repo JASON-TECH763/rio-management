@@ -170,9 +170,9 @@ if (isset($_POST['place_order'])) {
                                             <td><?php echo htmlspecialchars($row['prod_price'], ENT_QUOTES, 'UTF-8'); ?></td>
                                             <td>
                                                  <form method="POST" action="">
-                                                            <input type="hidden" name="prod_id" value="<?php echo $row['prod_id']; ?>" />
-                                                            <input type="hidden" name="prod_name" value="<?php echo $row['prod_name']; ?>" />
-                                                            <input type="hidden" name="prod_price" value="<?php echo $row['prod_price']; ?>" />
+                                                            <input type="hidden" name="prod_id" value="<?php echo htmlspecialchars($row['prod_id'], ENT_QUOTES, 'UTF-8'); ?>" />
+                                                            <input type="hidden" name="prod_name" value="<?php echo htmlspecialchars($row['prod_name'], ENT_QUOTES, 'UTF-8'); ?>" />
+                                                            <input type="hidden" name="prod_price" value="<?php echo htmlspecialchars($row['prod_price'], ENT_QUOTES, 'UTF-8'); ?>" />
                                                             <input type="number" name="quantity" min="1" placeholder="Qty" required />
                                                             <button type="submit" name="add_order" class="btn btn-sm btn-warning">
                                                                 <i class="fas fa-cart-plus"></i>
