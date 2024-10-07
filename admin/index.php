@@ -99,7 +99,7 @@ style="background-color: #1572e8; color: white; padding-left: 5px; padding-right
           </div>
           <div class="d-flex justify-content-between align-items-center">
             <button type="submit" name="login" class="btn btn-warning btn-lg enter" style="background-color: #1572e8; color: white; padding-left: 2.5rem; padding-right: 2.5rem;">Login</button>
-            <a href="forgot.php" class="text-body">Forgot password?</a>
+            <a href="forgot_password.php" class="">Forgot password?</a>
           </div>
           <div class="text-center text-lg-start mt-4 pt-2"></div>
         </form>
