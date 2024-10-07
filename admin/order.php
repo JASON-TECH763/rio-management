@@ -166,8 +166,8 @@ if (isset($_POST['place_order'])) {
                                                     echo "<img src='assets/img/products/default.jpg' height='60' width='60' class='img-thumbnail'>";
                                                 }
                                             ?></td>
-                                            <td><?php echo $row['prod_name']; ?></td>
-                                            <td><?php echo $row['prod_price']; ?></td>
+                                            <td><?php echo htmlspecialchars($row['prod_name'], ENT_QUOTES, 'UTF-8'); ?></td>
+                                            <td><?php echo htmlspecialchars($row['prod_price'], ENT_QUOTES, 'UTF-8'); ?></td>
                                             <td>
                                                  <form method="POST" action="">
                                                             <input type="hidden" name="prod_id" value="<?php echo $row['prod_id']; ?>" />
