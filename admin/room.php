@@ -2,29 +2,21 @@
 session_start();
 include("config/connect.php");
 
-// Secure the session
-session_regenerate_id(true); // Regenerate session ID to prevent session fixation
-ini_set('session.cookie_httponly', 1); // Make the session cookie HTTP only
-ini_set('session.cookie_secure', 1); // Secure session cookie over HTTPS
 
-// Function to sanitize output for XSS
-function sanitize_output($data) {
-    return htmlspecialchars($data, ENT_QUOTES, 'UTF-8');
-}
-
-// Prevent SQL Injection with prepared statements
 if (isset($_GET['delete'])) {
+    // Assuming $conn is your database connection object
+
     // Sanitize the input to avoid SQL injection (assuming $conn is a PDO object)
     $id = htmlspecialchars($_GET['delete']);
 
     // Prepare the SQL statement with a placeholder for the ID
-    $sql = "DELETE FROM room WHERE id = :id";
-    
+    $sql = "DELETE FROM room WHERE id = ?";
+
     // Prepare the statement
     $stmt = $conn->prepare($sql);
 
     // Bind the parameter (ID)
-    $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+    $stmt->bind_param('i', $id); // Assuming 'i' for integer type of ID
 
     // Execute the statement
     if ($stmt->execute()) {
@@ -55,23 +47,12 @@ if (isset($_GET['delete'])) {
     }
 
     // Close the statement
-    $stmt->closeCursor();
+    $stmt->close();
 }
-?>
 
-<!-- Additional Headers for Security -->
-<?php
-// Set Content Security Policy to restrict where scripts can be loaded from
-header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';");
 
-// Prevent Clickjacking with X-Frame-Options
-header("X-Frame-Options: DENY");
 
-// Prevent XSS with X-XSS-Protection
-header("X-XSS-Protection: 1; mode=block");
 
-// HTTP Strict Transport Security (HSTS) for HTTPS sites
-header("Strict-Transport-Security: max-age=31536000; includeSubDomains");
 ?>
 
 
