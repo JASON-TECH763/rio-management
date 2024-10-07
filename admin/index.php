@@ -1,57 +1,33 @@
 <?php 
   session_start();
   include('config/connect.php');
-
-  // Anti-Brute Force: Track login attempts
-  if(!isset($_SESSION['login_attempts'])) {
-    $_SESSION['login_attempts'] = 0;
-  }
-  
-  // Define maximum login attempts and block duration
-  $max_attempts = 3;
-  $block_duration = 15 * 60; // 15 minutes
-  
-  $error = "";
-
-  if(isset($_POST['login'])) {
-    if($_SESSION['login_attempts'] >= $max_attempts && time() - $_SESSION['last_attempt_time'] < $block_duration) {
-      $error = "* Too many login attempts. Please try again after 15 minutes.";
-    } else {
-      // CSRF token validation
-      if ($_POST['csrf_token'] !== $_SESSION['csrf_token']) {
-        $error = "* Invalid CSRF token.";
-      } else {
-        $user = $_REQUEST['uname'];
-        $pass = $_REQUEST['pass'];
-        // $pass = sha1($pass); // Consider hashing passwords
-
-        // SQL Injection Prevention: Prepared statements
-        if (!empty($user) && !empty($pass)) {
-          $query = $conn->prepare("SELECT uname, password FROM admin WHERE uname = ? AND password = ?");
-          $query->bind_param("ss", $user, $pass);
-          $query->execute();
-          $result = $query->get_result();
-          
-          if($result->num_rows == 1) {
-            $_SESSION['uname'] = $user;
-            $_SESSION['login_attempts'] = 0; // Reset attempts on successful login
-            header("Location: dashboard.php");
-          } else {
-            $_SESSION['login_attempts']++; // Increment failed login attempts
-            $_SESSION['last_attempt_time'] = time(); // Set the last attempt time
-            $error = "* Invalid Username or Password";
-          }
-        } else {
-          $error = "* Please fill all fields!";
-        }
+  $error="";
+  if(isset($_POST['login']))
+  {
+    $user=$_REQUEST['uname'];
+    $pass=$_REQUEST['pass'];
+    // $pass= sha1($pass);
+    $user = mysqli_real_escape_string($conn, $user);
+    $pass = mysqli_real_escape_string($conn, $pass);
+    if(!empty($user) && !empty($pass))
+    {
+      $query = "SELECT uname, password FROM admin WHERE uname='$user' AND password='$pass'";
+      $result = mysqli_query($conn,$query)or die(mysqli_error());
+      $num_row = mysqli_num_rows($result);
+      $row=mysqli_fetch_array($result);
+      if( $num_row ==1 )
+      {
+        $_SESSION['uname']=$user;
+        header("Location: dashboard.php");
       }
+      else
+      {
+        $error='* Invalid User Name and Password';
+      }
+    }else{
+      $error="* Please Fill all the Fileds!";
     }
-  }
-
-  // Generate CSRF token
-  if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-  }
+  }   
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -59,10 +35,39 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
     <title>Rio Management System</title>
+    <!-- Favicon -->
+    <link rel="shortcut icon" type="image/x-icon" href="assets/img/ a.jpg">
+    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+    <!-- Fontawesome CSS -->
+    <link rel="stylesheet" href="assets/css/font-awesome.min.css">
+    <!-- Main CSS -->
     <link rel="stylesheet" href="assets/css/style.css">
-    <style>
-      /* Additional styles */
+    <!--[if lt IE 9]>
+      <script src="assets/js/html5shiv.min.js"></script>
+      <script src="assets/js/respond.min.js"></script>
+    <![endif]-->
+    <style type="text/css">
+      .divider:after,
+      .divider:before {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: #eee;
+      }
+      .h-custom {
+        height: calc(100% - 73px);
+      }
+      @media (max-width: 450px) {
+        .h-custom {
+          height: 100%;
+        }
+      }
+      .back-button {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+      }
     </style>
 </head>
 <a href="https://rio-lawis.com/" class="btn btn-light back-button" 
@@ -76,15 +81,20 @@ style="background-color: #1572e8; color: white; padding-left: 5px; padding-right
       </div>
       <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
         <form method="post">
-          <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+          <div class="d-flex flex-row align-items-center justify-content-center justify-content-lg-start">
+            <div class="d-flex align-items-center mb-3 pb-1">
+              <span class="h1 fw-bold mb-0" style="color: #FEA116;">RMS Login</span>
+              <i class="fa fa-heart fa-2x me-3"></i>
+            </div>
+          </div>
           <p style="color:red;"><?php echo $error; ?></p>
           <div class="form-outline mb-4">
             <label class="form-label" name="uname" for="user">Username</label>
-            <input type="text" name="uname" id="user" class="form-control form-control-lg" placeholder="Enter username" required />
+            <input type="text" name="uname" id="user" class="form-control form-control-lg" placeholder="Enter username" />
           </div>
           <div class="form-outline mb-3">
             <label class="form-label" for="pass">Password</label>
-            <input type="password" name="pass" id="psw" class="form-control form-control-lg" placeholder="Enter password" required />
+            <input type="password" name="pass" id="psw" class="form-control form-control-lg" placeholder="Enter password" />
             <input class="p-2" type="checkbox" onclick="myFunction()" style="margin-left: 10px; margin-top: 13px;"> <span style="margin-left: 5px;">Show password</span>
           </div>
           <div class="d-flex justify-content-between align-items-center">
@@ -97,7 +107,14 @@ style="background-color: #1572e8; color: white; padding-left: 5px; padding-right
     </div>
   </div>
 </section>
-<script>
+<!-- jQuery -->
+<script src="assets/js/jquery-3.2.1.min.js"></script>
+<!-- Bootstrap Core JS -->
+<script src="assets/js/popper.min.js"></script>
+<script src="assets/js/bootstrap.min.js"></script>
+<!-- Custom JS -->
+<script src="assets/js/script.js"></script>
+<script type="text/javascript">
   function myFunction() {
     var x = document.getElementById("psw");
     if (x.type === "password") {
@@ -106,21 +123,39 @@ style="background-color: #1572e8; color: white; padding-left: 5px; padding-right
       x.type = "password";
     }
   }
+</script>
 
-  // Disable right-click and developer tools
-  document.addEventListener('contextmenu', function (e) {
-    e.preventDefault();
-  });
+<script>
+// Disable right-click
+        document.addEventListener('contextmenu', function (e) {
+            e.preventDefault();
+        });
 
-  document.onkeydown = function (e) {
-    if (
-      e.key === 'F12' ||
-      (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J')) ||
-      (e.ctrlKey && e.key === 'U')
-    ) {
-      e.preventDefault();
-    }
-  };
+        // Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U
+        document.onkeydown = function (e) {
+            if (
+                e.key === 'F12' ||
+                (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J')) ||
+                (e.ctrlKey && e.key === 'U')
+            ) {
+                e.preventDefault();
+            }
+        };
+
+        // Disable developer tools
+        function disableDevTools() {
+            if (window.devtools.isOpen) {
+                window.location.href = "about:blank";
+            }
+        }
+
+        // Check for developer tools every 100ms
+        setInterval(disableDevTools, 100);
+
+        // Disable selecting text
+        document.onselectstart = function (e) {
+            e.preventDefault();
+        };
 </script>
 </body>
 </html>
