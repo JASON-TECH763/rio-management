@@ -2,30 +2,35 @@
   session_start();
   include('config/connect.php');
   $error="";
-  if(isset($_POST['login']))
-  {
-    $user=$_REQUEST['uname'];
-    $pass=$_REQUEST['pass'];
-    // $pass= sha1($pass);
+  
+  if(isset($_POST['login'])) {
+    $user = $_REQUEST['uname'];
+    $pass = $_REQUEST['pass'];
+
+    // Sanitize user inputs
     $user = mysqli_real_escape_string($conn, $user);
     $pass = mysqli_real_escape_string($conn, $pass);
-    if(!empty($user) && !empty($pass))
-    {
-      $query = "SELECT uname, password FROM admin WHERE uname='$user' AND password='$pass'";
-      $result = mysqli_query($conn,$query)or die(mysqli_error());
-      $num_row = mysqli_num_rows($result);
-      $row=mysqli_fetch_array($result);
-      if( $num_row ==1 )
-      {
-        $_SESSION['uname']=$user;
-        header("Location: dashboard.php");
+
+    if(!empty($user) && !empty($pass)) {
+      // Fetch hashed password from the database
+      $query = "SELECT uname, password FROM admin WHERE uname='$user'";
+      $result = mysqli_query($conn, $query) or die(mysqli_error($conn));
+
+      if(mysqli_num_rows($result) == 1) {
+        $row = mysqli_fetch_assoc($result);
+        
+        // Verify the hashed password
+        if(password_verify($pass, $row['password'])) {
+          $_SESSION['uname'] = $user;
+          header("Location: dashboard.php");
+        } else {
+          $error = '* Invalid User Name and Password';
+        }
+      } else {
+        $error = '* Invalid User Name and Password';
       }
-      else
-      {
-        $error='* Invalid User Name and Password';
-      }
-    }else{
-      $error="* Please Fill all the Fileds!";
+    } else {
+      $error = "* Please Fill all the Fields!";
     }
   }   
 ?>
