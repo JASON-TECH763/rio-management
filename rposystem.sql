@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 27, 2024 at 08:55 AM
+-- Generation Time: Oct 08, 2024 at 04:12 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -34,7 +34,8 @@ CREATE TABLE `admin` (
   `uname` varchar(200) NOT NULL,
   `email` varchar(100) NOT NULL,
   `password` varchar(200) NOT NULL,
-  `image` text DEFAULT NULL,
+  `reset_token` varchar(255) DEFAULT NULL,
+  `token_expire` datetime DEFAULT NULL,
   `date_updated` datetime DEFAULT NULL ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -42,8 +43,8 @@ CREATE TABLE `admin` (
 -- Dumping data for table `admin`
 --
 
-INSERT INTO `admin` (`aid`, `fname`, `lname`, `uname`, `email`, `password`, `image`, `date_updated`) VALUES
-(1, 'Jason', 'Cueva', 'admin', 'riomanagement123@gmail.com', '123456', NULL, '2024-09-22 13:06:30');
+INSERT INTO `admin` (`aid`, `fname`, `lname`, `uname`, `email`, `password`, `reset_token`, `token_expire`, `date_updated`) VALUES
+(1, 'Jason', 'Cueva', 'admin', 'riomanagement123@gmail.com', '$2y$10$/Bp8ZesO7iFvJIALn.qYguHKuEnyo0qIccoH4qcigX2Nz5XeuneAq', NULL, NULL, '2024-10-04 21:33:57');
 
 -- --------------------------------------------------------
 
@@ -90,8 +91,8 @@ CREATE TABLE `customer` (
 --
 
 INSERT INTO `customer` (`id`, `name`, `email`, `password`, `phone`, `date_created`, `verified`) VALUES
-(50, 'Jose Jason Cueva', 'josejasoncueva402@gmail.com', '$2y$10$A5hbC/H.55u5s0bC5slSI.atIzTL3vIYnLbZSUS9/uBByGGFtMdn2', 9887865565, '2024-09-22 18:51:45', 1),
-(52, 'dong', 'fordkylie99@gmail.com', '$2y$10$WwYaEEf1IxH.kcPMb.TFx.ML93nzWndw5eFyhXzQZEGvdXZBYwyIu', 988786554, '2024-09-23 05:44:25', 1);
+(56, 'Jose Jason Cueva', 'josejasoncueva402@gmail.com', '$2y$10$861kObD6.Pm5AwgTbURrpeR70tz3S7k6j..KqYtN.LU8BLUmMMiwy', 9887865565, '2024-10-05 04:35:10', 1),
+(57, 'eric', 'fordkylie99@gmail.com', '$2y$10$OeryxUUjGrWt9hahwdo41eLOTzneA2D42S74fSu3nE.xSGEnqDwPe', 9887865565, '2024-10-06 04:43:23', 1);
 
 -- --------------------------------------------------------
 
@@ -110,8 +111,9 @@ CREATE TABLE `orders` (
 --
 
 INSERT INTO `orders` (`order_id`, `order_date`, `status`) VALUES
-(35, '2024-09-16 12:15:33', 'Paid'),
-(36, '2024-09-16 14:54:48', 'Pending');
+(71, '2024-10-06 09:05:49', 'Rejected'),
+(72, '2024-10-06 09:13:35', 'Reserved'),
+(73, '2024-10-06 09:15:00', 'Reserved');
 
 -- --------------------------------------------------------
 
@@ -133,7 +135,9 @@ CREATE TABLE `order_details` (
 --
 
 INSERT INTO `order_details` (`order_detail_id`, `order_id`, `prod_id`, `prod_name`, `prod_price`, `quantity`) VALUES
-(67, 35, 95866804, 'd', '34', '2');
+(121, 71, 1, 'Flavored Beer', '70', '1'),
+(122, 72, 1, 'Flavored Beer', '70', '1'),
+(123, 73, 1, 'Flavored Beer', '70', '1');
 
 -- --------------------------------------------------------
 
@@ -164,8 +168,13 @@ CREATE TABLE `reservations` (
 --
 
 INSERT INTO `reservations` (`id`, `booking_id`, `checkin_date`, `checkout_date`, `r_name`, `amount`, `title`, `first_name`, `last_name`, `email`, `phone`, `country`, `payment`, `status`, `created_at`) VALUES
-(41, 33824808, '2024-07-23', '2024-07-25', 'Standard Single Room', '₱ 1700.00', '', 'kenken', 'D', 'rich@gmail.com', '0935252532', 'America', 'cash', 'Confirmed', '2024-07-23 09:39:10'),
-(42, 40792995, '2024-07-25', '2024-07-31', 'Standard Twin Room', '₱ 9600.00', '', 'bebe', 'jose', 'josejasoncueva402@gmail.com', '09352525325', 'Philippines', 'cash', 'Confirmed', '2024-07-25 06:53:44');
+(42, 40792995, '2024-07-25', '2024-07-31', 'Standard Twin Room', '₱ 9600.00', '', 'bebe', 'jose', 'josejasoncueva402@gmail.com', '09352525325', 'Philippines', 'cash', 'Confirmed', '2024-07-25 06:53:44'),
+(43, 66364352, '2024-09-29', '2024-10-01', 'Standard Single Room', '₱ 1700.00', '', 'jose', 'cueva', 'dong@gmail.com', '09887865565', '', 'cash', 'Pending', '2024-09-29 02:51:25'),
+(44, 67763305, '2024-09-30', '2024-10-01', 'Standard Twin Room', '₱ 1600.00', '', 'jose', 'cueva', 'josejasoncueva402@gmail.com', '09887865565', '', 'cash', 'Pending', '2024-09-30 06:52:24'),
+(45, 10111290, '2024-10-02', '2024-10-03', 'Standard Twin Room', '₱ 3200.00', '', 'jose', 'cueva-o', 'josejasoncueva402@gmail.com', '09887865565', '', 'cash', 'Pending', '2024-10-02 09:34:53'),
+(46, 52177605, '2024-10-02', '2024-10-03', 'Standard Single Room', '₱ 850.00', '', 'jose', 'cueva-o', 'josejasoncueva402@gmail.com', '09887865565', '', 'cash', 'Pending', '2024-10-02 09:35:24'),
+(47, 77650134, '2024-10-02', '2024-10-03', 'Standard Single Room', '₱ 850.00', '', 'jose', 'cueva', 'josejasoncueva402@gmail.com', '09887865565', '', 'cash', 'Pending', '2024-10-02 09:41:28'),
+(48, 75125746, '2024-10-04', '2024-10-05', 'Standard Single Room', '₱ 1233.00', '', 'jose', 'cueva', 'josejasoncueva402@gmail.com', '09887865565', '', 'cash', 'Confirmed', '2024-10-04 08:36:56');
 
 -- --------------------------------------------------------
 
@@ -176,6 +185,7 @@ INSERT INTO `reservations` (`id`, `booking_id`, `checkin_date`, `checkout_date`,
 CREATE TABLE `room` (
   `id` int(11) NOT NULL,
   `r_name` varchar(200) NOT NULL,
+  `r_img` varchar(200) NOT NULL,
   `available` varchar(200) NOT NULL,
   `bed` varchar(200) NOT NULL,
   `bath` varchar(200) NOT NULL,
@@ -186,9 +196,9 @@ CREATE TABLE `room` (
 -- Dumping data for table `room`
 --
 
-INSERT INTO `room` (`id`, `r_name`, `available`, `bed`, `bath`, `price`) VALUES
-(9, 'Standard Single Room', '1 Available Room', '1 Bed', '1 Bath', '850'),
-(10, 'Standard Twin Room', '2 Availble Room', '2 Bed', '1 Bath', '1,600');
+INSERT INTO `room` (`id`, `r_name`, `r_img`, `available`, `bed`, `bath`, `price`) VALUES
+(33, 'Standard Single Room', '6700dc3111bd1.jpg', '1 Available Room', '1 Bed', '1 Bath', '1233'),
+(34, 'Standard Twin Room', '6700dc56537e4.jpg', '1 Available Room', '1 Bed', '1 Bath', '850');
 
 -- --------------------------------------------------------
 
@@ -240,6 +250,13 @@ CREATE TABLE `rpos_staff` (
   `staff_gender` enum('Male','Female') NOT NULL,
   `date_created` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `rpos_staff`
+--
+
+INSERT INTO `rpos_staff` (`id`, `staff_name`, `staff_last_name`, `staff_email`, `staff_password`, `staff_gender`, `date_created`) VALUES
+(31, 'jose', 'cueva', 'jason@gmail.com', 'Jason&123', 'Male', '2024-10-05 05:38:27');
 
 --
 -- Indexes for dumped tables
@@ -320,31 +337,31 @@ ALTER TABLE `booking_status`
 -- AUTO_INCREMENT for table `customer`
 --
 ALTER TABLE `customer`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=58;
 
 --
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
+  MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=74;
 
 --
 -- AUTO_INCREMENT for table `order_details`
 --
 ALTER TABLE `order_details`
-  MODIFY `order_detail_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=68;
+  MODIFY `order_detail_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=124;
 
 --
 -- AUTO_INCREMENT for table `reservations`
 --
 ALTER TABLE `reservations`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
 
 --
 -- AUTO_INCREMENT for table `room`
 --
 ALTER TABLE `room`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
 
 --
 -- AUTO_INCREMENT for table `rpos_products`
@@ -356,7 +373,7 @@ ALTER TABLE `rpos_products`
 -- AUTO_INCREMENT for table `rpos_staff`
 --
 ALTER TABLE `rpos_staff`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- Constraints for dumped tables
