@@ -1,9 +1,27 @@
 <?php 
-  session_start();
-  include('config/connect.php');
-  $error="";
-  
-  if(isset($_POST['login'])) {
+session_start();
+include('config/connect.php');
+$error = "";
+$max_attempts = 5; // Maximum login attempts
+$lockout_time = 30; // Lockout time in seconds
+
+// Initialize attempts if not set
+if (!isset($_SESSION['attempts'])) {
+    $_SESSION['attempts'] = 0;
+    $_SESSION['last_attempt_time'] = time();
+}
+
+// Check if the user is locked out
+if ($_SESSION['attempts'] >= $max_attempts) {
+    if ((time() - $_SESSION['last_attempt_time']) < $lockout_time) {
+        $error = "Too many login attempts. Please try again later.";
+    } else {
+        // Reset attempts after lockout time
+        $_SESSION['attempts'] = 0;
+    }
+}
+
+if (isset($_POST['login']) && $_SESSION['attempts'] < $max_attempts) {
     $user = $_REQUEST['uname'];
     $pass = $_REQUEST['pass'];
 
@@ -11,28 +29,35 @@
     $user = mysqli_real_escape_string($conn, $user);
     $pass = mysqli_real_escape_string($conn, $pass);
 
-    if(!empty($user) && !empty($pass)) {
-      // Fetch hashed password from the database
-      $query = "SELECT uname, password FROM admin WHERE uname='$user'";
-      $result = mysqli_query($conn, $query) or die(mysqli_error($conn));
+    if (!empty($user) && !empty($pass)) {
+        // Use prepared statements to prevent SQL injection
+        $stmt = $conn->prepare("SELECT uname, password FROM admin WHERE uname=?");
+        $stmt->bind_param("s", $user);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
-      if(mysqli_num_rows($result) == 1) {
-        $row = mysqli_fetch_assoc($result);
-        
-        // Verify the hashed password
-        if(password_verify($pass, $row['password'])) {
-          $_SESSION['uname'] = $user;
-          header("Location: dashboard.php");
+        if ($result->num_rows === 1) {
+            $row = $result->fetch_assoc();
+
+            // Verify the hashed password
+            if (password_verify($pass, $row['password'])) {
+                $_SESSION['uname'] = $user;
+                $_SESSION['attempts'] = 0; // Reset attempts on successful login
+                header("Location: dashboard.php");
+            } else {
+                $_SESSION['attempts']++;
+                $error = '* Invalid User Name and Password';
+            }
         } else {
-          $error = '* Invalid User Name and Password';
+            $_SESSION['attempts']++;
+            $error = '* Invalid User Name and Password';
         }
-      } else {
-        $error = '* Invalid User Name and Password';
-      }
+
+        $_SESSION['last_attempt_time'] = time(); // Update last attempt time
     } else {
-      $error = "* Please Fill all the Fields!";
+        $error = "* Please Fill all the Fields!";
     }
-  }   
+}   
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -40,18 +65,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
     <title>Rio Management System</title>
-    <!-- Favicon -->
-    <link rel="shortcut icon" type="image/x-icon" href="assets/img/ a.jpg">
-    <!-- Bootstrap CSS -->
+    <link rel="shortcut icon" type="image/x-icon" href="assets/img/a.jpg">
     <link rel="stylesheet" href="assets/css/bootstrap.min.css">
-    <!-- Fontawesome CSS -->
     <link rel="stylesheet" href="assets/css/font-awesome.min.css">
-    <!-- Main CSS -->
     <link rel="stylesheet" href="assets/css/style.css">
-    <!--[if lt IE 9]>
-      <script src="assets/js/html5shiv.min.js"></script>
-      <script src="assets/js/respond.min.js"></script>
-    <![endif]-->
     <style type="text/css">
       .divider:after,
       .divider:before {
@@ -74,6 +91,12 @@
         left: 20px;
       }
     </style>
+    <script>
+        // Protect against XSS
+        function sanitize(str) {
+            return str.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+    </script>
 </head>
 <a href="https://rio-lawis.com/" class="btn btn-light back-button" 
 style="background-color: #1572e8; color: white; padding-left: 5px; padding-right: 5px;">Back to Site</a>
@@ -95,11 +118,11 @@ style="background-color: #1572e8; color: white; padding-left: 5px; padding-right
           <p style="color:red;"><?php echo $error; ?></p>
           <div class="form-outline mb-4">
             <label class="form-label" name="uname" for="user">Username</label>
-            <input type="text" name="uname" id="user" class="form-control form-control-lg" placeholder="Enter username" />
+            <input type="text" name="uname" id="user" class="form-control form-control-lg" placeholder="Enter username" required />
           </div>
           <div class="form-outline mb-3">
             <label class="form-label" for="pass">Password</label>
-            <input type="password" name="pass" id="psw" class="form-control form-control-lg" placeholder="Enter password" />
+            <input type="password" name="pass" id="psw" class="form-control form-control-lg" placeholder="Enter password" required />
             <input class="p-2" type="checkbox" onclick="myFunction()" style="margin-left: 10px; margin-top: 13px;"> <span style="margin-left: 5px;">Show password</span>
           </div>
           <div class="d-flex justify-content-between align-items-center">
@@ -112,12 +135,9 @@ style="background-color: #1572e8; color: white; padding-left: 5px; padding-right
     </div>
   </div>
 </section>
-<!-- jQuery -->
 <script src="assets/js/jquery-3.2.1.min.js"></script>
-<!-- Bootstrap Core JS -->
 <script src="assets/js/popper.min.js"></script>
 <script src="assets/js/bootstrap.min.js"></script>
-<!-- Custom JS -->
 <script src="assets/js/script.js"></script>
 <script type="text/javascript">
   function myFunction() {
@@ -132,35 +152,25 @@ style="background-color: #1572e8; color: white; padding-left: 5px; padding-right
 
 <script>
 // Disable right-click
-        document.addEventListener('contextmenu', function (e) {
-            e.preventDefault();
-        });
+document.addEventListener('contextmenu', function (e) {
+    e.preventDefault();
+});
 
-        // Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U
-        document.onkeydown = function (e) {
-            if (
-                e.key === 'F12' ||
-                (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J')) ||
-                (e.ctrlKey && e.key === 'U')
-            ) {
-                e.preventDefault();
-            }
-        };
+// Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U
+document.onkeydown = function (e) {
+    if (
+        e.key === 'F12' ||
+        (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J')) ||
+        (e.ctrlKey && e.key === 'U')
+    ) {
+        e.preventDefault();
+    }
+};
 
-        // Disable developer tools
-        function disableDevTools() {
-            if (window.devtools.isOpen) {
-                window.location.href = "about:blank";
-            }
-        }
-
-        // Check for developer tools every 100ms
-        setInterval(disableDevTools, 100);
-
-        // Disable selecting text
-        document.onselectstart = function (e) {
-            e.preventDefault();
-        };
+// Disable selecting text
+document.onselectstart = function (e) {
+    e.preventDefault();
+};
 </script>
 </body>
 </html>
