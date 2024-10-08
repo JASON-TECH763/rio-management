@@ -43,7 +43,7 @@ if (isset($_POST['submit'])) {
             $mail->Body    = "
                 <p>Hi Admin,</p>
                 <p>You have requested to reset your password. Click the link below to reset your password:</p>
-                <a href='http://localhost/rio/admin/reset_password.php?token=$token'>Reset Password</a>
+                <a href='http://rio-lawis.com/admin/reset_password.php?token=$token'>Reset Password</a>
                 <p>This link will expire in 1 hour.</p>
             ";
 
