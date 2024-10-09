@@ -147,10 +147,10 @@ if (isset($_GET['delete'])) {
                               while ($row = $result->fetch_assoc()) {
                           ?>
                               <tr>
-                                  <td><?php echo $cnt; ?></td>
-                                  <td><?php echo $row['name']; ?></td>
-                                  <td><?php echo $row['email']; ?></td>
-                                  <td><?php echo $row['phone']; ?></td>
+                                  <td><?php echo htmlspecialchars($cnt, ENT_QUOTES, 'UTF-8'); ?></td>
+                                  <td><?php echo htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8'); ?></td>
+                                  <td><?php echo htmlspecialchars($row['email'], ENT_QUOTES, 'UTF-8'); ?></td>
+                                  <td><?php echo htmlspecialchars($row['phone'], ENT_QUOTES, 'UTF-8'); ?></td>
                                   <td>
                                       <div class="btn-group dropstart">
                                       <button
