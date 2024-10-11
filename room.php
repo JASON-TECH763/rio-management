@@ -98,11 +98,11 @@ include("config/connect.php");
                         <div class="room-item shadow rounded overflow-hidden">
                             <div class="position-relative">
                                 <img class="img-fluid" src="img/room-1.jpg" style="height: 200px; width: 500px;" alt="">
-                                <small class="position-absolute start-0 top-100 translate-middle-y bg-primary text-white rounded py-1 px-3 ms-4">₱<?php echo $row['price']; ?>/Night</small>
+                                <small class="position-absolute start-0 top-100 translate-middle-y bg-primary text-white rounded py-1 px-3 ms-4">₱<?php echo htmlspecialchars($row['price']); ?>/Night</small>
                             </div>
                             <div class="p-2 mt-2">
                                 <div class="d-flex justify-content-between mb-3">
-                                <h5 class="mb-0"><?php echo $row['r_name']; ?></h5>
+                                <h5 class="mb-0"><?php echo htmlspecialchars($row['r_name']); ?></h5>
                                     <div class="ps-2">
                                         <small class="fa fa-star text-primary"></small>
                                         <small class="fa fa-star text-primary"></small>
@@ -114,10 +114,10 @@ include("config/connect.php");
                                     </div>
 
                                 </div>
-                                <h6 class="mb-0"><i class="fa fa-home text-primary me-2"></i><?php echo $row['available']; ?></h6><br>
+                                <h6 class="mb-0"><i class="fa fa-home text-primary me-2"></i><?php echo htmlspecialchars($row['available']); ?></h6><br>
                                 <div class="d-flex mb-3">
-                                    <small class="border-end me-3 pe-3"><i class="fa fa-bed text-primary me-2"></i><?php echo $row['bed']; ?></small>
-                                    <small class="border-end me-3 pe-3"><i class="fa fa-bath text-primary me-2"></i><?php echo $row['bath']; ?></small>
+                                    <small class="border-end me-3 pe-3"><i class="fa fa-bed text-primary me-2"></i><?php echo htmlspecialchars($row['bed']); ?></small>
+                                    <small class="border-end me-3 pe-3"><i class="fa fa-bath text-primary me-2"></i><?php echo htmlspecialchars($row['bath']); ?></small>
                                     <small><i class="fa fa-wifi text-primary me-2"></i>Wifi</small>
 
                                 </div>
@@ -144,11 +144,11 @@ include("config/connect.php");
                         <div class="room-item shadow rounded overflow-hidden">
                             <div class="position-relative">
                                 <img class="img-fluid" src="img/js.jpg" style="height: 200px; width: 500px;" alt="">
-                                <small class="position-absolute start-0 top-100 translate-middle-y bg-primary text-white rounded py-1 px-3 ms-4">₱<?php echo $row['price']; ?>/Night</small>
+                                <small class="position-absolute start-0 top-100 translate-middle-y bg-primary text-white rounded py-1 px-3 ms-4">₱<?php echo htmlspecialchars($row['price']); ?>/Night</small>
                             </div>
                             <div class="p-2 mt-2">
                                 <div class="d-flex justify-content-between mb-3">
-                                <h5 class="mb-0"><?php echo $row['r_name']; ?></h5>
+                                <h5 class="mb-0"><?php echo htmlspecialchars($row['r_name']); ?></h5>
                                     <div class="ps-2">
                                         <small class="fa fa-star text-primary"></small>
                                         <small class="fa fa-star text-primary"></small>
@@ -160,10 +160,10 @@ include("config/connect.php");
                                     </div>
 
                                 </div>
-                                <h6 class="mb-0"><i class="fa fa-home text-primary me-2"></i><?php echo $row['available']; ?></h6><br>
+                                <h6 class="mb-0"><i class="fa fa-home text-primary me-2"></i><?php echo htmlspecialchars($row['available']); ?></h6><br>
                                 <div class="d-flex mb-3">
-                                    <small class="border-end me-3 pe-3"><i class="fa fa-bed text-primary me-2"></i><?php echo $row['bed']; ?></small>
-                                    <small class="border-end me-3 pe-3"><i class="fa fa-bath text-primary me-2"></i><?php echo $row['bath']; ?></small>
+                                    <small class="border-end me-3 pe-3"><i class="fa fa-bed text-primary me-2"></i><?php echo htmlspecialchars($row['bed']); ?></small>
+                                    <small class="border-end me-3 pe-3"><i class="fa fa-bath text-primary me-2"></i><?php echo htmlspecialchars($row['bath']); ?></small>
                                     <small><i class="fa fa-wifi text-primary me-2"></i>Wifi</small>
 
                                 </div>
