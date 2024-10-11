@@ -156,9 +156,9 @@ if(isset($_GET['id']) && isset($_POST['submit'])) {
 </div>
                             <div class="col-6">
                               <button class="btn btn-primary w-100 py-3" name="submit" type="submit">Submit</button>
-                            </div>
+                          </div>
                              <div class="col-6">
-                              <button onclick="location.href='room.php'" class="btn btn-black w-100 py-3"  type="button">Cancel</button>
+                             <button onclick="location.href='room.php'" class="btn btn-black w-100 py-3"  type="button">Cancel</button>
                             </div>
                           </div>
                       <?php

@@ -177,13 +177,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                             <label for="bed">Availabilty</label>
                                         
                                         </div>
-                                    </div>
-                                    <div class="col-md-6">
+                                        <div class="col-md-6">
     <div class="form-floating">
-        <input type="text" class="form-control" id="price" name="price" placeholder="Price" required oninput="this.value = this.value.replace(/[^0-9]/g, '');">
+        <input type="text" class="form-control" id="price" name="price" placeholder="Price" required oninput="this.value = this.value.replace(/[^0-9]/g, '');" />
         <label for="price">Price</label>
     </div>
 </div>
+
                                     <div class="col-12">
                                         <button class="btn btn-primary w-100 py-3" name="submit" type="submit">Submit</button>
                                     </div>
