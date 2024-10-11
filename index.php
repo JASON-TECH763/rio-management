@@ -296,12 +296,10 @@ include('config/connect.php');
                     </div>
                 <?php } ?>
                    
-                                  </div>
+                 </div>
             </div>
         </div>
         <!-- Room End -->
-
-
 
         <!-- Service Start -->
         <div class="container-xxl py-5">
@@ -333,8 +331,6 @@ include('config/connect.php');
                             <p class="text-body mb-0"></p>
                         </a>
                     </div>
-                   
-                   
                     <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.5s">
                         <a class="service-item rounded" href="">
                             <div class="service-icon bg-transparent border rounded p-1">
