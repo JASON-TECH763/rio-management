@@ -101,15 +101,15 @@
                         if($fetch_row>0)
                         {
                         while($row = mysqli_fetch_assoc($fetch_details)){
-                            $booking_id = $row['booking_id'];
-                            $first_name = $row['first_name'];
-                            $last_name = $row['last_name'];
-                            $email = $row['email'];
-                            $mobile = $row['phone'];
-                            $booking_date = $row['checkin_date'];
+                            $booking_id = htmlspecialchars($row['booking_id']);
+                            $first_name = htmlspecialchars($row['first_name']);
+                            $last_name = htmlspecialchars($row['last_name']);
+                            $email = htmlspecialchars($row['email']);
+                            $mobile = htmlspecialchars($row['phone']);
+                            $booking_date = htmlspecialchars($row['checkin_date']);
                             
-                            $amount = $row['amount'];
-                            $status = $row['status'];
+                            $amount = htmlspecialchars($row['amount']);
+                            $status = htmlspecialchars($row['status']);
                         
                             
                             echo '<tr>
