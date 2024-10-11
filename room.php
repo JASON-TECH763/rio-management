@@ -96,11 +96,10 @@ include("config/connect.php");
 
                     <div class="col-lg- col-md-6 wow fadeInUp" data-wow-delay="0.1s">
                         <div class="room-item shadow rounded overflow-hidden">
-                            <div class="position-relative">
+                        <div class="position-relative">
                                 <img class="img-fluid" src="img/room-1.jpg" style="height: 200px; width: 500px;" alt="">
-                                <small class="position-absolute start-0 top-100 translate-middle-y bg-primary text-white rounded py-1 px-3 ms-4">
-    ₱<?php echo htmlspecialchars(preg_replace('/\D/', '', $row['price']), ENT_QUOTES, 'UTF-8'); ?>/Night
-</small>
+                                <small class="position-absolute start-0 top-100 translate-middle-y bg-primary text-white rounded py-1 px-3 ms-4">₱<?php echo htmlspecialchars($row['price'], ENT_QUOTES, 'UTF-8'); ?>/Night</small>
+                            </div>
 
                             </div>
                             <div class="p-2 mt-2">
@@ -117,10 +116,10 @@ include("config/connect.php");
                                     </div>
 
                                 </div>
-                                <h6 class="mb-0"><i class="fa fa-home text-primary me-2"></i><?php echo htmlspecialchars($row['available'], ENT_QUOTES, 'UTF-8'); ?></h6><br>
+                                <h6 class="mb-0"><i class="fa fa-home text-primary me-2"></i><?php echo $row['available']; ?></h6><br>
                                 <div class="d-flex mb-3">
-                                    <small class="border-end me-3 pe-3"><i class="fa fa-bed text-primary me-2"></i><?php echo htmlspecialchars($row['bed'], ENT_QUOTES, 'UTF-8'); ?></small>
-                                    <small class="border-end me-3 pe-3"><i class="fa fa-bath text-primary me-2"></i><?php echo htmlspecialchars($row['bath'], ENT_QUOTES, 'UTF-8'); ?></small>
+                                    <small class="border-end me-3 pe-3"><i class="fa fa-bed text-primary me-2"></i><?php echo $row['bed']; ?></small>
+                                    <small class="border-end me-3 pe-3"><i class="fa fa-bath text-primary me-2"></i><?php echo $row['bath']; ?></small>
                                     <small><i class="fa fa-wifi text-primary me-2"></i>Wifi</small>
 
                                 </div>
@@ -163,14 +162,13 @@ include("config/connect.php");
                                     </div>
 
                                 </div>
-                                <h6 class="mb-0"><i class="fa fa-home text-primary me-2"></i><?php echo htmlspecialchars($row['available'], ENT_QUOTES, 'UTF-8'); ?></h6><br>
+                                <h6 class="mb-0"><i class="fa fa-home text-primary me-2"></i><?php echo $row['available']; ?></h6><br>
                                 <div class="d-flex mb-3">
-                                    <small class="border-end me-3 pe-3"><i class="fa fa-bed text-primary me-2"></i><?php echo htmlspecialchars($row['bed'], ENT_QUOTES, 'UTF-8'); ?></small>
-                                    <small class="border-end me-3 pe-3"><i class="fa fa-bath text-primary me-2"></i><?php echo htmlspecialchars($row['bath'], ENT_QUOTES, 'UTF-8'); ?></small>
+                                    <small class="border-end me-3 pe-3"><i class="fa fa-bed text-primary me-2"></i><?php echo $row['bed']; ?></small>
+                                    <small class="border-end me-3 pe-3"><i class="fa fa-bath text-primary me-2"></i><?php echo $row['bath']; ?></small>
                                     <small><i class="fa fa-wifi text-primary me-2"></i>Wifi</small>
 
                                 </div>
-                               
                                
                                 <div class="d-flex justify-content-between">
                                      <a class="btn btn-sm btn-dark rounded py-2 px-4" href="booking.php">Book Now</a>
