@@ -19,8 +19,7 @@
                                 <a href="index.php" class="nav-item nav-link active">Home</a>
                                 <a href="about.php" class="nav-item nav-link">About</a>
                                 <a href="service.php" class="nav-item nav-link">Services</a>
-                                <a href="room.php" class="nav-item nav-link">Rooms</a>
-                               
+                                <a href="room.php" class="nav-item nav-link">Rooms</a>         
                                 <a href="contact.php" class="nav-item nav-link">Contact</a>
                                 <a href="check_status.php" class="nav-item nav-link">Check Status</a>
                                  
