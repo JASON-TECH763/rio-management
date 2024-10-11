@@ -194,11 +194,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <div class="room-item shadow rounded overflow-hidden">
                             <div class="position-relative">
                                 <img class="img-fluid" src="img/room-1.jpg" style="height: 200px; width: 500px;" alt="">
-                                <small class="position-absolute start-0 top-100 translate-middle-y bg-primary text-white rounded py-1 px-3 ms-4">₱<?php echo $row['price']; ?>/Night</small>
+                                <small class="position-absolute start-0 top-100 translate-middle-y bg-primary text-white rounded py-1 px-3 ms-4">₱<?php echo htmlspecialchars($row['price'], ENT_QUOTES, 'UTF-8'); ?>/Night</small>
                             </div>
                             <div class="p-2 mt-2">
                                 <div class="d-flex justify-content-between mb-3">
-                                <h5 class="mb-0"><?php echo $row['r_name']; ?></h5>
+                                <h5 class="mb-0"><?php echo htmlspecialchars($row['r_name'], ENT_QUOTES, 'UTF-8'); ?></h5>
                                     <div class="ps-2">
                                         <small class="fa fa-star text-primary"></small>
                                         <small class="fa fa-star text-primary"></small>
@@ -250,11 +250,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <div class="room-item shadow rounded overflow-hidden">
                             <div class="position-relative">
                                 <img class="img-fluid" src="img/js.jpg" style="height: 200px; width: 500px;" alt="">
-                                <small class="position-absolute start-0 top-100 translate-middle-y bg-primary text-white rounded py-1 px-3 ms-4">₱<?php echo $row['price']; ?>/Night</small>
+                                <small class="position-absolute start-0 top-100 translate-middle-y bg-primary text-white rounded py-1 px-3 ms-4">₱<?php echo htmlspecialchars($row['price'], ENT_QUOTES, 'UTF-8'); ?>/Night</small>
                             </div>
                             <div class="p-2 mt-2">
                                 <div class="d-flex justify-content-between mb-3">
-                                <h5 class="mb-0"><?php echo $row['r_name']; ?></h5>
+                                <h5 class="mb-0"><?php echo htmlspecialchars($row['r_name'], ENT_QUOTES, 'UTF-8'); ?></h5>
                                     <div class="ps-2">
                                         <small class="fa fa-star text-primary"></small>
                                         <small class="fa fa-star text-primary"></small>
