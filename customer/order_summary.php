@@ -2,6 +2,13 @@
 session_start();
 include("config/connect.php");
 
+
+if (!isset($_SESSION['uname'])) {
+    header("location:index.php");
+    exit();
+}
+
+
 // Check if order_id is provided
 if (!isset($_GET['order_id'])) {
     die("No order ID provided");

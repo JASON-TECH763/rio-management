@@ -2,6 +2,13 @@
 session_start();
 include("config/connect.php");
 
+
+if (!isset($_SESSION['uname'])) {
+  header("location:index.php");
+  exit();
+}
+
+
 // Check if `prod_id` is present in the URL
 if (isset($_GET['prod_id']) && isset($_POST['submit'])) {
     $prod_id = intval($_GET['prod_id']); // Get the prod_id from the URL

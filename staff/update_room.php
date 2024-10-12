@@ -2,6 +2,13 @@
 session_start();
 include("config/connect.php");
 
+
+if (!isset($_SESSION['uname'])) {
+  header("location:index.php");
+  exit();
+}
+
+
 // Check if `id` is present in the URL
 if(isset($_GET['id']) && isset($_POST['submit'])) {
     $id = intval($_GET['id']); // Get the ID from the URL

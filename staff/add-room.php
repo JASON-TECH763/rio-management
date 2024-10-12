@@ -3,6 +3,13 @@ session_start();
 include("config/connect.php");
 
 
+if (!isset($_SESSION['uname'])) {
+  header("location:index.php");
+  exit();
+}
+
+
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
     $r_name = $_POST['r_name'];

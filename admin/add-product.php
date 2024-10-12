@@ -3,6 +3,13 @@ session_start();
 include("config/connect.php");
 include("config/code-generator.php");
 
+
+if (!isset($_SESSION['uname'])) {
+    header("location:index.php");
+    exit();
+}
+
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $prod_id = $_POST['prod_id'];
     $prod_name = $_POST['prod_name'];

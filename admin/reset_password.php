@@ -4,6 +4,13 @@ ini_set('display_errors', 1);
 session_start();
 include('config/connect.php'); // Include database connection
 
+
+if (!isset($_SESSION['uname'])) {
+    header("location:index.php");
+    exit();
+}
+
+
 $error = "";
 $success = "";
 

@@ -3,6 +3,12 @@ session_start();
 include("config/connect.php");
 
 
+if (!isset($_SESSION['uname'])) {
+  header("location:index.php");
+  exit();
+}
+
+
 if (isset($_GET['delete'])) {
     // Assuming $conn is your database connection object
 
