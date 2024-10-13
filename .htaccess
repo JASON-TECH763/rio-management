@@ -3,4 +3,9 @@ php_value display_errors 1
 # DO NOT REMOVE OR MODIFY THIS LINE AND THE LINES ABOVE HTID:23422420:
 
 RewriteEngine On
-RewriteRule ^index\.php$ https://rio-lawis.com/ [R=301,L]
+
+# Remove the redirect for index.php
+# RewriteRule ^index\.php$ https://rio-lawis.com/ [R=301,L]
+
+# Allow index.php to execute normally
+RewriteRule ^index\.php$ - [L]
