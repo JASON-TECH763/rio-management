@@ -352,8 +352,9 @@ include('config/connect.php');
        
         <!-- Footer Start -->
          <?php include("footer.php");?>
-        <!-- Footer End -->
 
+        <!-- Footer End -->
+      <?php include("header.php");?>
 
         <!-- Back to Top -->
         <a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
