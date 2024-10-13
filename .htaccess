@@ -4,8 +4,9 @@ php_value display_errors 1
 
 RewriteEngine On
 
-# Remove the redirect for index.php
-# RewriteRule ^index\.php$ https://rio-lawis.com/ [R=301,L]
-
-# Allow index.php to execute normally
+# Allow index.php to execute normally without redirection
 RewriteRule ^index\.php$ - [L]
+
+# If you want to serve the default page when accessing the domain root
+RewriteRule ^$ index.php [L]
+
