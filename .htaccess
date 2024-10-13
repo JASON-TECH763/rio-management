@@ -1,5 +1,11 @@
-# HTID:23422420: DO NOT REMOVE OR MODIFY THIS LINE AND THE LINES BELOW
+# Enable error display in PHP
 php_value display_errors 1
-# DO NOT REMOVE OR MODIFY THIS LINE AND THE LINES ABOVE HTID:23422420:
+
+# Enable rewrite engine
 RewriteEngine On
-RewriteRule ^index\.php$ https://rio-lawis.com/ [R=301,L]
+
+# Comment out or remove redirection to disable it
+# RewriteCond %{REQUEST_URI} ^/$
+# RewriteRule ^$ https://rio-lawis.com/ [R=301,L]
+
+# Allow index.php to work normally without redirection
