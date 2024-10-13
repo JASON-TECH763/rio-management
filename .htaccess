@@ -2,12 +2,4 @@
 php_value display_errors 1
 # DO NOT REMOVE OR MODIFY THIS LINE AND THE LINES ABOVE HTID:23422420:
 
-# Enable rewrite engine
-RewriteEngine On
-
-# Remove redirection rule for index.php
-RewriteRule ^index\.php$ - [L]
-
-# Now index.php will be executed normally without redirection.
-
 
