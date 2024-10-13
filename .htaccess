@@ -6,7 +6,7 @@ php_value display_errors 1
 RewriteEngine On
 
 # Remove or comment out the problematic redirect for index.php
-# RewriteRule ^index\.php$ https://rio-lawis.com/ [R=301,L]
+# RewriteRule ^index.php$ https://rio-lawis.com/ [R=301,L]
 
 # Now index.php will be found and executed normally.
 
