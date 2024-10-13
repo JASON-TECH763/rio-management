@@ -4,8 +4,9 @@ php_value display_errors 1
 # Enable rewrite engine
 RewriteEngine On
 
-# Comment out or remove redirection to disable it
-# RewriteCond %{REQUEST_URI} ^/$
-# RewriteRule ^$ https://rio-lawis.com/ [R=301,L]
+# If you want to only redirect the root domain (not index.php)
+RewriteCond %{REQUEST_URI} ^/$
+RewriteRule ^$ https://rio-lawis.com/ [R=301,L]
 
-# Allow index.php to work normally without redirection
+# Allow index.php to work without redirecting it
+
