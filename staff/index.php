@@ -1,64 +1,85 @@
 <?php 
-  session_start();
-  include('config/connect.php');
-  $error = "";
+session_start();
+include('config/connect.php');
+$error = "";
 
-  // Handle staff login
-  if (isset($_POST['login'])) {
-    $user = $_REQUEST['uname'];
-    $pass = $_REQUEST['pass'];
+// Handle staff login
+if (isset($_POST['login'])) {
+    // Gather input
+    $user = trim($_POST['uname']);
+    $pass = trim($_POST['pass']);
 
-    // Sanitize input
-    $user = mysqli_real_escape_string($conn, $user);
-
+    // Check if both fields are filled
     if (!empty($user) && !empty($pass)) {
-      // Prepare statement for login
-      $query = "SELECT staff_email, staff_password FROM rpos_staff WHERE staff_email=?";
-      $stmt = mysqli_prepare($conn, $query);
-      mysqli_stmt_bind_param($stmt, "s", $user);
-      mysqli_stmt_execute($stmt);
-      $result = mysqli_stmt_get_result($stmt);
-
-      $row = mysqli_fetch_array($result);
-
-      if ($row && $pass === $row['staff_password']) {
-        // Login successful, store session information
-        $_SESSION['staff_email'] = $row['staff_email'];
-        header("Location: dashboard.php"); // Redirect to staff dashboard
-        exit(); // Always call exit after a header redirect
-      } else {
-        $error = '* Invalid Email or Password';
-      }
+        // Prepare a secure SQL statement to prevent SQL Injection
+        $query = "SELECT staff_email, staff_password FROM rpos_staff WHERE staff_email = ?";
+        $stmt = mysqli_prepare($conn, $query);
+        
+        if ($stmt) {
+            // Bind the input parameter
+            mysqli_stmt_bind_param($stmt, "s", $user);
+            mysqli_stmt_execute($stmt);
+            $result = mysqli_stmt_get_result($stmt);
+            
+            // Fetch result
+            $row = mysqli_fetch_array($result);
+            
+            if ($row) {
+                // Verify the password using password_verify for hashed passwords
+                if (password_verify($pass, $row['staff_password'])) {
+                    // Login successful, store session information
+                    $_SESSION['staff_email'] = $row['staff_email'];
+                    header("Location: dashboard.php");
+                    exit(); // Always call exit after a redirect
+                } else {
+                    $error = '* Invalid Email or Password';
+                }
+            } else {
+                $error = '* Invalid Email or Password';
+            }
+        } else {
+            $error = '* SQL Error occurred during login.';
+        }
     } else {
-      $error = '* Please fill all the fields!';
+        $error = '* Please fill all the fields!';
     }
-  }
+}
 
-  // Handle staff account creation
-  if (isset($_POST['create_account'])) {
-    $staff_name = $_POST['name'];
-    $staff_last_name = $_POST['last_name'];
-    $staff_email = $_POST['email'];
-    $staff_password = $_POST['password'];
-    $staff_gender = $_POST['gender'];
+// Handle staff account creation
+if (isset($_POST['create_account'])) {
+    $staff_name = trim($_POST['name']);
+    $staff_last_name = trim($_POST['last_name']);
+    $staff_email = trim($_POST['email']);
+    $staff_password = trim($_POST['password']);
+    $staff_gender = trim($_POST['gender']);
 
+    // Validate if all fields are filled
     if (!empty($staff_name) && !empty($staff_last_name) && !empty($staff_email) && !empty($staff_password) && !empty($staff_gender)) {
-      // Prepare statement for account creation
-      $query = "INSERT INTO rpos_staff (staff_name, staff_last_name, staff_email, staff_password, staff_gender, date_created) 
-                VALUES (?, ?, ?, ?, ?, NOW())";
-      $stmt = mysqli_prepare($conn, $query);
-      mysqli_stmt_bind_param($stmt, "sssss", $staff_name, $staff_last_name, $staff_email, $staff_password, $staff_gender);
-      $result = mysqli_stmt_execute($stmt);
+        // Hash the password before storing it
+        $hashed_password = password_hash($staff_password, PASSWORD_DEFAULT);
+        
+        // Prepare a secure SQL statement to create a new account
+        $query = "INSERT INTO rpos_staff (staff_name, staff_last_name, staff_email, staff_password, staff_gender, date_created) 
+                  VALUES (?, ?, ?, ?, ?, NOW())";
+        $stmt = mysqli_prepare($conn, $query);
+        
+        if ($stmt) {
+            // Bind the input parameters
+            mysqli_stmt_bind_param($stmt, "sssss", $staff_name, $staff_last_name, $staff_email, $hashed_password, $staff_gender);
+            $result = mysqli_stmt_execute($stmt);
 
-      if ($result) {
-        echo "<script>alert('Account created successfully! Please login.');</script>";
-      } else {
-        echo "<script>alert('Error creating account.');</script>";
-      }
+            if ($result) {
+                echo "<script>alert('Account created successfully! Please login.');</script>";
+            } else {
+                echo "<script>alert('Error creating account.');</script>";
+            }
+        } else {
+            $error = '* SQL Error occurred during account creation.';
+        }
     } else {
-      $error = '* Please fill all the fields!';
+        $error = '* Please fill all the fields!';
     }
-  }
+}
 ?>
 
 
