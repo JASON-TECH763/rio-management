@@ -126,24 +126,94 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <h2 class="my-4">Add New Staff</h2>
 </center>
 <div class="card-body">
-            <form action="add_staff.php" method="POST">
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="staff_name" class="form-label">First Name</label>
-                        <input type="text" class="form-control" id="staff_name" name="staff_name" required>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="staff_last_name" class="form-label">Last Name</label>
-                        <input type="text" class="form-control" id="staff_last_name" name="staff_last_name" required>
-                    </div>
+                 <div class="col-md-6 ms-auto me-auto">
+                        <div class="wow fadeInUp" data-wow-delay="0.2s">
+                        <form method="POST" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" enctype="multipart/form-data">
+                        <div class="row">
+                        <div class="row">
+    <div class="col-md-6 mb-3">
+        <label for="staff_name" class="form-label">First Name</label>
+        <input type="text" class="form-control" id="staff_name" name="staff_name" placeholder="" required 
+        pattern="[A-Za-zÀ-ž' -]+" title="First Name can contain only letters, hyphens, apostrophes, and spaces." oninput="validateStaffName()">
+    </div>
+    <div class="col-md-6 mb-3">
+        <label for="staff_last_name" class="form-label">Last Name</label>
+        <input type="text" class="form-control" id="staff_last_name" name="staff_last_name" placeholder="" required 
+        pattern="[A-Za-zÀ-ž' -]+" title="Last Name can contain only letters, hyphens, apostrophes, and spaces." oninput="validateStaffLastName()">
+    </div>
+</div>
+
+<script>
+    // JavaScript function to validate First Name
+    function validateStaffName() {
+        var nameField = document.getElementById('staff_name');
+        var value = nameField.value;
+
+        // Regular expression to allow letters, hyphens, apostrophes, and spaces, but no < or > (to prevent script tags)
+        var regex = /^[A-Za-zÀ-ž' -]+$/;
+
+        if (!regex.test(value)) {
+            nameField.setCustomValidity("Please enter a valid first name (letters, hyphens, apostrophes, and spaces allowed).");
+        } else {
+            nameField.setCustomValidity(""); // Clear the message if valid
+        }
+    }
+
+    // JavaScript function to validate Last Name
+    function validateStaffLastName() {
+        var nameField = document.getElementById('staff_last_name');
+        var value = nameField.value;
+
+        // Regular expression to allow letters, hyphens, apostrophes, and spaces, but no < or > (to prevent script tags)
+        var regex = /^[A-Za-zÀ-ž' -]+$/;
+
+        if (!regex.test(value)) {
+            nameField.setCustomValidity("Please enter a valid last name (letters, hyphens, apostrophes, and spaces allowed).");
+        } else {
+            nameField.setCustomValidity(""); // Clear the message if valid
+        }
+    }
+</script>
+
+<?php
+// Check if the form was submitted
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $staff_name = $_POST['staff_name'];
+    $staff_last_name = $_POST['staff_last_name'];
+
+    // Sanitize inputs to remove any HTML or script tags
+    $staff_name_sanitized = htmlspecialchars($staff_name, ENT_QUOTES, 'UTF-8');
+    $staff_last_name_sanitized = htmlspecialchars($staff_last_name, ENT_QUOTES, 'UTF-8');
+
+    // Validate the input: allow letters, hyphens, apostrophes, and spaces, but block < or >
+   if (!preg_match("/^[A-Za-zÀ-ž' -]+$/", $staff_name)) {
+        echo '<div class="alert alert-danger">Invalid input: Please enter a valid first name (letters, hyphens, apostrophes, and spaces only).</div>';
+    } elseif ($staff_name !== $staff_name_sanitized) {
+        echo '<div class="alert alert-danger">Invalid input: HTML or script tags are not allowed in the first name.</div>';
+    } elseif (!preg_match("/^[A-Za-zÀ-ž' -]+$/", $staff_last_name)) {
+        echo '<div class="alert alert-danger">Invalid input: Please enter a valid last name (letters, hyphens, apostrophes, and spaces only).</div>';
+    } elseif ($staff_last_name !== $staff_last_name_sanitized) {
+        echo '<div class="alert alert-danger">Invalid input: HTML or script tags are not allowed in the last name.</div>';
+    } else {
+        // If valid, display success message
+        echo '<div class="alert alert-success">Input is valid. Form submitted successfully!</div>';
+        // Proceed with storing or processing the sanitized input.
+    }
+}
+?>
+
                     <div class="col-md-6 mb-3">
                         <label for="staff_email" class="form-label">Email</label>
                         <input type="email" class="form-control" id="staff_email" name="staff_email" required>
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label for="staff_password" class="form-label">Password</label>
-                        <input type="password" class="form-control" id="staff_password" name="staff_password" required>
-                    </div>
+    <label for="staff_password" class="form-label">Password</label>
+    <input type="password" class="form-control" id="staff_password" name="staff_password" 
+           pattern="(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}" 
+           title="Password must contain at least one uppercase letter, one number, one special character, and be at least 8 characters long" 
+           minlength="8" required>
+</div>
+
                     <div class="col-md-6 mb-3">
                         <label for="staff_gender" class="form-label">Gender</label>
                         <select class="form-control" id="staff_gender" name="staff_gender" required>
