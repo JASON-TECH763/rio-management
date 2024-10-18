@@ -4,47 +4,53 @@ include('config/connect.php');
 $error = "";
 
 if (isset($_POST['login'])) {
-    $user = $_REQUEST['uname'];
-    $pass = $_REQUEST['pass'];
+  // Retrieve and sanitize input
+  $user = trim($_POST['uname']);
+  $pass = trim($_POST['pass']);
 
-    // Sanitize input
-    $user = mysqli_real_escape_string($conn, $user);
+  // Use prepared statements to prevent SQL injection
+  if (!empty($user) && !empty($pass)) {
+      // Prepare a parameterized query to prevent SQL injection
+      $query = "SELECT email, password, verified FROM customer WHERE email=?";
+      $stmt = mysqli_prepare($conn, $query);
 
-    if (!empty($user) && !empty($pass)) {
-        // Prepare statement for login
-        $query = "SELECT email, password, verified FROM customer WHERE email=?";
-        $stmt = mysqli_prepare($conn, $query);
-        mysqli_stmt_bind_param($stmt, "s", $user);
-        mysqli_stmt_execute($stmt);
-        $result = mysqli_stmt_get_result($stmt);
+      if ($stmt) {
+          // Bind the email (user input) as a parameter to the prepared statement
+          mysqli_stmt_bind_param($stmt, "s", $user);
+          mysqli_stmt_execute($stmt);
+          $result = mysqli_stmt_get_result($stmt);
 
-        $row = mysqli_fetch_array($result);
+          // Fetch the user data
+          $row = mysqli_fetch_array($result);
 
-        if ($row) {
-            // Check if password is correct
-            if (password_verify($pass, $row['password'])) {
-                // Check if account is verified
-                if ($row['verified'] == 1) {
-                    // Login successful, store email and verified status in session
-                    $_SESSION['email'] = $row['email'];
-                    $_SESSION['verified'] = $row['verified'];  // Ensure this is set
-                    header("Location: order.php"); // Redirect to order page
-                    exit(); // Always call exit after a header redirect
-                } else {
-                    $_SESSION['status'] = "error";
-                    $_SESSION['message'] = "Your account is not verified. Please use a verified email account.";
-                    header("Location: index.php");
-                    exit();
-                }
-            } else {
-                $error = '* Invalid Email or Password';
-            }
-        } else {
-            $error = '* Invalid Email or Password';
-        }
-    } else {
-        $error = '* Please fill all the fields!';
-    }
+          if ($row) {
+              // Verify the hashed password
+              if (password_verify($pass, $row['password'])) {
+                  // Check if the account is verified
+                  if ($row['verified'] == 1) {
+                      // Login successful
+                      $_SESSION['email'] = $row['email'];
+                      $_SESSION['verified'] = $row['verified'];  // Set session variable for verified status
+                      header("Location: order.php");
+                      exit(); // Stop further script execution after redirect
+                  } else {
+                      $_SESSION['status'] = "error";
+                      $_SESSION['message'] = "Your account is not verified. Please use a verified email account.";
+                      header("Location: index.php");
+                      exit();
+                  }
+              } else {
+                  $error = '* Invalid Email or Password';
+              }
+          } else {
+              $error = '* Invalid Email or Password';
+          }
+      } else {
+          $error = '* Failed to prepare the SQL statement';
+      }
+  } else {
+      $error = '* Please fill all the fields!';
+  }
 }
 
 // Handle account creation
