@@ -120,19 +120,63 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 <div class="wow fadeInUp" data-wow-delay="0.2s">
                                     <form method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" enctype="multipart/form-data">
                                         <div class="row g-3">
+                                        <div class="col-md-6">
+    <div class="form-floating">
+        <!-- Product Name input with validation -->
+        <input type="text" class="form-control" id="pname" name="prod_name" placeholder="Product Name" required 
+               pattern="[A-Za-zÀ-ž' -]+" title="Product Name can contain only letters, hyphens, apostrophes, and spaces." 
+               oninput="validateProductName()">
+        <input type="hidden" name="prod_id" value="<?php echo htmlspecialchars($prod_id); ?>" class="form-control">
+        <label for="pname">Product Name</label>
+    </div>
+</div>
+
+<script>
+    // JavaScript function to validate product name input
+    function validateProductName() {
+        var nameField = document.getElementById('pname');
+        var value = nameField.value;
+
+        // Regular expression to allow letters, hyphens, apostrophes, and spaces
+        var regex = /^[A-Za-zÀ-ž' -]+$/;
+
+        if (!regex.test(value)) {
+            nameField.setCustomValidity("Please enter a valid product name (letters, hyphens, apostrophes, and spaces allowed).");
+        } else {
+            nameField.setCustomValidity(""); // Clear the message if valid
+        }
+    }
+</script>
+
+<?php
+// Check if the form was submitted
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $prod_name = $_POST['prod_name'];
+    $prod_id = $_POST['prod_id'];
+
+    // Sanitize the input to prevent HTML or script tags
+    $prod_name_sanitized = htmlspecialchars($prod_name, ENT_QUOTES, 'UTF-8');
+
+    // Validate the input: only allow letters, hyphens, apostrophes, and spaces
+    if (!preg_match("/^[A-Za-zÀ-ž' -]+$/", $prod_name)) {
+        echo '<div class="alert alert-danger">Invalid input: Please enter a valid product name (letters, hyphens, apostrophes, and spaces only).</div>';
+    } else if ($prod_name !== $prod_name_sanitized) {
+        echo '<div class="alert alert-danger">Invalid input: HTML or script tags are not allowed.</div>';
+    } else {
+        // If valid, display a success message
+        echo '<div class="alert alert-success">Input is valid. Form submitted successfully!</div>';
+        // Here, you can proceed with updating the record in the database
+    }
+}
+?>
+
                                             <div class="col-md-6">
-                                                <div class="form-floating">
-                                                    <input type="text" class="form-control" id="pname" name="prod_name" placeholder="Product Name" required>
-                                                    <input type="hidden" name="prod_id" value="<?php echo $prod_id; ?>" class="form-control">
-                                                    <label for="pname">Product Name</label>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="form-floating">
-                                                    <input type="text" class="form-control" id="price" name="prod_price" placeholder="Price" required>
-                                                    <label for="price">Price</label>
-                                                </div>
-                                            </div>
+                             <div class="form-floating">
+                             <input type="text" class="form-control" id="price" name="prod_price" placeholder="Price" required oninput="this.value = this.value.replace(/[^0-9]/g, '');">
+                                <label for="price">Price</label>
+                                     </div>
+                                    </div>
+
                                             <div class="col-md-12">
                                                 <div class="form-floating">
                                                     <input type="file" class="form-control" id="prod_img" name="prod_img" placeholder="Image" required>
