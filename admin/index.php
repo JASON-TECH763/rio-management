@@ -1,4 +1,4 @@
-<?php 
+<?php  
 session_start();
 include('config/connect.php');
 $error = "";
@@ -22,17 +22,15 @@ if ($_SESSION['attempts'] >= $max_attempts) {
 }
 
 if (isset($_POST['login']) && $_SESSION['attempts'] < $max_attempts) {
-    $user = $_REQUEST['uname'];
-    $pass = $_REQUEST['pass'];
+    // Sanitize inputs
+    $user = trim($_POST['uname']);
+    $pass = trim($_POST['pass']);
 
-    // Sanitize user inputs
-    $user = mysqli_real_escape_string($conn, $user);
-    $pass = mysqli_real_escape_string($conn, $pass);
-
+    // Basic input validation
     if (!empty($user) && !empty($pass)) {
         // Use prepared statements to prevent SQL injection
-        $stmt = $conn->prepare("SELECT uname, password FROM admin WHERE uname=?");
-        $stmt->bind_param("s", $user);
+        $stmt = $conn->prepare("SELECT uname, password FROM admin WHERE uname = ?");
+        $stmt->bind_param("s", $user); // Bind parameter safely
         $stmt->execute();
         $result = $stmt->get_result();
 
@@ -44,13 +42,14 @@ if (isset($_POST['login']) && $_SESSION['attempts'] < $max_attempts) {
                 $_SESSION['uname'] = $user;
                 $_SESSION['attempts'] = 0; // Reset attempts on successful login
                 header("Location: dashboard.php");
+                exit(); // Stop further script execution
             } else {
                 $_SESSION['attempts']++;
-                $error = '* Invalid User Name and Password';
+                $error = '* Invalid Username or Password';
             }
         } else {
             $_SESSION['attempts']++;
-            $error = '* Invalid User Name and Password';
+            $error = '* Invalid Username or Password';
         }
 
         $_SESSION['last_attempt_time'] = time(); // Update last attempt time
