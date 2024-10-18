@@ -1,6 +1,17 @@
 <?php 
 include("config/connect.php");
 
+// Anti-HTTP Secure Headers
+header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;");
+header("Strict-Transport-Security: max-age=31536000; includeSubDomains");
+header("X-Content-Type-Options: nosniff");
+header("X-Frame-Options: DENY");
+header("X-XSS-Protection: 1; mode=block");
+header("Referrer-Policy: no-referrer-when-downgrade");
+header("Permissions-Policy: geolocation=(self), microphone=()");
+header("Expect-CT: max-age=86400, enforce");
+header("Clear-Site-Data: \"cache\", \"cookies\", \"storage\", \"executionContexts\"");
+
 // Fetch all rooms from the database
 $sql = "SELECT * FROM room";
 $result = $conn->query($sql);

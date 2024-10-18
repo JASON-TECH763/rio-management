@@ -1,3 +1,16 @@
+<?php
+// Anti-HTTP Secure Headers
+header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;");
+header("Strict-Transport-Security: max-age=31536000; includeSubDomains");
+header("X-Content-Type-Options: nosniff");
+header("X-Frame-Options: DENY");
+header("X-XSS-Protection: 1; mode=block");
+header("Referrer-Policy: no-referrer-when-downgrade");
+header("Permissions-Policy: geolocation=(self), microphone=()");
+header("Expect-CT: max-age=86400, enforce");
+header("Clear-Site-Data: \"cache\", \"cookies\", \"storage\", \"executionContexts\"");
+?>
+
  <div class="container-fluid bg-dark px-0">
             <div class="row gx-0">
                 <div class="col-lg-6 bg-dark d-none d-lg-block">
