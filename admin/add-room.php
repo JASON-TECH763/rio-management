@@ -11,61 +11,71 @@ if (!isset($_SESSION['uname'])) {
 
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    
     $r_name = $_POST['r_name'];
     $available = $_POST['available'];
     $bath = $_POST['bath'];
     $bed = $_POST['bed'];
     $price = $_POST['price'];
 
-   // $sql="insert into reservations (booking_id,checkin_date,checkout_date,amount,title,first_name,last_name,email,phone,country,payment) values('$booking_id','$checkin_date','$checkout_date','$amount','$title','$first_name','$last_name','$email','$phone','$country','$payment')";
-
-   $sql = "INSERT INTO room (r_name, available, bath, bed, price)
-            VALUES ('$r_name','$available','$bath','$bed', '$price')";
-
-
-    // $result=mysqli_query($mysqli,$sql);
-
-    if ($conn->query($sql) === TRUE)
-    // if($result)
-        {
-            echo '<script>
-                    window.onload = function() {
-                        Swal.fire({
-                            title: "Success!",
-                            text: "Data added Successfully",
-                            icon: "success"
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                window.location.href = "room.php";
-                            }
-                        });
-                    };
-                  </script>';
-                    
+    if (isset($_FILES["r_img"]) && $_FILES["r_img"]["error"] == 0) {
+        $target_dir = "uploads/"; // Relative path for front-end
+        if (!is_dir($target_dir)) {
+            mkdir($target_dir, 0777, true); // Create uploads folder if not exists
         }
-        else
-        {
-           echo '<script>
-                    window.onload = function() {
-                        Swal.fire({
-                            title: "Error!",
-                            text: "failed to add data.",
-                            icon: "error"
-                        });
-                    };
-                  </script>';
+
+        $imageFileType = strtolower(pathinfo($_FILES["r_img"]["name"], PATHINFO_EXTENSION));
+        $target_file = $target_dir . uniqid() . '.' . $imageFileType;
+
+        $uploadOk = 1;
+        $check = getimagesize($_FILES["r_img"]["tmp_name"]);
+
+        if ($check === false) {
+            echo "File is not an image.";
+            $uploadOk = 0;
         }
+
+        if ($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg" && $imageFileType != "gif") {
+            echo "Sorry, only JPG, JPEG, PNG & GIF files are allowed.";
+            $uploadOk = 0;
+        }
+
+        if ($uploadOk == 1) {
+            if (move_uploaded_file($_FILES["r_img"]["tmp_name"], $target_file)) {
+                echo "File uploaded successfully to: " . $target_file; // Debugging
+
+                $r_img = basename($target_file); // Save just the filename
+                $sql = "INSERT INTO room (r_name, available, bath, bed, price, r_img) VALUES ('$r_name', '$available', '$bath', '$bed', '$price', '$r_img')";
+
+                if ($conn->query($sql) === TRUE) {
+                    echo '<script>
+                            window.onload = function() {
+                                Swal.fire({
+                                    title: "Success!",
+                                    text: "Data added successfully",
+                                    icon: "success"
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        window.location.href = "room.php";
+                                    }
+                                });
+                            };
+                          </script>';
+                } else {
+                    echo "Error: " . $conn->error;
+                }
+            } else {
+                echo "Sorry, there was an error uploading your file.";
+                var_dump(error_get_last());
+            }
+        }
+    } else {
+        echo "No file was uploaded or an error occurred.";
+    }
 }
-
-
-
-
-
-
-
-
 ?>
+
+
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -106,16 +116,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <link rel="stylesheet" href="assets/css/plugins.min.css" />
     <link rel="stylesheet" href="assets/css/kaiadmin.min.css" />
 <link rel="stylesheet" href="assets/css/demo.css" />
-   
+  
+</head>
   </head>
   <body>
-    <div class="wrapper">
-      <!-- Sidebar -->
-      <?php include("include/sidenavigation.php");?>
+  <div class="wrapper">
+        <!-- Sidebar -->
+        <?php include("include/sidenavigation.php"); ?>
 
-      <div class="main-panel">
-        
-        <?php include("include/header.php");?>
+        <div class="main-panel">
+            <?php include("include/header.php"); ?>
+
 
         <div class="container">
           <div class="page-inner">
@@ -139,19 +150,55 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <div class="card-body">
                  <div class="col-md-6 ms-auto me-auto">
                         <div class="wow fadeInUp" data-wow-delay="0.2s">
-                            <form method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
-                                <div class="row g-3">
-                              <div class="col-md-12">
-                                        <div class="form-floating">
-                                          <select class="form-control" id="r_name" name="r_name" required>
-                                            <option value="Standard Single Room">Standard Single Room</option>
-                                            <option value="Standard Twin Room">Standard Twin Room</option>
-                                            
-                                          </select>
-                                            <label for="r_name">Room Name</label>
-                                        
-                                        </div>
-                                    </div>
+                        <form method="POST" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" enctype="multipart/form-data">
+
+  <div class="row g-3">
+    <div class="col-md-12">
+    <div class="form-floating">
+        <input type="text" class="form-control" id="r_name" name="r_name" placeholder="Enter Room Name" required 
+        pattern="[A-Za-zÀ-ž' -]+" title="Room Name can contain only letters, hyphens, apostrophes, and spaces." oninput="validateRoomName()">
+        <label for="r_name">Room Name</label>
+    </div>
+</div>
+
+<script>
+    // JavaScript function to prevent script tags and allow certain symbols
+    function validateRoomName() {
+        var nameField = document.getElementById('r_name');
+        var value = nameField.value;
+
+        // Regular expression to allow letters, hyphens, apostrophes, and spaces, but no < or > (to prevent script tags)
+        var regex = /^[A-Za-zÀ-ž' -]+$/;
+
+        if (!regex.test(value)) {
+            nameField.setCustomValidity("Please enter a valid room name (letters, hyphens, apostrophes, and spaces allowed).");
+        } else {
+            nameField.setCustomValidity(""); // Clear the message if valid
+        }
+    }
+</script>
+
+<?php
+// Check if the form was submitted
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $r_name = $_POST['r_name'];
+
+    // Sanitize input to remove any HTML or script tags
+    $r_name_sanitized = htmlspecialchars($r_name, ENT_QUOTES, 'UTF-8');
+
+    // Validate the input: allow letters, hyphens, apostrophes, and spaces, but block < or >
+    if (!preg_match("/^[A-Za-zÀ-ž' -]+$/", $r_name)) {
+        echo '<div class="alert alert-danger">Invalid input: Please enter a valid room name (letters, hyphens, apostrophes, and spaces only).</div>';
+    } else if ($r_name !== $r_name_sanitized) {
+        echo '<div class="alert alert-danger">Invalid input: HTML or script tags are not allowed.</div>';
+    } else {
+        // If valid, display success message
+        echo '<div class="alert alert-success">Input is valid. Form submitted successfully!</div>';
+        // Here, you can proceed with storing or processing the sanitized input.
+    }
+}
+?>
+
                                     <div class="col-md-6">
                                         <div class="form-floating">
                                           <select class="form-control" id="available" name="available" required>
@@ -184,12 +231,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                             <label for="bed">Availabilty</label>
                                         
                                         </div>
-                                        <div class="col-md-6">
+                                    </div>
+                                    <div class="col-md-6">
     <div class="form-floating">
-        <input type="text" class="form-control" id="price" name="price" placeholder="Price" required oninput="this.value = this.value.replace(/[^0-9]/g, '');" />
+        <input type="text" class="form-control" id="price" name="price" placeholder="Price" required oninput="this.value = this.value.replace(/[^0-9]/g, '');">
         <label for="price">Price</label>
     </div>
 </div>
+
+                                    <div class="col-md-12">
+        <div class="form-floating">
+            <input type="file" class="form-control" id="r_img" name="r_img" required>
+            <label for="r_img">Room Image</label>
+        </div>
+    </div>
+
+
+<!-- Bootstrap JS and dependencies -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 
                                     <div class="col-12">
                                         <button class="btn btn-primary w-100 py-3" name="submit" type="submit">Submit</button>
