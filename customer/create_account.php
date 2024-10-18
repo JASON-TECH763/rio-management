@@ -164,7 +164,7 @@ if (isset($_POST['create_account'])) {
                     <div class="form-box text-center position-relative" style="background-color: #3b4272; padding: 30px; border-radius: 10px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);">
                         
                         <!-- Icon button for back -->
-                        <a href="http://localhost/RIO" class="btn btn-light position-absolute" style="top: 10px; left: 10px; background-color: transparent; color:  #1572e8;">
+                        <a href="https://rio-lawis.com/customer/" class="btn btn-light position-absolute" style="top: 10px; left: 10px; background-color: transparent; color:  #1572e8;">
                             <i class="fas fa-arrow-left"></i>
                         </a>
                         
