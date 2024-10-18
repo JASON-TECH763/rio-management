@@ -2,8 +2,10 @@
 session_start();
 include('config/connect.php');
 
+// Enhance Content Security Policy (CSP)
 header("Content-Security-Policy: default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; img-src 'self' data:; font-src 'self' https://fonts.googleapis.com https://cdn.jsdelivr.net; frame-ancestors 'none'; form-action 'self'; base-uri 'self';");
 
+// Error message
 $error = "";
 $max_attempts = 5; // Maximum login attempts
 $lockout_time = 30; // Lockout time in seconds
@@ -12,6 +14,11 @@ $lockout_time = 30; // Lockout time in seconds
 if (!isset($_SESSION['attempts'])) {
     $_SESSION['attempts'] = 0;
     $_SESSION['last_attempt_time'] = time();
+}
+
+// Generate CSRF token if not set
+if (!isset($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32)); // Generate 32-byte random token
 }
 
 // Check if the user is locked out
@@ -25,39 +32,45 @@ if ($_SESSION['attempts'] >= $max_attempts) {
 }
 
 if (isset($_POST['login']) && $_SESSION['attempts'] < $max_attempts) {
-    // Sanitize inputs
-    $user = trim($_POST['uname']);
-    $pass = trim($_POST['pass']);
+    // CSRF token validation
+    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+        $error = "Invalid CSRF token!";
+    } else {
+        // Sanitize inputs
+        $user = trim($_POST['uname']);
+        $pass = trim($_POST['pass']);
 
-    // Basic input validation
-    if (!empty($user) && !empty($pass)) {
-        // Use prepared statements to prevent SQL injection
-        $stmt = $conn->prepare("SELECT uname, password FROM admin WHERE uname = ?");
-        $stmt->bind_param("s", $user); // Bind parameter safely
-        $stmt->execute();
-        $result = $stmt->get_result();
+        // Basic input validation
+        if (!empty($user) && !empty($pass)) {
+            // Use prepared statements to prevent SQL injection
+            $stmt = $conn->prepare("SELECT uname, password FROM admin WHERE uname = ?");
+            $stmt->bind_param("s", $user); // Bind parameter safely
+            $stmt->execute();
+            $result = $stmt->get_result();
 
-        if ($result->num_rows === 1) {
-            $row = $result->fetch_assoc();
+            if ($result->num_rows === 1) {
+                $row = $result->fetch_assoc();
 
-            // Verify the hashed password
-            if (password_verify($pass, $row['password'])) {
-                $_SESSION['uname'] = $user;
-                $_SESSION['attempts'] = 0; // Reset attempts on successful login
-                header("Location: dashboard.php");
-                exit(); // Stop further script execution
+                // Verify the hashed password
+                if (password_verify($pass, $row['password'])) {
+                    session_regenerate_id(true); // Regenerate session ID upon login to prevent session fixation
+                    $_SESSION['uname'] = $user;
+                    $_SESSION['attempts'] = 0; // Reset attempts on successful login
+                    header("Location: dashboard.php");
+                    exit(); // Stop further script execution
+                } else {
+                    $_SESSION['attempts']++;
+                    $error = '* Invalid Username or Password';
+                }
             } else {
                 $_SESSION['attempts']++;
                 $error = '* Invalid Username or Password';
             }
-        } else {
-            $_SESSION['attempts']++;
-            $error = '* Invalid Username or Password';
-        }
 
-        $_SESSION['last_attempt_time'] = time(); // Update last attempt time
-    } else {
-        $error = "* Please Fill all the Fields!";
+            $_SESSION['last_attempt_time'] = time(); // Update last attempt time
+        } else {
+            $error = "* Please Fill all the Fields!";
+        }
     }
 }   
 ?>
@@ -111,6 +124,7 @@ style="background-color: #1572e8; color: white; padding-left: 5px; padding-right
       </div>
       <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
         <form method="post">
+          <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
           <div class="d-flex flex-row align-items-center justify-content-center justify-content-lg-start">
             <div class="d-flex align-items-center mb-3 pb-1">
               <span class="h1 fw-bold mb-0" style="color: #FEA116;">RMS Login</span>
