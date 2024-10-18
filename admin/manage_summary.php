@@ -288,14 +288,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     <tbody>
                                     <?php
     // Fetch order summary with customer email
-    $sql_orders = "SELECT o.order_id, o.order_date, o.status, o.customer_email 
-                   FROM orders o 
-                   ORDER BY o.order_date DESC";
-    $result_orders = $conn->query($sql_orders);
-    if ($result_orders->num_rows > 0) {
-        while ($row = $result_orders->fetch_assoc()) {
-            $order_total_price = 0; // Initialize total price for the order
-            ?>
+    $sql_orders = "
+    SELECT o.order_id, o.order_date, o.status, c.email AS customer_email 
+    FROM orders o
+    JOIN customer c ON o.customer_id = c.id
+    ORDER BY o.order_date DESC";
+$result_orders = $conn->query($sql_orders);
+if ($result_orders->num_rows > 0) {
+    while ($row = $result_orders->fetch_assoc()) {
+        $order_total_price = 0; // Initialize total price for the order
+        ?>
             <tr>
                 <td><?php echo $row['order_id']; ?></td>
                 <td><?php echo date('Y-m-d H:i:s', strtotime($row['order_date'])); ?></td>
