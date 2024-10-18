@@ -125,6 +125,7 @@ if (isset($_POST['create_account'])) {
 <a href="https://rio-lawis.com/" class="btn btn-light back-button" 
 style="background-color: #1572e8; color: white; padding-left: 5px; padding-right: 5px;">Back to Site</a>
 
+
 <section class="vh-100" style="background-color: #2a2f5b; color: white;">
   <div class="container-fluid h-custom">
     <div class="row d-flex justify-content-center align-items-center h-100">
