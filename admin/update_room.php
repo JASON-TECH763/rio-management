@@ -2,58 +2,105 @@
 session_start();
 include("config/connect.php");
 
+
 if (!isset($_SESSION['uname'])) {
   header("location:index.php");
   exit();
 }
 
 
-// Check if `id` is present in the URL
-if(isset($_GET['id']) && isset($_POST['submit'])) {
-    $id = intval($_GET['id']); // Get the ID from the URL
-    $rid = $_POST['rid'];
+// Check if `id` is present in the URL and form is submitted
+if (isset($_GET['id']) && isset($_POST['submit'])) {
+    $id = intval($_GET['id']); // Ensure ID is an integer
     $r_name = $_POST['r_name'];
     $available = $_POST['available'];
     $bed = $_POST['bed'];
     $bath = $_POST['bath'];
     $price = $_POST['price'];
 
-    // Prepare SQL statement
-    $sql = "UPDATE room SET r_name = ?, available = ?, bed = ?, bath = ?, price = ? WHERE id = ?";
-    $stmt = mysqli_prepare($conn, $sql);
+    // Handle image upload
+    $image_path = ""; // Initialize image path
+    if (isset($_FILES["r_img"]) && $_FILES["r_img"]["error"] == 0) {
+        $target_dir = __DIR__ . "/uploads/"; // Absolute path to 'uploads' directory
+        if (!is_dir($target_dir)) {
+            mkdir($target_dir, 0777, true); // Create the directory if it doesn't exist
+        }
 
-    // Bind parameters and execute
-    mysqli_stmt_bind_param($stmt, "sssssi", $r_name, $available, $bed, $bath, $price, $id);
+        $imageFileType = strtolower(pathinfo($_FILES["r_img"]["name"], PATHINFO_EXTENSION));
+        $target_file = $target_dir . uniqid() . '.' . $imageFileType;
+
+        $uploadOk = 1;
+        $check = getimagesize($_FILES["r_img"]["tmp_name"]);
+
+        if ($check === false) {
+            echo "File is not an image.";
+            $uploadOk = 0;
+        }
+
+        if ($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg" && $imageFileType != "gif") {
+            echo "Sorry, only JPG, JPEG, PNG & GIF files are allowed.";
+            $uploadOk = 0;
+        }
+
+        if ($uploadOk == 1) {
+            if (move_uploaded_file($_FILES["r_img"]["tmp_name"], $target_file)) {
+                $image_path = basename($target_file); // Just the name of the file
+            } else {
+                echo "Sorry, there was an error uploading your file.";
+                var_dump(error_get_last()); // Display error details
+            }
+        }
+    }
+
+    // Prepare SQL statement for updating the room
+    if ($image_path) {
+        // Update with new image
+        $sql = "UPDATE room SET r_name = ?, available = ?, bed = ?, bath = ?, price = ?, r_img = ? WHERE id = ?";
+        $stmt = mysqli_prepare($conn, $sql);
+        mysqli_stmt_bind_param($stmt, "ssssssi", $r_name, $available, $bed, $bath, $price, $image_path, $id);
+    } else {
+        // Update without changing the image
+        $sql = "UPDATE room SET r_name = ?, available = ?, bed = ?, bath = ?, price = ? WHERE id = ?";
+        $stmt = mysqli_prepare($conn, $sql);
+        mysqli_stmt_bind_param($stmt, "ssssi", $r_name, $available, $bed, $bath, $price, $id);
+    }
+
+    // Execute the statement
     $result = mysqli_stmt_execute($stmt);
 
     if ($result) {
         echo '<script>
-               window.onload = function() {
-            Swal.fire({
-                title: "Success!",
-                text: "Room data successfully updated!",
-                icon: "success"
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.href = "room.php";
-                }
-            });
-        };
-      </script>';
+                window.onload = function() {
+                    Swal.fire({
+                        title: "Success!",
+                        text: "Room data successfully updated!",
+                        icon: "success"
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = "room.php";
+                        }
+                    });
+                };
+              </script>';
     } else {
-       echo '<script>
-              window.onload = function() {
-                Swal.fire({
-                title: "Error!",
-                text: "Error updating room data.",
-                icon: "error"
-            });
-        };
-      </script>';
+        echo '<script>
+                window.onload = function() {
+                    Swal.fire({
+                        title: "Error!",
+                        text: "Error updating room data.",
+                        icon: "error"
+                    });
+                };
+              </script>';
     }
+
+    // Close the statement
     mysqli_stmt_close($stmt);
-} 
+}
+
+// Include the footer or other components here if needed
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -117,13 +164,56 @@ if(isset($_GET['id']) && isset($_POST['submit'])) {
                           while ($row = mysqli_fetch_array($query)) {
                       ?>
                           <div class="row g-3">
-                            <div class="col-md-12">
-                              <div class="form-floating">
-                                <input type="text" class="form-control" name="r_name" placeholder="Room" required value="<?php echo htmlspecialchars($row['r_name']); ?>">
-                                <input type="hidden" class="form-control" name="rid" placeholder="rid" required readonly value="<?php echo htmlspecialchars($row['id']); ?>">
-                                <label for="r_name">Room Name</label>
-                              </div>
-                            </div>
+                          <div class="col-md-12">
+    <div class="form-floating">
+        <!-- Room Name input with validation -->
+        <input type="text" class="form-control" id="r_name" name="r_name" placeholder="Room" required 
+               pattern="[A-Za-zÀ-ž' -]+" title="Room Name can contain only letters, hyphens, apostrophes, and spaces." 
+               value="<?php echo htmlspecialchars($row['r_name']); ?>" oninput="validateRoomName()">
+        <input type="hidden" class="form-control" name="rid" placeholder="rid" required readonly value="<?php echo htmlspecialchars($row['id']); ?>">
+        <label for="r_name">Room Name</label>
+    </div>
+</div>
+
+<script>
+    // JavaScript function to validate room name input
+    function validateRoomName() {
+        var nameField = document.getElementById('r_name');
+        var value = nameField.value;
+
+        // Regular expression to allow letters, hyphens, apostrophes, and spaces, but no < or >
+        var regex = /^[A-Za-zÀ-ž' -]+$/;
+
+        if (!regex.test(value)) {
+            nameField.setCustomValidity("Please enter a valid room name (letters, hyphens, apostrophes, and spaces allowed).");
+        } else {
+            nameField.setCustomValidity(""); // Clear the message if valid
+        }
+    }
+</script>
+
+<?php
+// Check if the form was submitted
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $r_name = $_POST['r_name'];
+    $rid = $_POST['rid'];
+
+    // Sanitize the input to prevent HTML or script tags
+    $r_name_sanitized = htmlspecialchars($r_name, ENT_QUOTES, 'UTF-8');
+
+    // Validate the input: only allow letters, hyphens, apostrophes, and spaces
+    if (!preg_match("/^[A-Za-zÀ-ž' -]+$/", $r_name)) {
+        echo '<div class="alert alert-danger">Invalid input: Please enter a valid room name (letters, hyphens, apostrophes, and spaces only).</div>';
+    } else if ($r_name !== $r_name_sanitized) {
+        echo '<div class="alert alert-danger">Invalid input: HTML or script tags are not allowed.</div>';
+    } else {
+        // If valid, display a success message
+        echo '<div class="alert alert-success">Input is valid. Form submitted successfully!</div>';
+        // Here, you can proceed with updating the record in the database
+    }
+}
+?>
+
                             <div class="col-md-6">
                               <div class="form-floating">
                                 <select class="form-control" id="available" name="available" required>
@@ -156,15 +246,25 @@ if(isset($_GET['id']) && isset($_POST['submit'])) {
                             </div>
                             <div class="col-md-6">
     <div class="form-floating">
-        <input type="text" class="form-control" id="price" name="price" placeholder="Price" required oninput="this.value = this.value.replace(/[^0-9]/g, '');">
+        <input type="number" class="form-control" id="price" name="price" placeholder="Price" required 
+               value="<?php echo htmlspecialchars($row['price']); ?>" 
+               min="0" step="0.01" title="Please enter a valid price. Only numbers are allowed.">
         <label for="price">Price</label>
     </div>
 </div>
+
+                            <div class="col-md-12">
+        <div class="form-floating">
+            <input type="file" class="form-control" id="r_img" name="r_img" required>
+            <label for="r_img">Room Image</label>
+        </div>
+    </div>
+
                             <div class="col-6">
                               <button class="btn btn-primary w-100 py-3" name="submit" type="submit">Submit</button>
-                          </div>
+                            </div>
                              <div class="col-6">
-                             <button onclick="location.href='room.php'" class="btn btn-black w-100 py-3"  type="button">Cancel</button>
+                              <button onclick="location.href='room.php'" class="btn btn-black w-100 py-3"  type="button">Cancel</button>
                             </div>
                           </div>
                       <?php

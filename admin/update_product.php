@@ -8,6 +8,7 @@ if (!isset($_SESSION['uname'])) {
   exit();
 }
 
+
 // Check if `prod_id` is present in the URL
 if (isset($_GET['prod_id']) && isset($_POST['submit'])) {
     $prod_id = intval($_GET['prod_id']); // Get the prod_id from the URL
@@ -126,19 +127,64 @@ if (isset($_GET['prod_id']) && isset($_POST['submit'])) {
                           while ($row = mysqli_fetch_array($query)) {
                       ?>
                           <div class="row g-3">
-                            <div class="col-md-12">
-                              <div class="form-floating">
-                                <input type="text" class="form-control" name="prod_name" placeholder="Product Name" required value="<?php echo htmlspecialchars($row['prod_name']); ?>">
-                                <input type="hidden" class="form-control" name="rid" placeholder="rid" required readonly value="<?php echo htmlspecialchars($row['prod_id']); ?>">
-                                <label for="prod_name">Product Name</label>
-                              </div>
-                            </div>
+                          <div class="col-md-12">
+    <div class="form-floating">
+        <!-- Product Name input with validation -->
+        <input type="text" class="form-control" id="prod_name" name="prod_name" placeholder="Product Name" required 
+               pattern="[A-Za-zÀ-ž' -]+" title="Product Name can contain only letters, hyphens, apostrophes, and spaces." 
+               value="<?php echo htmlspecialchars($row['prod_name']); ?>" oninput="validateProductName()">
+        <input type="hidden" class="form-control" name="prod_id" placeholder="Product ID" required readonly 
+               value="<?php echo htmlspecialchars($row['prod_id']); ?>">
+        <label for="prod_name">Product Name</label>
+    </div>
+</div>
+
+<script>
+    // JavaScript function to validate product name input
+    function validateProductName() {
+        var nameField = document.getElementById('prod_name');
+        var value = nameField.value;
+
+        // Regular expression to allow letters, hyphens, apostrophes, and spaces
+        var regex = /^[A-Za-zÀ-ž' -]+$/;
+
+        if (!regex.test(value)) {
+            nameField.setCustomValidity("Please enter a valid product name (letters, hyphens, apostrophes, and spaces allowed).");
+        } else {
+            nameField.setCustomValidity(""); // Clear the message if valid
+        }
+    }
+</script>
+
+<?php
+// Check if the form was submitted
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $prod_name = $_POST['prod_name'];
+    $prod_id = $_POST['prod_id'];
+
+    // Sanitize the input to prevent HTML or script tags
+    $prod_name_sanitized = htmlspecialchars($prod_name, ENT_QUOTES, 'UTF-8');
+
+    // Validate the input: only allow letters, hyphens, apostrophes, and spaces
+    if (!preg_match("/^[A-Za-zÀ-ž' -]+$/", $prod_name)) {
+        echo '<div class="alert alert-danger">Invalid input: Please enter a valid product name (letters, hyphens, apostrophes, and spaces only).</div>';
+    } else if ($prod_name !== $prod_name_sanitized) {
+        echo '<div class="alert alert-danger">Invalid input: HTML or script tags are not allowed.</div>';
+    } else {
+        // If valid, display a success message
+        echo '<div class="alert alert-success">Input is valid. Form submitted successfully!</div>';
+        // Here, you can proceed with updating the record in the database
+    }
+}
+?>
+
                             <div class="col-md-6">
-                              <div class="form-floating">
-                                <input type="text" class="form-control" id="prod_price" name="prod_price" placeholder="Price" required value="<?php echo htmlspecialchars($row['prod_price']); ?>">
-                                <label for="prod_price">Price</label>
-                              </div>
-                            </div>
+               <div class="form-floating">
+                <input type="text" class="form-control" id="prod_price" name="prod_price" placeholder="Price" required oninput="this.value = this.value.replace(/[^0-9]/g, '');" value="<?php echo htmlspecialchars($row['prod_price']); ?>">
+                <label for="prod_price">Price</label>
+                  </div>
+                  </div>
+
                             <div class="col-md-6">
                               <div class="form-floating">
                                 <input type="file" class="form-control" id="prod_img" name="prod_img" placeholder="Product Image">
@@ -152,7 +198,7 @@ if (isset($_GET['prod_id']) && isset($_POST['submit'])) {
                               <button class="btn btn-primary w-100 py-3" name="submit" type="submit">Submit</button>
                             </div>
                              <div class="col-6">
-                              <button onclick="location.href='products.php'" class="btn btn-black w-100 py-3"  type="button">Cancel</button>
+                              <button onclick="location.href='product.php'" class="btn btn-black w-100 py-3"  type="button">Cancel</button>
                             </div>
                           </div>
                       <?php
