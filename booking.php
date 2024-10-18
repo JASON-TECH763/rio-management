@@ -1,20 +1,19 @@
-<?php
+<?php 
 session_start();
 include('config/connect.php');
-
 
 // Handle form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $booking_id = mt_rand(10000000, 99999999);
-    $checkin_date = $_POST['checkin_date'];
-    $checkout_date = $_POST['checkout_date'];
-    $r_name = $_POST['r_name']; // Room name from the fetched data
-    $amount = $_POST['amount'];  // Room price from the fetched data
-    $first_name = $_POST['first_name'];
-    $last_name = $_POST['last_name'];
-    $email = $_POST['email'];
-    $phone = $_POST['phone'];
-    $payment = $_POST['payment'];
+    $checkin_date = htmlspecialchars($_POST['checkin_date'], ENT_QUOTES, 'UTF-8');
+    $checkout_date = htmlspecialchars($_POST['checkout_date'], ENT_QUOTES, 'UTF-8');
+    $r_name = htmlspecialchars($_POST['r_name'], ENT_QUOTES, 'UTF-8'); // Room name from the fetched data
+    $amount = htmlspecialchars($_POST['amount'], ENT_QUOTES, 'UTF-8');  // Room price from the fetched data
+    $first_name = htmlspecialchars($_POST['first_name'], ENT_QUOTES, 'UTF-8');
+    $last_name = htmlspecialchars($_POST['last_name'], ENT_QUOTES, 'UTF-8');
+    $email = htmlspecialchars($_POST['email'], ENT_QUOTES, 'UTF-8');
+    $phone = htmlspecialchars($_POST['phone'], ENT_QUOTES, 'UTF-8');
+    $payment = htmlspecialchars($_POST['payment'], ENT_QUOTES, 'UTF-8');
 
     $sql = "INSERT INTO reservations (booking_id, checkin_date, checkout_date, r_name, amount, first_name, last_name, email, phone, payment, status)
             VALUES ('$booking_id', '$checkin_date', '$checkout_date', '$r_name', '$amount', '$first_name', '$last_name', '$email', '$phone', '$payment', 'Pending')";
@@ -46,6 +45,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -457,7 +457,6 @@ function calculateAmount(price, guestCount) {
             e.preventDefault();
         };
 </script>
-
 </body>
 
 </html>
