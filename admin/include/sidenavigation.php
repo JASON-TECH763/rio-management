@@ -90,13 +90,7 @@
                  
                 </a>
               </li>
-              <li class="nav-item">
-                <a  href="manage_summary.php">
-                <i class="fas fa-shopping-cart"></i>
-                  <p>Manage Foods & Drinks</p>
-                 
-                </a>
-              </li>
+             
               <li class="nav-item">
                 <a  href="order.php">
                   <i class="fas fa-shopping-cart"></i>
@@ -111,6 +105,13 @@
                  
                 </a>
               </li> -->
+              <li class="nav-item">
+                <a  href="manage_summary.php">
+                <i class="fas fa-shopping-cart"></i>
+                  <p>Manage Foods & Drinks</p>
+                 
+                </a>
+              </li>
               <li class="nav-item">
                 <a  href="manage_order.php">
                   <i class="fas fa-receipt"></i>
