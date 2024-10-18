@@ -63,13 +63,14 @@
                 </div><center>
                 <div class="col-lg-4">
                         <div class="wow fadeInUp" data-wow-delay="0.2s">
-                            <form method="POST" action="status_detail.php">
+                        <form method="POST" action="status_detail.php">
                                 <div class="row g-3">
                                     <div class="col-md-12">
-                                        <div class="form-floating">
-                                           <input type="text" class="form-control" id="booking" name="booking_number" placeholder="Enter Booking Number"  required>
-                                            <label for="booking">Enter Booking Number</label>
-                                        </div>
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control" id="booking" name="booking_number" placeholder="Enter Booking Number" required oninput="this.value = this.value.replace(/[^0-9]/g, '');">
+                                        <label for="booking">Enter Booking Number</label>
+                                    </div>
+
                                     </div>
                                    
                                  
