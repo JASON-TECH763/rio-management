@@ -92,6 +92,7 @@ if (isset($_POST['place_order'])) {
     }
 }
 
+
 ?>
 
 <!DOCTYPE html>
@@ -209,6 +210,7 @@ if (isset($_POST['place_order'])) {
         <?php include("include/footer.php"); ?>
     </div>
 </div>
+
 <script src="assets/js/core/jquery-3.7.1.min.js"></script>
 <script src="assets/js/core/popper.min.js"></script>
 <script src="assets/js/core/bootstrap.min.js"></script>
