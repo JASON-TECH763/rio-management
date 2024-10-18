@@ -253,42 +253,39 @@ if (isset($_GET['room_id'])) {
                             
 
 
- <?php
-        // Check if the form was submitted
-        if ($_SERVER["REQUEST_METHOD"] == "POST") {
-            $first_name = $_POST['first_name'];
-
-            // Sanitize input to remove any HTML or script tags
-            $first_name_sanitized = htmlspecialchars($first_name, ENT_QUOTES, 'UTF-8');
-
-            // Validate the input: allow letters, hyphens, apostrophes, and spaces, but block < or >
-            if (!preg_match("/^[A-Za-z\s'-]+$/", $first_name)) {
-                echo '<div class="alert alert-danger">Invalid input: Please enter a valid name (letters, hyphens, apostrophes, and spaces only).</div>';
-            } else if ($first_name !== $first_name_sanitized) {
-                echo '<div class="alert alert-danger">Invalid input: HTML or script tags are not allowed.</div>';
-            } else {
-                // If valid, display success message
-                echo '<div class="alert alert-success">Input is valid. Form submitted successfully!</div>';
-                // Here, you can proceed with storing or processing the sanitized input.
-            }
-
-            $last_name = $_POST['last_name'];
-
-            // Sanitize input to remove any HTML or script tags
-            $last_name_sanitized = htmlspecialchars($last_name, ENT_QUOTES, 'UTF-8');
-
-            // Validate the input: allow letters, hyphens, apostrophes, and spaces, but block < or >
-            if (!preg_match("/^[A-Za-z\s'-]+$/", $last_name)) {
-                echo '<div class="alert alert-danger">Invalid input: Please enter a valid name (letters, hyphens, apostrophes, and spaces only).</div>';
-            } else if ($last_name !== $last_name_sanitized) {
-                echo '<div class="alert alert-danger">Invalid input: HTML or script tags are not allowed.</div>';
-            } else {
-                // If valid, display success message
-                echo '<div class="alert alert-success">Input is valid. Form submitted successfully!</div>';
-                // Here, you can proceed with storing or processing the sanitized input.
-            }
+                            <?php
+    if ($_SERVER["REQUEST_METHOD"] == "POST") {
+        // Input length validation to prevent excessively large inputs
+        if (strlen($_POST['first_name']) > 100 || strlen($_POST['last_name']) > 100) {
+            echo '<div class="alert alert-danger">Invalid input: Name too long. Maximum 100 characters allowed.</div>';
+            exit; // Exit early to prevent further processing
         }
-        ?>
+
+        // Sanitize first name and last name inputs using filter_input and trim unnecessary spaces
+        $first_name = trim(filter_input(INPUT_POST, 'first_name', FILTER_SANITIZE_STRING));
+        $last_name = trim(filter_input(INPUT_POST, 'last_name', FILTER_SANITIZE_STRING));
+
+        // Additional sanitization to block any HTML or script tags
+        $first_name_sanitized = htmlspecialchars($first_name, ENT_QUOTES, 'UTF-8');
+        $last_name_sanitized = htmlspecialchars($last_name, ENT_QUOTES, 'UTF-8');
+
+        // Regex validation: allow letters, hyphens, apostrophes, and spaces only
+        if (!preg_match("/^[A-Za-z\s'-]+$/", $first_name)) {
+            echo '<div class="alert alert-danger">Invalid input: Please enter a valid first name (letters, hyphens, apostrophes, and spaces only).</div>';
+        } elseif ($first_name !== $first_name_sanitized) {
+            echo '<div class="alert alert-danger">Invalid input: HTML or script tags are not allowed in first name.</div>';
+        } elseif (!preg_match("/^[A-Za-z\s'-]+$/", $last_name)) {
+            echo '<div class="alert alert-danger">Invalid input: Please enter a valid last name (letters, hyphens, apostrophes, and spaces only).</div>';
+        } elseif ($last_name !== $last_name_sanitized) {
+            echo '<div class="alert alert-danger">Invalid input: HTML or script tags are not allowed in last name.</div>';
+        } else {
+            // If both inputs are valid, proceed
+            echo '<div class="alert alert-success">Input is valid. Form submitted successfully!</div>';
+            // Process the sanitized input or store it as needed
+        }
+    }
+?>
+
                                 <div class="row g-3">
                                      <div class="form-floating">
                                             <input type="date" name="checkin_date" class="form-control" id="checkin_date" placeholder="Check-in Date" value="<?php echo date('Y-m-d'); ?>" min="<?php echo date('Y-m-d'); ?>" required>
