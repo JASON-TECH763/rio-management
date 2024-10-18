@@ -8,7 +8,6 @@ if (!isset($_SESSION['uname'])) {
   exit();
 }
 
-
 if (isset($_GET['delete'])) {
     // Assuming $conn is your database connection object
 
@@ -54,11 +53,13 @@ if (isset($_GET['delete'])) {
 
     // Close the statement
     $stmt->close();
-}
+} 
+
+
+
+
 
 ?>
-
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -129,88 +130,69 @@ if (isset($_GET['delete'])) {
                     </div>
                   </div>
                   <div class="card-body">
-                    <div class="table-responsive">
-                      <table
-                        id="basic-datatables"
-                        class="display table table-striped table-hover" style="width: 100%;">
-                        <thead>
-                          <tr>
-                                        <th>#</th>
-                                        <!-- <th>Booking No.</th> -->
-                                        <th>Name</th>
-                                        <th>Availability</th>
-                                        <th>Bath</th>
-
-                                        <th>Bed</th>
-                                        
-                                        <th>Price</th>
-                                        
-                                        
-                                       
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                 
-                                   <?php
-                                    $sql = "SELECT id, r_name, available, bath, bed, price FROM room";
-                                    $result = $conn->query($sql);
-                                    $cnt = 1;
-                                    if ($result->num_rows > 0) {
-  // output data of each row
-                                    while($row = $result->fetch_assoc()) {
-
-                                    ?>
+    <div class="table-responsive">
+        <table id="basic-datatables" class="display table table-striped table-hover" style="width: 100%;">
+            <thead>
                 <tr>
-                    <td><?php echo htmlspecialchars($cnt, ENT_QUOTES, 'UTF-8'); ?></td>
-                    <td><?php echo htmlspecialchars($row['r_name'], ENT_QUOTES, 'UTF-8'); ?></td>
-                    <td><?php echo htmlspecialchars($row['available'], ENT_QUOTES, 'UTF-8'); ?></td>
-                    <td><?php echo htmlspecialchars($row['bath'], ENT_QUOTES, 'UTF-8'); ?></td>
-                    <td><?php echo htmlspecialchars($row['bed'], ENT_QUOTES, 'UTF-8'); ?></td>
-                    <td><?php echo htmlspecialchars($row['price'], ENT_QUOTES, 'UTF-8'); ?></td>
-                   
-                    
-                    
-                   
-                         
+                    <th>#</th>
+                    <th>Room</th>
+                    <th>Availability</th>
+                    <th>Bath</th>
+                    <th>Bed</th>
+                    <th>Price</th>
+                    <th>Image</th> <!-- New column for Room Image -->
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+             $sql = "SELECT id, r_name, available, bath, bed, price, r_img FROM room";
+
+                $result = $conn->query($sql);
+                $cnt = 1;
+                if ($result->num_rows > 0) {
+                    while ($row = $result->fetch_assoc()) {
+                ?>
+                <tr>
+                    <td><?php echo htmlspecialchars($cnt); ?></td>
+                    <td><?php echo htmlspecialchars($row['r_name']); ?></td>
+                    <td><?php echo htmlspecialchars($row['available']); ?></td>
+                    <td><?php echo htmlspecialchars($row['bath']); ?></td>
+                    <td><?php echo htmlspecialchars($row['bed']); ?></td>
+                    <td><?php echo htmlspecialchars($row['price']); ?></td>
+                    <td>
+                        <!-- Display room image -->
+                        <img src="uploads/<?php echo htmlspecialchars($row['r_img']); ?>" alt="Room Image" style="width: 100px; height: auto;">
+                    </td>
                     <td>
                         <div class="btn-group dropstart">
-                        <button
-                          type="button"
-                          class="btn btn-primary btn-border dropdown-toggle"
-                          data-bs-toggle="dropdown"
-                          aria-haspopup="true"
-                          aria-expanded="false"
-                        >
-                          Action
-                        </button>
-                        <ul class="dropdown-menu" role="menu">
-                          <li>
-                            <a class="dropdown-item" href="update_room.php?id=<?php echo $row['id']; ?>"
-                              ><button class="btn btn-info btn-sm"><i class="fa fa-info"></i> Edit</button></a>
-                            
-                            <div class="dropdown-divider"></div>
-                       
-                           
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="room.php?delete=<?php echo $row['id']; ?>"
-                              ><button type="submit" class="btn btn-danger btn-sm"><i class="fa fa-times"></i> Delete</button></a>
-                          </li>
-                        </ul>
-                      </div>
-                           
-
+                            <button type="button" class="btn btn-primary btn-border dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Action
+                            </button>
+                            <ul class="dropdown-menu" role="menu">
+                                <li>
+                                    <a class="dropdown-item" href="update_room.php?id=<?php echo $row['id']; ?>">
+                                        <button class="btn btn-info btn-sm"><i class="fa fa-info"></i> Edit</button>
+                                    </a>
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item" href="room.php?delete=<?php echo $row['id']; ?>">
+                                        <button type="submit" class="btn btn-danger btn-sm"><i class="fa fa-times"></i> Delete</button>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
                     </td>
                 </tr>
-                <?php  $cnt = $cnt+1; } } $conn->close(); ?>
-            
+                <?php
+                    $cnt++;
+                    }
+                }
+                ?>
+            </tbody>
+        </table>
+    </div>
+</div>
 
-                        
-                       
-                                </tbody>
-                            </table>
-                    </div>
-                  </div>
                 </div>
               </div>
            
