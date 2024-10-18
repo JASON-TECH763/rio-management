@@ -147,18 +147,33 @@ $stmt->close();
 $(document).ready(function () {
     $("#booking-reports-datatables").DataTable({});
 });
-
 function printTable() {
     var divToPrint = document.getElementById("booking-reports-datatables");
     var newWin = window.open("");
     newWin.document.write("<html><head><title>Print</title>");
     newWin.document.write('<link rel="stylesheet" href="assets/css/bootstrap.min.css" />');
     newWin.document.write('</head><body>');
+
+    // Add the address header section
+    newWin.document.write(`
+        <div class="receipt" style="text-align: center;">
+            <div class="address-header">
+                <img src="assets/img/a.jpg" alt="navbar brand" class="navbar-brand" height="70">
+                <h2>RIO MANAGEMENT</h2>
+                <p>Poblacion, Madridejos, Cebu</p>
+                <p>Phone: (123) 456-7890</p>
+                <p>Email: riomanagement123@gmail.com</p>
+            </div>
+        </div>
+    `);
+
+    // Print the booking reports datatable
     newWin.document.write(divToPrint.outerHTML);
     newWin.document.write('</body></html>');
     newWin.document.close();
     newWin.print();
 }
+
 </script>
 </body>
 </html>
