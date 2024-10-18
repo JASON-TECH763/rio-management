@@ -110,21 +110,19 @@
                              <?php echo $row['4']; ?>
                             </p>
                             <?php } ?>
-                            <a
+                            <!--  <a
                               href="profile.html"
                               class="btn btn-xs btn-secondary btn-sm"
                               >View Profile</a
-                            >
+                            >-->
                           </div>
                         </div>
                       </li>
                       <li>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="#">My Profile</a>
+                        <!--  <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="#">My Profile</a>-->
                         
-                        
-                        <div class="dropdown-divider"></div>
-                        
+                      
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item" href="index.php">Logout</a>
                       </li>
