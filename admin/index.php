@@ -1,6 +1,9 @@
 <?php  
 session_start();
 include('config/connect.php');
+
+header("Content-Security-Policy: default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; img-src 'self' data:; font-src 'self' https://fonts.googleapis.com https://cdn.jsdelivr.net; frame-ancestors 'none'; form-action 'self'; base-uri 'self';");
+
 $error = "";
 $max_attempts = 5; // Maximum login attempts
 $lockout_time = 30; // Lockout time in seconds
