@@ -23,19 +23,93 @@
                                 <a href="contact.php" class="nav-item nav-link">Contact</a>
                                 <a href="check_status.php" class="nav-item nav-link">Check Status</a>
                                  
-                                <li class="nav-item dropdown">
-    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        <!-- Here you can dynamically display the login name -->
-        <span id="loginName">Login</span> 
-    </a>
-    <div class="dropdown-menu" aria-labelledby="userDropdown">
-        <!-- <a class="dropdown-item" href="staff">Staff</a>
-        <a class="dropdown-item" href="customer">Customer</a>-->
-        <a class="dropdown-item" href="admin">Admin</a>
-    </div>
-</li>
+                                <style>
+  .dropdown-menu {
+  background-color: #14165b; /* Change background color */
+}
 
-                                    
+.dropdown-item {
+  color: #FEA116; /* Change text color to white for visibility */
+}
+
+.dropdown-item:hover {
+  background-color: #FEA116; /* Optional: Lighter shade on hover */
+  color: #fff; /* Ensure text stays white */
+}
+.profile-pic {
+  color: #fff; /* Change login text to white */
+}
+
+</style>
+
+
+    
+    <!-- Toggler for mobile view -->
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#navbarResponsive"
+      aria-controls="navbarResponsive"
+      aria-expanded="false"
+      aria-label="Toggle navigation"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    
+    <!-- Navbar content -->
+    <div class="collapse navbar-collapse" id="navbarResponsive">
+      <ul class="navbar-nav ms-auto topbar-nav align-items-center">
+        <li class="nav-item topbar-user dropdown hidden-caret">
+          <!-- Dropdown trigger -->
+          <a class="dropdown-toggle profile-pic" href="#" id="loginTrigger" role="button">
+            <!-- Dynamically display the login name -->
+            <span class="fw-bold">Login</span>
+          </a>
+          <!-- Dropdown menu (hidden by default) -->
+          <ul class="dropdown-menu dropdown-user animated fadeIn" id="loginDropdown" style="display: none;">
+            <div class="dropdown-user-scroll scrollbar-outer">
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="staff">
+                <i class="fas fa-user-tie"></i> Staff
+              </a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="customer">
+                <i class="fas fa-users"></i> Customer
+              </a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="admin">
+                <i class="fas fa-user-shield"></i> Admin
+              </a>
+            </div>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- JavaScript to control the dropdown behavior -->
+<script>
+  // Get the login trigger and dropdown elements
+  const loginTrigger = document.getElementById('loginTrigger');
+  const loginDropdown = document.getElementById('loginDropdown');
+
+  // Add a click event listener to the login trigger
+  loginTrigger.addEventListener('click', function (event) {
+    event.preventDefault(); // Prevent default anchor behavior
+    loginDropdown.style.display = (loginDropdown.style.display === 'none' || loginDropdown.style.display === '') ? 'block' : 'none';
+  });
+
+  // Close the dropdown if the user clicks outside of it
+  document.addEventListener('click', function (event) {
+    const isClickInside = loginTrigger.contains(event.target) || loginDropdown.contains(event.target);
+    if (!isClickInside) {
+      loginDropdown.style.display = 'none';
+    }
+  });
+</script>
+              
                               
                             </div>
                            
