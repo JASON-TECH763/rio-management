@@ -2,85 +2,50 @@
 session_start();
 include('config/connect.php');
 
-header("Content-Security-Policy: default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; img-src 'self' data:;");
 
-// At the start of the session
-if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
-
-// Before processing the form submission
+// Handle form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Check if the CSRF token is present in the form submission
-    if (isset($_POST['csrf_token'])) {
-        if (!hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
-            die('Invalid CSRF token');
-        }
+    $booking_id = mt_rand(10000000, 99999999);
+    $checkin_date = $_POST['checkin_date'];
+    $checkout_date = $_POST['checkout_date'];
+    $r_name = $_POST['r_name']; // Room name from the fetched data
+    $amount = $_POST['amount'];  // Room price from the fetched data
+    $first_name = $_POST['first_name'];
+    $last_name = $_POST['last_name'];
+    $email = $_POST['email'];
+    $phone = $_POST['phone'];
+    $payment = $_POST['payment'];
+
+    $sql = "INSERT INTO reservations (booking_id, checkin_date, checkout_date, r_name, amount, first_name, last_name, email, phone, payment, status)
+            VALUES ('$booking_id', '$checkin_date', '$checkout_date', '$r_name', '$amount', '$first_name', '$last_name', '$email', '$phone', '$payment', 'Pending')";
+
+    if ($conn->query($sql) === TRUE) {
+        echo '<script>
+                window.onload = function() {
+                    Swal.fire({
+                        title: "Success!",
+                        text: "Your booking was successful. Booking number is ' . $booking_id . '",
+                        icon: "success"
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = "check_status.php";
+                        }
+                    });
+                };
+              </script>';
     } else {
-        die('CSRF token missing');
+        echo '<script>
+                window.onload = function() {
+                    Swal.fire({
+                        title: "Error!",
+                        text: "Failed to book.",
+                        icon: "error"
+                    });
+                };
+              </script>';
     }
-
-
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $booking_id = mt_rand(10000000,99999999);
-    $checkin_date = htmlspecialchars($_POST['checkin_date'], ENT_QUOTES, 'UTF-8');
-    $checkout_date = htmlspecialchars($_POST['checkout_date'], ENT_QUOTES, 'UTF-8');
-    $r_name = htmlspecialchars($_POST['r_name'], ENT_QUOTES, 'UTF-8');
-    $amount = htmlspecialchars($_POST['amount'], ENT_QUOTES, 'UTF-8');
-    
-    $first_name = htmlspecialchars($_POST['first_name'], ENT_QUOTES, 'UTF-8');
-    $last_name = htmlspecialchars($_POST['last_name'], ENT_QUOTES, 'UTF-8');
-    $email = htmlspecialchars($_POST['email'], ENT_QUOTES, 'UTF-8');
-    $phone = htmlspecialchars($_POST['phone'], ENT_QUOTES, 'UTF-8');
-    $country = htmlspecialchars($_POST['country'], ENT_QUOTES, 'UTF-8');
-    $payment = htmlspecialchars($_POST['payment'], ENT_QUOTES, 'UTF-8');
-    
-   // $sql="insert into reservations (booking_id,checkin_date,checkout_date,amount,title,first_name,last_name,email,phone,country,payment) values('$booking_id','$checkin_date','$checkout_date','$amount','$title','$first_name','$last_name','$email','$phone','$country','$payment')";
-
-   $sql = "INSERT INTO reservations (booking_id, checkin_date, checkout_date, r_name, amount, first_name, last_name , email, phone, country, payment, status)
-            VALUES ('$booking_id','$checkin_date','$checkout_date', '$r_name', '$amount','$first_name','$last_name','$email','$phone','$country','$payment', 'Pending')";
-
-
-    // $result=mysqli_query($mysqli,$sql);
-
-    if ($conn->query($sql) === TRUE)
-    // if($result)
-        {
-            echo '<script>
-                    window.onload = function() {
-                        Swal.fire({
-                            title: "Success!",
-                            text: "Your booking sent successfully.Booking number is "+"'.$booking_id.'",
-                            icon: "success"
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                window.location.href = "check_status.php";
-                            }
-                        });
-                    };
-                  </script>';
-                    
-        }
-        else
-        {
-           echo '<script>
-                    window.onload = function() {
-                        Swal.fire({
-                            title: "Error!",
-                            text: "failed to booked.",
-                            icon: "error"
-                        });
-                    };
-                  </script>';
-        }
-}
-
 }
 ?>
-
-
-
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -114,6 +79,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     <!-- Template Stylesheet -->
     <link href="css/style.css" rel="stylesheet">
+
+ 
     <script>
         // JavaScript function to prevent script tags and allow certain symbols
         function validateInput() {
@@ -144,6 +111,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
         }
     </script>
+    
 </head>
 
 <body>
@@ -168,9 +136,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         
 
 
-        <!-- Booking Start -->
-        <div class="container-xxl py-5">
-            <div class="container">
+            <!-- Booking Start -->
+            <div class="container-xxl py-5">
+                <div class="container">
                
                 
                     <div class="container-xxl py-5">
@@ -180,124 +148,101 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <h1 class="mb-5"><span class="text-primary text-uppercase">Book</span> Now!</h1>
                 </div>
                 <div class="row g-12">
-                    <?php
-                                    $sql = "SELECT * FROM room Where r_name = 'Standard Single Room'";
-                                    $result = $conn->query($sql);
-                                   
-                                    
-  // output data of each row
-                                    while($row = $result->fetch_assoc()) {
+                <?php
+// Check if a room_id is provided in the URL
+if (isset($_GET['room_id'])) {
+    $room_id = $_GET['room_id'];
+    
+    // Prepare the query to fetch the specific room
+    $sql = "SELECT * FROM room WHERE id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $room_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    // Check if the room exists
+    if ($result->num_rows > 0) {
+        $room = $result->fetch_assoc(); // Fetch room data
+?>
 
-                                    ?>
+        <!-- Display the room details -->
+        <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
+            <div class="room-item shadow rounded overflow-hidden">
+                <div class="position-relative">
+                    <!-- Display the room image -->
+                    <img src="admin/uploads/<?php echo htmlspecialchars($room['r_img']); ?>" alt="<?php echo htmlspecialchars($room['r_name']); ?>" class="img-fluid">
 
-                    <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
-                        <div class="room-item shadow rounded overflow-hidden">
-                            <div class="position-relative">
-                                <img class="img-fluid" src="img/room-1.jpg" style="height: 200px; width: 500px;" alt="">
-                                <small class="position-absolute start-0 top-100 translate-middle-y bg-primary text-white rounded py-1 px-3 ms-4">₱<?php echo htmlspecialchars($row['price'], ENT_QUOTES, 'UTF-8'); ?>/Night</small>
-                            </div>
-                            <div class="p-2 mt-2">
-                                <div class="d-flex justify-content-between mb-3">
-                                <h5 class="mb-0"><?php echo htmlspecialchars($row['r_name'], ENT_QUOTES, 'UTF-8'); ?></h5>
-                                    <div class="ps-2">
-                                        <small class="fa fa-star text-primary"></small>
-                                        <small class="fa fa-star text-primary"></small>
-                                        <small class="fa fa-star text-primary"></small>
-                                        <small class="fa fa-star text-primary"></small>
-                                        <small class="fa fa-star text-primary"></small>
 
-                                    </div>
+<!-- Bootstrap JS and dependencies -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 
-                                </div>
-                                <h6 class="mb-0"><i class="fa fa-home text-primary me-2"></i><?php echo $row['available']; ?></h6><br>
-                                <div class="d-flex mb-3">
-                                    <small class="border-end me-3 pe-3"><i class="fa fa-bed text-primary me-2"></i><?php echo $row['bed']; ?></small>
-                                    <small class="border-end me-3 pe-3"><i class="fa fa-bath text-primary me-2"></i><?php echo $row['bath']; ?></small>
-                                    <small><i class="fa fa-wifi text-primary me-2"></i>Wifi</small>
 
-                                </div>
-                               
-                               
-                                <div class="d-flex justify-content-between">
-                                   <div class="col-md-12">
-                                        <div class="form-floating">
-                                            <select id="guest-count-single" class="form-control" name="guest-count-single" onchange="calculateAmount()">
+                    <!-- Display the room price -->
+                    <small class="position-absolute start-0 top-100 translate-middle-y bg-primary text-white rounded py-1 px-3 ms-4">₱<?php echo $room['price']; ?>/Night</small>
+                </div>
+
+                <div class="p-2 mt-2">
+                    <div class="d-flex justify-content-between mb-3">
+                        <!-- Display the room name dynamically -->
+                        <h5 class="mb-0"><?php echo htmlspecialchars($room['r_name']); ?></h5>
+                        <div class="ps-2">
+                            <!-- Display 5 stars -->
+                            <small class="fa fa-star text-primary"></small>
+                            <small class="fa fa-star text-primary"></small>
+                            <small class="fa fa-star text-primary"></small>
+                            <small class="fa fa-star text-primary"></small>
+                            <small class="fa fa-star text-primary"></small>
+                        </div>
+                    </div>
+
+                    <!-- Display room availability -->
+                    <h6 class="mb-0"><i class="fa fa-home text-primary me-2"></i><?php echo htmlspecialchars($room['available']); ?></h6><br>
+
+                    <div class="d-flex mb-3">
+                        <!-- Display bed and bath information dynamically -->
+                        <small class="border-end me-3 pe-3"><i class="fa fa-bed text-primary me-2"></i><?php echo htmlspecialchars($room['bed']); ?></small>
+                        <small class="border-end me-3 pe-3"><i class="fa fa-bath text-primary me-2"></i><?php echo htmlspecialchars($room['bath']); ?></small>
+                        <small><i class="fa fa-wifi text-primary me-2"></i>Wifi</small>
+                    </div>
+
+                    <!-- Guest selection dropdown -->
+                    <div class="d-flex justify-content-between">
+                    <div class="col-md-12">
+                        <div class="form-floating">
+                            <select id="guest-count-<?php echo $row['id']; ?>" class="form-control" name="guest-count-<?php echo $row['id']; ?>" onchange="updateRoomName('<?php echo $room['r_name']; ?>'); calculateAmount(<?php echo $room['price']; ?>, this.value)">
                                 <option value="0">--Select--</option>
                                 <option value="1">1</option>
                                 <option value="2">2</option>
                                 <option value="3">3</option>
                                 <!-- Add more options as needed -->
                             </select>
-                                            <label for="guest-count-single">Select Guest</label>
-                                        </div>
-                                    </div>
-                                </div>
+                            <label for="guest-count-<?php echo $row['id']; ?>">Select Guest</label>
                             </div>
                         </div>
                     </div>
-                <?php } ?>
-                    <?php
-                                    $sql = "SELECT * FROM room Where r_name = 'Standard Twin Room'";
-                                    $result = $conn->query($sql);
-                                   
-                                    
-  // output data of each row
-                                    while($row = $result->fetch_assoc()) {
+                </div>
+            </div>
+        </div>
 
-                                    ?>
+<?php
+    } else {
+        // Room not found
+        echo "<p class='alert alert-danger'>Room not found.</p>";
+    }
+} else {
+    // No room_id provided
+    echo "<p class='alert alert-warning'>No room selected. Please provide a room_id.</p>";
+}
+?>
 
-                    <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
-                        <div class="room-item shadow rounded overflow-hidden">
-                            <div class="position-relative">
-                                <img class="img-fluid" src="img/js.jpg" style="height: 200px; width: 500px;" alt="">
-                                <small class="position-absolute start-0 top-100 translate-middle-y bg-primary text-white rounded py-1 px-3 ms-4">₱<?php echo htmlspecialchars($row['price'], ENT_QUOTES, 'UTF-8'); ?>/Night</small>
-                            </div>
-                            <div class="p-2 mt-2">
-                                <div class="d-flex justify-content-between mb-3">
-                                <h5 class="mb-0"><?php echo htmlspecialchars($row['r_name'], ENT_QUOTES, 'UTF-8'); ?></h5>
-                                    <div class="ps-2">
-                                        <small class="fa fa-star text-primary"></small>
-                                        <small class="fa fa-star text-primary"></small>
-                                        <small class="fa fa-star text-primary"></small>
-                                        <small class="fa fa-star text-primary"></small>
-                                        <small class="fa fa-star text-primary"></small>
-                                        <small class="fa fa-star text-primary"></small>
-
-                                    </div>
-
-                                </div>
-                                <h6 class="mb-0"><i class="fa fa-home text-primary me-2"></i><?php echo $row['available']; ?></h6><br>
-                                <div class="d-flex mb-3">
-                                    <small class="border-end me-3 pe-3"><i class="fa fa-bed text-primary me-2"></i><?php echo $row['bed']; ?></small>
-                                    <small class="border-end me-3 pe-3"><i class="fa fa-bath text-primary me-2"></i><?php echo $row['bath']; ?></small>
-                                    <small><i class="fa fa-wifi text-primary me-2"></i>Wifi</small>
-
-                                </div>
-                               
-                               
-                                <div class="d-flex justify-content-between">
-                                   <div class="col-md-12">
-                                        <div class="form-floating">
-                                            <select id="guest-count-twin" class="form-control" name="guest-count-twin" onchange="calculateAmount()">
-
-                                <option value="0">--Select--</option>
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <!-- Add more options as needed -->
-                            </select>
-                                            <label for="guest-count-twin">Select Guest</label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                <?php } ?>
                     <div class="col-lg-4">
                         <div class="wow fadeInUp" data-wow-delay="0.2s">
                             <form method="POST">
-                            <?php
+
+                            
+
+
+ <?php
         // Check if the form was submitted
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $first_name = $_POST['first_name'];
@@ -333,7 +278,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
         }
         ?>
-                            <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
                                 <div class="row g-3">
                                      <div class="form-floating">
                                             <input type="date" name="checkin_date" class="form-control" id="checkin_date" placeholder="Check-in Date" value="<?php echo date('Y-m-d'); ?>" min="<?php echo date('Y-m-d'); ?>" required>
@@ -344,18 +288,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                             <input type="date" id="checkout_date" class="form-control"name="checkout_date" min="<?php echo date('Y-m-d', strtotime('+1 day')); ?>" required>
                                             <label for="checkout_date">Check-out Date</label>
                                         </div>
-                                    <div class="col-md-12">
-                                        <div class="form-floating">
-                                        <select id="r_name" name="r_name" class="form-control" required>
-                                            <option value="">--Select--</option>
-                                            <option value="Standard Single Room">Standard Single Room</option>
-                                            <option value="Standard Twin Room">Standard Twin Room</option>
-                                            <!-- Add more countries as needed -->
-                                        </select>
-                                            <label for="r_name">Select Room</label>
-                                        </div>
-                                    </div>
+                                        <div class="col-md-12">
+    <div class="form-floating">
+        <input id="r_name" name="r_name" class="form-control" readonly placeholder="Selected Room" required>
+        <label for="r_name">Selected Room</label>
+    </div>
+</div>
+
                                    
+                                    
                                     <div class="col-md-6">
                                         <div class="form-floating">
                                         <input type="text" class="form-control" id="fname" name="first_name" placeholder="Enter Firstname" required oninput="validateInput()" pattern="[A-Za-z\s'-]+">
@@ -374,45 +315,34 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                             <label for="email">Email</label>
                                         </div>
                                     </div>
-                                    <div class="col-6">
-                                   <div class="form-floating">
-                                    <input 
-                                     type="tel" 
-                                     class="form-control" 
-                                     id="phone" 
-                                     name="phone" 
-                                     placeholder="Phone" 
-                                     pattern="\d{11}" 
-                                     maxlength="11" 
-                                     required 
-                                    title="Please enter an 11-digit phone number without letters."
-                                      oninput="this.value = this.value.replace(/[^0-9]/g, '');"
+                                    <div class="col-md-12">
+    <div class="form-floating">
+        <input 
+            type="tel" 
+            class="form-control" 
+            id="phone" 
+            name="phone" 
+            placeholder="Phone" 
+            pattern="\d{11}" 
+            maxlength="11" 
+            required 
+            title="Please enter an 11-digit phone number without letters."
+            oninput="this.value = this.value.replace(/[^0-9]/g, '');"
         >
-                                       <label for="phone">Phone</label>
-                                      </div>
-                                  </div>
+        <label for="phone">Phone</label>
+    </div>
+</div>
 
-
-                                    <div class="col-md-6">
+                                    
+<div class="col-md-12">
+    <div class="form-floating">
+        <input id="amount" name="amount" class="form-control" readonly placeholder="Total Amount" required>
+        <label for="amount">Amount</label>
+    </div>
+</div>
+                                    <div class="col-md-12">
                                         <div class="form-floating">
-                                        <select id="country" name="country" class="form-control" required>
-                                            <option value="">--Select--</option>
-                                            <option value="Philippines">Philippines</option>
-                                            <option value="America">America</option>
-                                            <!-- Add more countries as needed -->
-                                        </select>
-                                            <label for="country">Select Country</label>
-                                        </div>
-                                    </div>
-                                     <div class="col-md-6">
-                                        <div class="form-floating">
-                                           <input type="text" class="form-control" id="amount" name="amount" placeholder="Enter amount" readonly required>
-                                            <label for="amount">Amount</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-floating">
-                                           <input type="text" class="form-control" id="payment" name="payment" placeholder="Payment Method" value="cash" readonly required>
+                                           <input type="text" class="form-control" id="payment" name="payment" placeholder="Payment Method" value="Only accept cash as payment upon arrival" readonly required>
                                             <label for="payment">Payment Method</label>
                                         </div>
                                     </div>
@@ -421,7 +351,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     </div>
                                 </div>
                             </form>
-                            
                         </div>
                     </div>
 
@@ -465,115 +394,35 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <!-- Template Javascript -->
     <script src="js/main.js"></script>
 
+    <script>
+function updateRoomName(roomName) {
+    // Set the value of the room name input field based on the selected room
+    document.getElementById('r_name').value = roomName;
+}
 
-  <script>
+function calculateAmount(price, guestCount) {
+    // Get the check-in and check-out dates
+    const checkInDate = new Date(document.getElementById('checkin_date').value);
+    const checkOutDate = new Date(document.getElementById('checkout_date').value);
 
-        function calculateAmount() {
-           
-            var guestCountSingle = parseInt(document.getElementById("guest-count-single").value);
-            var priceSingle = 850; // Example price for Standard Single Room
+    // Calculate the number of nights (difference between check-in and check-out)
+    let nights = 0;
+    if (checkInDate && checkOutDate && checkOutDate > checkInDate) {
+        nights = Math.ceil((checkOutDate - checkInDate) / (1000 * 60 * 60 * 24)); // Convert milliseconds to days
+    }
 
-            var guestCountTwin = parseInt(document.getElementById("guest-count-twin").value);
-            var priceTwin = 1600; // Example price for Standard Twin Room
+    // Calculate the total amount based on room price, number of guests, and number of nights
+    const amountField = document.getElementById('amount');
+    const guests = parseInt(guestCount);
+    const totalAmount = (nights > 0 && guests > 0) ? price * nights * guests : 0; // Calculate if valid data
 
-
-            
-
-            var checkinDate = new Date(document.getElementById("checkin_date").value);
-            var checkoutDate = new Date(document.getElementById("checkout_date").value);
-            var diffTime = Math.abs(checkoutDate - checkinDate);
-            var diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-            var totalAmount = (guestCountSingle * priceSingle +
-                               guestCountTwin * priceTwin
-                               ) * diffDays;
-
-            document.getElementById("amount").value = '₱ ' + totalAmount.toFixed(2);
-        }
-
-      
-
-
-
-        // Call calculateAmount initially to set the initial amount
-        calculateAmount();
-    </script>
+    // Update the total amount field
+    amountField.value = totalAmount > 0 ? '₱' + totalAmount : '₱0'; // Display the total amount
+}
+</script>
 
     <!-- SweetAlert JS -->
     <script src="js/sweetalert.js"></script>
-
-    <script>
-// Disable right-click
-        document.addEventListener('contextmenu', function (e) {
-            e.preventDefault();
-        });
-
-        // Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U
-        document.onkeydown = function (e) {
-            if (
-                e.key === 'F12' ||
-                (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J')) ||
-                (e.ctrlKey && e.key === 'U')
-            ) {
-                e.preventDefault();
-            }
-        };
-
-        // Disable developer tools
-        function disableDevTools() {
-            if (window.devtools.isOpen) {
-                window.location.href = "about:blank";
-            }
-        }
-
-        // Check for developer tools every 100ms
-        setInterval(disableDevTools, 100);
-
-        // Disable selecting text
-        document.onselectstart = function (e) {
-            e.preventDefault();
-        };
-</script>
-<script>
-document.querySelector('form').addEventListener('submit', function(e) {
-    var checkinDate = document.getElementById("checkin_date").value;
-    var checkoutDate = document.getElementById("checkout_date").value;
-    var email = document.getElementById("email").value;
-    var phone = document.getElementById("phone").value;
-
-    if (new Date(checkinDate) >= new Date(checkoutDate)) {
-        e.preventDefault();
-        Swal.fire({
-            title: "Error!",
-            text: "Check-out date must be after check-in date.",
-            icon: "error"
-        });
-        return false;
-    }
-
-    var emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailPattern.test(email)) {
-        e.preventDefault();
-        Swal.fire({
-            title: "Error!",
-            text: "Please enter a valid email address.",
-            icon: "error"
-        });
-        return false;
-    }
-
-    var phonePattern = /^\d{11}$/;
-    if (!phonePattern.test(phone)) {
-        e.preventDefault();
-        Swal.fire({
-            title: "Error!",
-            text: "Please enter a valid 11-digit phone number.",
-            icon: "error"
-        });
-        return false;
-    }
-});
-</script>
 </body>
 
 </html>
