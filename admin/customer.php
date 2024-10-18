@@ -3,6 +3,7 @@ session_start();
 include("config/connect.php");
 
 
+
 if (!isset($_SESSION['uname'])) {
   header("location:index.php");
   exit();
@@ -154,38 +155,22 @@ if (isset($_GET['delete'])) {
                               while ($row = $result->fetch_assoc()) {
                           ?>
                               <tr>
-                                  <td><?php echo htmlspecialchars($cnt, ENT_QUOTES, 'UTF-8'); ?></td>
-                                  <td><?php echo htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8'); ?></td>
-                                  <td><?php echo htmlspecialchars($row['email'], ENT_QUOTES, 'UTF-8'); ?></td>
-                                  <td><?php echo htmlspecialchars($row['phone'], ENT_QUOTES, 'UTF-8'); ?></td>
+                                  <td><?php echo $cnt; ?></td>
+                                  <td><?php echo $row['name']; ?></td>
+                                  <td><?php echo $row['email']; ?></td>
+                                  <td><?php echo $row['phone']; ?></td>
                                   <td>
-                                      <div class="btn-group dropstart">
-                                      <button
-                                        type="button"
-                                        class="btn btn-primary btn-border dropdown-toggle"
-                                        data-bs-toggle="dropdown"
-                                        aria-haspopup="true"
-                                        aria-expanded="false"
-                                      >
-                                        Action
-                                      </button>
-                                      <ul class="dropdown-menu" role="menu">
-                                        <li>
-                                        <a class="dropdown-item" href="update_customer.php?id=<?php echo $row['id']; ?>">
-                                        <button class="btn btn-info btn-sm"><i class="fa fa-info"></i> Edit</button></a>
-                                          <div class="dropdown-divider"></div>
-                                          <a class="dropdown-item" href="customer.php?delete=<?php echo $row['id']; ?>">
+                                  
+                                          <a href="customer.php?delete=<?php echo $row['id']; ?>">
                                             <button type="button" class="btn btn-danger btn-sm"><i class="fa fa-times"></i> Delete</button></a>
                                         </li>
                                       </ul>
                                     </div>
                                   </td>
                               </tr>
-                          <?php
+                              <?php
                               $cnt++;
                               }
-                          } else {
-                              echo '<tr><td colspan="5">No verified customers found.</td></tr>';
                           }
                           $conn->close();
                           ?>
