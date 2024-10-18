@@ -25,14 +25,14 @@ if (isset($_POST['login'])) {
             if (password_verify($pass, $row['password'])) {
                 // Check if account is verified
                 if ($row['verified'] == 1) {
-                    // Login successful, store session information
+                    // Login successful, store email and verified status in session
                     $_SESSION['email'] = $row['email'];
-                    header("Location: order.php"); // Redirect to dashboard
+                    $_SESSION['verified'] = $row['verified'];  // Ensure this is set
+                    header("Location: order.php"); // Redirect to order page
                     exit(); // Always call exit after a header redirect
                 } else {
-                    // Set error message for unverified account
                     $_SESSION['status'] = "error";
-                    $_SESSION['message'] = "Your account is not verified. Please use verified email account.";
+                    $_SESSION['message'] = "Your account is not verified. Please use a verified email account.";
                     header("Location: index.php");
                     exit();
                 }
@@ -45,7 +45,7 @@ if (isset($_POST['login'])) {
     } else {
         $error = '* Please fill all the fields!';
     }
-}   
+}
 
 // Handle account creation
 if (isset($_POST['create_account'])) {
@@ -58,17 +58,28 @@ if (isset($_POST['create_account'])) {
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
     if (!empty($name) && !empty($email) && !empty($password) && !empty($phone)) {
-        // Prepare statement for account creation
-        $query = "INSERT INTO customer (name, email, password, phone, date_created) 
-                  VALUES (?, ?, ?, ?, NOW())";
-        $stmt = mysqli_prepare($conn, $query);
-        mysqli_stmt_bind_param($stmt, "ssss", $name, $email, $hashed_password, $phone);
-        $result = mysqli_stmt_execute($stmt);
+        // Check if email already exists
+        $email_check_query = "SELECT email FROM customer WHERE email = ?";
+        $stmt = mysqli_prepare($conn, $email_check_query);
+        mysqli_stmt_bind_param($stmt, "s", $email);
+        mysqli_stmt_execute($stmt);
+        $email_check_result = mysqli_stmt_get_result($stmt);
 
-        if ($result) {
-            echo "<script>alert('Account created successfully! Please login.');</script>";
+        if (mysqli_num_rows($email_check_result) == 0) {
+            // Prepare statement for account creation
+            $query = "INSERT INTO customer (name, email, password, phone, date_created) 
+                      VALUES (?, ?, ?, ?, NOW())";
+            $stmt = mysqli_prepare($conn, $query);
+            mysqli_stmt_bind_param($stmt, "ssss", $name, $email, $hashed_password, $phone);
+            $result = mysqli_stmt_execute($stmt);
+
+            if ($result) {
+                echo "<script>alert('Account created successfully! Please login.');</script>";
+            } else {
+                echo "<script>alert('Error creating account. Please try again.');</script>";
+            }
         } else {
-            echo "<script>alert('Error creating account.');</script>";
+            $error = '* Email already exists. Please use a different email.';
         }
     } else {
         $error = '* Please fill all the fields!';
@@ -85,7 +96,7 @@ if (isset($_POST['create_account'])) {
     <link rel="stylesheet" href="assets/css/bootstrap.min.css">
     <link rel="stylesheet" href="assets/css/font-awesome.min.css">
     <link rel="stylesheet" href="assets/css/style.css">
-    
+
     <style type="text/css">
       .divider:after,
       .divider:before {
@@ -110,9 +121,10 @@ if (isset($_POST['create_account'])) {
     </style>
 </head>
 
-<a href="https://rio-lawis.com/" class="btn btn-light back-button" 
-style="background-color: #1572e8; color: white; padding-left: 5px; padding-right: 5px;">Back to Site</a>
 <body>
+<a href="http://localhost/RIO" class="btn btn-light back-button" 
+style="background-color: #1572e8; color: white; padding-left: 5px; padding-right: 5px;">Back to Site</a>
+
 <section class="vh-100" style="background-color: #2a2f5b; color: white;">
   <div class="container-fluid h-custom">
     <div class="row d-flex justify-content-center align-items-center h-100">
@@ -122,20 +134,25 @@ style="background-color: #1572e8; color: white; padding-left: 5px; padding-right
       <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
         <form method="post">
           <div class="d-flex flex-row align-items-center justify-content-center justify-content-lg-start">
-            <div class="d-flex align-items e-center mb-3 pb-1">
+            <div class="d-flex align-items-center mb-3 pb-1">
               <span class="h1 fw-bold mb-0" style="color: #FEA116;">Customer Login</span>
             </div>
           </div>
+
           <p style="color:red;"><?php echo $error; ?></p>
+
           <div class="form-outline mb-4">
             <label class="form-label" for="user">Email</label>
             <input type="text" name="uname" id="user" class="form-control form-control-lg" placeholder="Enter email" />
           </div>
+
           <div class="form-outline mb-3">
             <label class="form-label" for="pass">Password</label>
             <input type="password" name="pass" id="psw" class="form-control form-control-lg" placeholder="Enter password" />
-            <input class="p-2" type="checkbox" onclick="myFunction()" style="margin-left: 10px; margin-top: 13px;"> <span style="margin-left: 5px;">Show password</span>
+            <input class="p-2" type="checkbox" onclick="myFunction()" style="margin-left: 10px; margin-top: 13px;"> 
+            <span style="margin-left: 5px;">Show password</span>
           </div>
+
           <div class="d-flex justify-content-between align-items-center">
             <button type="submit" name="login" class="btn btn-warning btn-lg enter" style="background-color: #1572e8; color: white; padding-left: 2.5rem; padding-right: 2.5rem;">Login</button>
             <a href="create_account.php"  class="btn btn-warning btn-lg enter" style="background-color: #1572e8; color: white; padding-left: 2.5rem; padding-right: 2.5rem;">Create Account</a>
@@ -154,6 +171,7 @@ style="background-color: #1572e8; color: white; padding-left: 5px; padding-right
 <script src="assets/js/bootstrap.min.js"></script>
 <!-- Custom JS -->
 <script src="assets/js/script.js"></script>
+
 <script type="text/javascript">
   function myFunction() {
     var x = document.getElementById("psw");
@@ -165,6 +183,7 @@ style="background-color: #1572e8; color: white; padding-left: 5px; padding-right
   }
 </script>
 
+<!-- SweetAlert -->
 <?php if (isset($_SESSION['status']) && $_SESSION['status'] != ""): ?>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
@@ -180,38 +199,5 @@ style="background-color: #1572e8; color: white; padding-left: 5px; padding-right
     unset($_SESSION['message']);
 endif;
 ?>
-
-<script>
-// Disable right-click
-        document.addEventListener('contextmenu', function (e) {
-            e.preventDefault();
-        });
-
-        // Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U
-        document.onkeydown = function (e) {
-            if (
-                e.key === 'F12' ||
-                (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J')) ||
-                (e.ctrlKey && e.key === 'U')
-            ) {
-                e.preventDefault();
-            }
-        };
-
-        // Disable developer tools
-        function disableDevTools() {
-            if (window.devtools.isOpen) {
-                window.location.href = "about:blank";
-            }
-        }
-
-        // Check for developer tools every 100ms
-        setInterval(disableDevTools, 100);
-
-        // Disable selecting text
-        document.onselectstart = function (e) {
-            e.preventDefault();
-        };
-</script>
 </body>
 </html>

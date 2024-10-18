@@ -2,13 +2,6 @@
 session_start();
 include("config/connect.php");
 
-
-if (!isset($_SESSION['uname'])) {
-    header("location:index.php");
-    exit();
-}
-
-
 // Check if order_id is provided
 if (!isset($_GET['order_id'])) {
     die("No order ID provided");
@@ -27,38 +20,26 @@ while ($row = $result->fetch_assoc()) {
 }
 $stmt->close();
 
-// Process payment
-$show_receipt = false;
-if (isset($_POST['confirm_payment'])) {
-    $payment_amount = floatval($_POST['payment_amount']);
+// Process reservation
+if (isset($_POST['reserve'])) {
     $total_price = 0;
     foreach ($order_details as $detail) {
         $total_price += floatval($detail['prod_price']) * intval($detail['quantity']);
     }
 
-    if ($payment_amount >= $total_price) {
-        // Update order status to "Paid"
-        $sql_update = "UPDATE orders SET status = 'Paid' WHERE order_id = ?";
-        $stmt_update = $conn->prepare($sql_update);
-        $stmt_update->bind_param('i', $order_id);
-        $stmt_update->execute();
-        $stmt_update->close();
+    // Update order status to "Reserved"
+    $sql_update = "UPDATE orders SET status = 'New Reserved' WHERE order_id = ?";
+    $stmt_update = $conn->prepare($sql_update);
+    $stmt_update->bind_param('i', $order_id);
+    $stmt_update->execute();
+    $stmt_update->close();
 
-        // Compute change
-        $change = $payment_amount - $total_price;
+    // Set a session variable to show the alert
+    $_SESSION['reservation_success'] = true;
 
-        // Generate receipt URL
-        $receipt_url = "print_receipt.php?order_id={$order_id}&payment_amount={$payment_amount}&change={$change}";
-
-        // Redirect to receipt URL
-        echo '<script>
-                window.location.href = "'.$receipt_url.'";
-              </script>';
-
-        $show_receipt = true;
-    } else {
-        $receipt = '<div class="alert alert-danger">Payment amount is insufficient.</div>';
-    }
+    // Redirect to the same page to display the SweetAlert
+    header("Location: ".$_SERVER['PHP_SELF']."?order_id=".$order_id);
+    exit();
 }
 ?>
 <!DOCTYPE html>
@@ -70,11 +51,7 @@ if (isset($_POST['confirm_payment'])) {
       content="width=device-width, initial-scale=1.0, shrink-to-fit=no"
       name="viewport"
     />
-    <link
-      rel="icon"
-      href="assets/img/a.jpg"
-      type="image/x-icon"
-    />
+    <link rel="icon" href="assets/img/a.jpg" type="image/x-icon" />
 
     <!-- Fonts and icons -->
     <script src="assets/js/plugin/webfont/webfont.min.js"></script>
@@ -100,10 +77,11 @@ if (isset($_POST['confirm_payment'])) {
     <link rel="stylesheet" href="assets/css/bootstrap.min.css" />
     <link rel="stylesheet" href="assets/css/plugins.min.css" />
     <link rel="stylesheet" href="assets/css/kaiadmin.min.css" />
-<link rel="stylesheet" href="assets/css/demo.css" />
-   
+    <link rel="stylesheet" href="assets/css/demo.css" />
+    <!-- SweetAlert -->
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   </head>
-<body>
+  <body>
     <div class="wrapper">
         <!-- Sidebar -->
         <?php include("include/sidenavigation.php");?>
@@ -163,21 +141,11 @@ if (isset($_POST['confirm_payment'])) {
                                             </tbody>
                                         </table>
                                     </div>
-                                    <!-- Payment Form -->
+                                    <!-- Reservation Form -->
                                     <form method="POST" action="">
-                                        <div class="form-group">
-                                            <label for="payment_amount">Payment Amount:</label>
-                                            <input type="number" id="payment_amount" name="payment_amount" class="form-control" step="0.01" required />
-                                        </div>
-                                        <button type="submit" name="confirm_payment" class="btn btn-primary">Confirm Payment</button>
+                                        <button type="submit" name="reserve" class="btn btn-primary">Reserve</button>
                                     </form>
-                                    <!-- Receipt Display -->
-                                    <?php if ($show_receipt): ?>
-                                    <div class="receipt mt-4">
-                                        <!-- The receipt will be displayed in a new window -->
-                                    </div>
-                                    <?php endif; ?>
-                                </div>
+                              </div>
                             </div>
                         </div>
                     </div>
@@ -186,6 +154,7 @@ if (isset($_POST['confirm_payment'])) {
         </div>
     </div>
 
+    <!-- Core JS Files -->
     <script src="assets/js/core/jquery-3.7.1.min.js"></script>
     <script src="assets/js/core/popper.min.js"></script>
     <script src="assets/js/core/bootstrap.min.js"></script>
@@ -195,5 +164,24 @@ if (isset($_POST['confirm_payment'])) {
     <script src="assets/js/plugin/chart-circle/circles.min.js"></script>
     <script src="assets/js/plugin/datatables/datatables.min.js"></script>
     <script src="assets/js/kaiadmin.min.js"></script>
-</body>
+
+    <!-- SweetAlert Trigger -->
+    <?php if (isset($_SESSION['reservation_success'])): ?>
+    <script>
+        Swal.fire({
+            title: "Success!",
+            text: "Your reservation of foods & drinks has been sent! Waiting for confirmation from the 3J'E Company.",
+            icon: "success"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = "order.php";
+            }
+        });
+    </script>
+    <?php
+        // Unset the session variable to prevent the alert from showing again
+        unset($_SESSION['reservation_success']);
+    endif;
+    ?>
+  </body>
 </html>

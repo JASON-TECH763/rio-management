@@ -61,20 +61,33 @@ if (isset($_POST['verify_otp'])) {
     </script>
 </head>
 <body>
+    <br><br>
+   
     <div class="container mt-5">
         <center>
+            <!-- Box container around the form -->
+            <div class="form-box" style="background-color: #3b4272; padding: 30px; border-radius: 10px; width: 400px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);">
+                
+                        
+                        <!-- Logo image at the top -->
+                        <img src="assets/img/1bg.jpg" alt="Logo" class="img-fluid mb-4" style="max-width: 100px; border-radius: 50%;">
             <form method="post">
-                <div class="d-flex flex-row align-items-center justify-content-center" style="color:#FEA116; font-size: 2.5rem;">
-                    <h1 class="mb-5">Verify OTP</h1>
-                </div>
-                <div class="form-outline mb-3">
-                    <input type="text" name="otp" id="otp" class="form-control form-control-lg" placeholder="Enter OTP" required />
-                </div>
-                <br><br>
-                <div class="d-flex justify-content-center">
-                    <button type="submit" name="verify_otp" class="btn btn-warning btn-lg" style="background-color: #1572e8; color: white; padding-left: 2.5rem; padding-right: 2.5rem;">Verify OTP</button>
-                </div>
-            </form>
+                    <div class="d-flex flex-row align-items-center justify-content-center" style="color:#FEA116; font-size: 1.7rem;">
+                        <h1 class="mb-5">Verify OTP</h1>
+                    </div>
+                    <span style="color: white; font-size: 1.1rem; margin-bottom: 20px;">Enter OTP number to verify your account:</span>
+                    
+                    <div class="form-outline mb-3">
+                        <br>
+                        <input type="text" name="otp" id="otp" class="form-control form-control-lg" placeholder="Enter OTP" required />
+                        <br> 
+                    </div>
+                    <br><br>
+                    <div class="d-flex justify-content-center">
+                        <button type="submit" name="verify_otp" class="btn btn-warning btn-lg" style="background-color: #1572e8; color: white; padding-left: 2.5rem; padding-right: 2.5rem;">Verify OTP</button>
+                    </div>
+                </form>
+            </div>
         </center>
     </div>
 
@@ -101,4 +114,5 @@ if (isset($_POST['verify_otp'])) {
         }
     </style>
 </body>
+
 </html>

@@ -86,7 +86,7 @@
               <li class="nav-item">
                 <a  href="order.php">
                   <i class="fas fa-shopping-cart"></i>
-                  <p>Manage Orders</p>
+                  <p>Foods & Drinks Menu</p>
                  
                 </a>
               </li>
@@ -97,30 +97,30 @@
                  
                 </a>
               </li> -->
-              <li class="nav-item">
-                <a  href="manage_order.php">
+              <!--<li class="nav-item">
+                <a  href="reservation_summary.php">
                   <i class="fas fa-receipt"></i>
-                  <p>Orders Paid</p>
+                  <p>Foods & Products</p>
                  
                 </a>
-              </li>
+              </li>-->
              <!--  <li class="nav-item">
                 <a  href="customer.php">
                   <i class="fas fa-user-tie"></i>
                   <p>Manage Staff</p>
                   
                 </a>
-              </li> -->
+              </li> 
               <li class="nav-section">
                 <span class="sidebar-mini-icon">
                   <i class="fa fa-ellipsis-h"></i>
                 </span>
                 <h4 class="text-section">Reports</h4>
-              </li>
+              </li>-->
                <!-- <li class="nav-item">
                 <a  href="booking_reports.php">
                   <i class="fas fa-th-list"></i>
-                  <p>Booking Reports</p>-->
+                  <p>Booking Reports</p>
                  
                 </a>
               </li>
@@ -130,7 +130,7 @@
                   <p>Orders Reports</p>
                  
                 </a>
-              </li>
+              </li>-->
                <!-- <li class="nav-item">
                 <a  href="sales_report.php">
                   <i class="fas fa-file-invoice"></i>

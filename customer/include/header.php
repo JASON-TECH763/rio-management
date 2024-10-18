@@ -30,25 +30,39 @@
       </nav>
 
       <ul class="navbar-nav topbar-nav ms-md-auto align-items-center">
-        <li class="nav-item topbar-user dropdown hidden-caret">
-          <a class="dropdown-toggle profile-pic" data-bs-toggle="dropdown" href="#" aria-expanded="false">
+    <li class="nav-item topbar-user dropdown hidden-caret">
+        <a class="dropdown-toggle profile-pic" data-bs-toggle="dropdown" href="#" aria-expanded="false">
             <div class="avatar-sm">
-              <img src="assets/img/p.png" alt="..." class="avatar-img rounded-circle" />
+                <img src="assets/img/p.png" alt="Profile Picture" class="avatar-img rounded-circle" />
             </div>
             <span class="profile-username" style="color:white;">
-              <span class="fw-bold"><?php echo $_SESSION['email']; ?></span>
+                <span class="fw-bold">
+                    <?php 
+                    // Check if user is logged in and account is verified
+                    if (isset($_SESSION['email']) && isset($_SESSION['verified']) && $_SESSION['verified'] == 1) {
+                        echo htmlspecialchars($_SESSION['email']); // Display the logged-in user's email
+                    } else {
+                        echo "Guest"; // Display 'Guest' if no user is logged in
+                    }
+                    ?>
+                </span>
             </span>
-          </a>
-          <ul class="dropdown-menu dropdown-user animated fadeIn">
+        </a>
+        <ul class="dropdown-menu dropdown-user animated fadeIn">
             <div class="dropdown-user-scroll scrollbar-outer">
-              <li>
-                <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="index.php">Logout</a>
-              </li>
+                <?php if (isset($_SESSION['email'])): ?>
+                <li>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="index.php">Logout</a> <!-- Link to logout page -->
+                </li>
+                <?php endif; ?>
             </div>
-          </ul>
-        </li>
-      </ul>
+        </ul>
+    </li>
+</ul>
+
+
+
     </div>
   </nav>
   <!-- End Navbar -->

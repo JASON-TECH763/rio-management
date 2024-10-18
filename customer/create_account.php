@@ -133,42 +133,136 @@ if (isset($_POST['create_account'])) {
     <link rel="stylesheet" href="assets/css/font-awesome.min.css">
     <link rel="stylesheet" href="assets/css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Include Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <style>
+
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            padding-right: 40px; /* Space for the icon */
+            box-sizing: border-box;
+        }
+        .password-toggle {
+            cursor: pointer;
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
+    </style>
 </head>
+
 <body>
-    <a href="http://localhost/RIO" class="btn btn-light back-button" style="background-color: #1572e8; color: white;">Back to Site</a>
     <section class="vh-100" style="background-color: #2a2f5b; color: white;">
         <div class="container-fluid h-custom">
             <div class="row d-flex justify-content-center align-items-center h-100">
-                <div class="col-md-9 col-lg-6 col-xl-5 position-relative">
-                    <img src="assets/img/1bg.jpg" class="img-fluid" alt="Sample image">
-                </div>
                 <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
-                    <form method="post">
-                        <div class="d-flex flex-row align-items-center justify-content-center justify-content-lg-start">
-                            <span class="h1 fw-bold mb-0" style="color: #FEA116; text-align: center;">Create Customer Account</span>
-                        </div>
-                        <p style="color:red;"><?php echo $error; ?></p>
-                        <div class="form-outline mb-4">
-                            <div class="form-group">
-                                <label for="name">Name</label>
-                                <input type="text" name="name" id="name" class="form-control" placeholder="Enter your name" required>
+                    <!-- Box container around the form -->
+                    <div class="form-box text-center position-relative" style="background-color: #3b4272; padding: 30px; border-radius: 10px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);">
+                        
+                        <!-- Icon button for back -->
+                        <a href="http://localhost/RIO" class="btn btn-light position-absolute" style="top: 10px; left: 10px; background-color: transparent; color:  #1572e8;">
+                            <i class="fas fa-arrow-left"></i>
+                        </a>
+                        
+                        <!-- Logo image at the top -->
+                        <img src="assets/img/1bg.jpg" alt="Logo" class="img-fluid mb-4" style="max-width: 100px; border-radius: 50%;">
+                        
+                        <form method="post">
+                            <div class="d-flex flex-row align-items-center justify-content-center justify-content-lg-start">
+                                <span class="h1 fw-bold mb-0" style="color: #FEA116; text-align: center;">Create Customer Account</span>
                             </div>
+                            <p style="color:red;"><?php echo $error; ?></p>
+                            <div class="form-outline mb-4">
                             <div class="form-group">
-                                <label for="email">Email</label>
-                                <input type="email" name="email" id="email" class="form-control" placeholder="Enter your email" required>
+    <label for="name"></label>
+    <input type="text" name="name" id="name" class="form-control" placeholder="Enter your name" required 
+    pattern="[A-Za-zÀ-ž' -]+" title="Name can contain only letters, hyphens, apostrophes, and spaces." oninput="validateName()">
+</div>
+
+<script>
+    // JavaScript function to prevent script tags and allow certain symbols
+    function validateName() {
+        var nameField = document.getElementById('name');
+        var value = nameField.value;
+
+        // Regular expression to allow letters, hyphens, apostrophes, and spaces, but no < or > (to prevent script tags)
+        var regex = /^[A-Za-zÀ-ž'-]+$/;
+
+        if (!regex.test(value)) {
+            nameField.setCustomValidity("Please enter a valid name!");
+        } else {
+            nameField.setCustomValidity(""); // Clear the message if valid
+        }
+    }
+</script>
+
+<?php
+// Check if the form was submitted
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $name = $_POST['name'];
+
+    // Sanitize input to remove any HTML or script tags
+    $name_sanitized = htmlspecialchars($name, ENT_QUOTES, 'UTF-8');
+
+    // Validate the input: allow letters, hyphens, apostrophes, and spaces, but block < or >
+    if (!preg_match("/^[A-Za-zÀ-ž'-]+$/", $name)) {
+        echo '<div class="alert alert-danger">Invalid input: Please enter a valid name (letters, hyphens, apostrophes, and spaces only).</div>';
+    } else if ($name !== $name_sanitized) {
+        echo '<div class="alert alert-danger">Invalid input: HTML or script tags are not allowed.</div>';
+    } else {
+        // If valid, display success message
+        echo '<div class="alert alert-success">Input is valid. Form submitted successfully!</div>';
+        // Here, you can proceed with storing or processing the sanitized input.
+    }
+}
+?>
+
+                                <br>
+                                <div class="form-group">
+                                    <label for="email"></label>
+                                    <input type="email" name="email" id="email" class="form-control" placeholder="Enter your email" required>
+                                </div>
+                                <br>
+                                <div class="form-group position-relative">
+    <label for="password"></label>
+    <input type="password" name="password" id="password" class="form-control" placeholder="Enter your password" minlength="8" pattern="(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}" title="Password must contain at least one uppercase letter, one number, and one special character" required>
+    <span class="password-toggle" style="cursor: pointer; position: absolute; right: 10px; top: 50%; transform: translateY(-50%);">
+        <i class="fas fa-eye" id="togglePassword" onclick="togglePasswordVisibility()"></i>
+    </span>
+</div>
+
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+<script>
+    function togglePasswordVisibility() {
+        const passwordInput = document.getElementById("password");
+        const toggleIcon = document.getElementById("togglePassword");
+        
+        if (passwordInput.type === "password") {
+            passwordInput.type = "text";
+            toggleIcon.classList.remove("fa-eye-slash");
+            toggleIcon.classList.add("fa-eye");
+        } else {
+            passwordInput.type = "password";
+            toggleIcon.classList.remove("fa-eye");
+            toggleIcon.classList.add("fa-eye-slash");
+        }
+    }
+</script>
+
+                                <br>
+                                <div class="form-group">
+                                    <label for="phone"></label>
+                                    <input type="text" name="phone" id="phone" class="form-control" placeholder="Enter your phone number" pattern="09\d{9}" maxlength="11" title="Phone number must start with '09' and be exactly 11 digits" required>
+                                </div>
+                                <br>
+                                <button type="submit" name="create_account" class="btn btn-warning btn-lg" style="background-color: #1572e8; color: white;">Send verification code</button>
                             </div>
-                            <div class="form-group">
-                                <label for="password">Password</label>
-                                <input type="password" name="password" id="password" class="form-control" placeholder="Enter your password" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="phone">Phone Number</label>
-                                <input type="text" name="phone" id="phone" class="form-control" placeholder="Enter your phone number" required>
-                            </div>
-                            <br>
-                            <button type="submit" name="create_account" class="btn btn-warning btn-lg" style="background-color: #1572e8; color: white;">Send verification code</button>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -194,4 +288,5 @@ if (isset($_POST['create_account'])) {
     endif;
     ?>
 </body>
+
 </html>

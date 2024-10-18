@@ -47,12 +47,16 @@ if (isset($_POST['add_order'])) {
         </script>';
     }
 }
-
-// Handle placing the order
 if (isset($_POST['place_order'])) {
-    // Insert into orders table
-    $sql_order = "INSERT INTO orders (order_date) VALUES (NOW())"; // Adjust as needed
-    if ($conn->query($sql_order)) {
+    // Guest email (can be hardcoded or fetched from form)
+    $guest_email = "Guest";  // You can replace this with a dynamic email if needed
+
+    // Insert into orders table with guest email
+    $sql_order = "INSERT INTO orders (order_date, customer_email) VALUES (NOW(), ?)";
+    $stmt_order = $conn->prepare($sql_order);
+    $stmt_order->bind_param('s', $guest_email);
+
+    if ($stmt_order->execute()) {
         $order_id = $conn->insert_id;
 
         // Insert into order_details table
@@ -81,6 +85,7 @@ if (isset($_POST['place_order'])) {
         </script>';
     }
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -129,7 +134,7 @@ if (isset($_POST['place_order'])) {
                             <div class="d-flex align-items-center">
                                 
                                <form method="post" action="">
-                                <button type="submit" name="place_order" class="btn btn-primary"> <i class="fas fa-cart-plus" ></i> Reserve Order</button>
+                                <button type="submit" name="place_order" class="btn btn-primary"> <i class="fas fa-cart-plus" ></i> Place Order</button>
 
                             </form>
                             </div>
