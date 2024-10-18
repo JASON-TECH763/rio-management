@@ -251,39 +251,46 @@ if (isset($_GET['room_id'])) {
                             <form method="POST">
 
                             
-
-
                             <?php
-    if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        // Input length validation to prevent excessively large inputs
-        if (strlen($_POST['first_name']) > 100 || strlen($_POST['last_name']) > 100) {
-            echo '<div class="alert alert-danger">Invalid input: Name too long. Maximum 100 characters allowed.</div>';
-            exit; // Exit early to prevent further processing
-        }
-
-        // Sanitize first name and last name inputs using filter_input and trim unnecessary spaces
-        $first_name = trim(filter_input(INPUT_POST, 'first_name', FILTER_SANITIZE_STRING));
-        $last_name = trim(filter_input(INPUT_POST, 'last_name', FILTER_SANITIZE_STRING));
-
-        // Additional sanitization to block any HTML or script tags
-        $first_name_sanitized = htmlspecialchars($first_name, ENT_QUOTES, 'UTF-8');
-        $last_name_sanitized = htmlspecialchars($last_name, ENT_QUOTES, 'UTF-8');
-
-        // Regex validation: allow letters, hyphens, apostrophes, and spaces only
-        if (!preg_match("/^[A-Za-z\s'-]+$/", $first_name)) {
-            echo '<div class="alert alert-danger">Invalid input: Please enter a valid first name (letters, hyphens, apostrophes, and spaces only).</div>';
-        } elseif ($first_name !== $first_name_sanitized) {
-            echo '<div class="alert alert-danger">Invalid input: HTML or script tags are not allowed in first name.</div>';
-        } elseif (!preg_match("/^[A-Za-z\s'-]+$/", $last_name)) {
-            echo '<div class="alert alert-danger">Invalid input: Please enter a valid last name (letters, hyphens, apostrophes, and spaces only).</div>';
-        } elseif ($last_name !== $last_name_sanitized) {
-            echo '<div class="alert alert-danger">Invalid input: HTML or script tags are not allowed in last name.</div>';
-        } else {
-            // If both inputs are valid, proceed
-            echo '<div class="alert alert-success">Input is valid. Form submitted successfully!</div>';
-            // Process the sanitized input or store it as needed
-        }
+// Function to limit input size early to avoid large payloads being processed
+function limit_input_size($input, $max_length = 100) {
+    if (strlen($input) > $max_length) {
+        return false; // Return false if input exceeds the allowed size
     }
+    return true;
+}
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Limit input size and exit early if too large
+    if (!limit_input_size($_POST['first_name']) || !limit_input_size($_POST['last_name'])) {
+        echo '<div class="alert alert-danger">Invalid input: Name too long. Maximum 100 characters allowed.</div>';
+        exit; // Stop further execution to save resources
+    }
+
+    // Efficient sanitization using trim and filter_input
+    $first_name = trim(filter_input(INPUT_POST, 'first_name', FILTER_SANITIZE_STRING));
+    $last_name = trim(filter_input(INPUT_POST, 'last_name', FILTER_SANITIZE_STRING));
+
+    // Sanitize to block any HTML or script tags
+    $first_name_sanitized = htmlspecialchars($first_name, ENT_QUOTES, 'UTF-8');
+    $last_name_sanitized = htmlspecialchars($last_name, ENT_QUOTES, 'UTF-8');
+
+    // Efficient regex processing: Validates the input in one step
+    $name_pattern = "/^[A-Za-z\s'-]+$/";
+
+    // Validate names and avoid unnecessary computations
+    if (!preg_match($name_pattern, $first_name) || $first_name !== $first_name_sanitized) {
+        echo '<div class="alert alert-danger">Invalid input: Please enter a valid first name (letters, hyphens, apostrophes, and spaces only).</div>';
+    } elseif (!preg_match($name_pattern, $last_name) || $last_name !== $last_name_sanitized) {
+        echo '<div class="alert alert-danger">Invalid input: Please enter a valid last name (letters, hyphens, apostrophes, and spaces only).</div>';
+    } else {
+        // Proceed with valid input and reduce unnecessary operations
+        echo '<div class="alert alert-success">Input is valid. Form submitted successfully!</div>';
+
+        // Efficiently handle data here (e.g., store in the database) without redundant file access or memory usage
+        // Make sure to batch operations if interacting with the database or external resources
+    }
+}
 ?>
 
                                 <div class="row g-3">
