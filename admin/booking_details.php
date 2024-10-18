@@ -20,7 +20,7 @@ use PHPMailer\PHPMailer\SMTP;
 
 
 // Fetch bookings from database
-$sql = "SELECT id, booking_id, checkin_date, checkout_date, r_name, amount, first_name, last_name , email, phone, country, payment, status FROM reservations order by created_at desc";
+$sql = "SELECT id, booking_id, checkin_date, checkout_date, r_name, amount, first_name, last_name , email, phone, payment, status FROM reservations order by created_at desc";
 $result = $conn->query($sql);
 
 $bookings = array();
