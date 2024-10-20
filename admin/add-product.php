@@ -3,46 +3,85 @@ session_start();
 include("config/connect.php");
 include("config/code-generator.php");
 
-
+// Check if the user is authenticated
 if (!isset($_SESSION['uname'])) {
     header("location:index.php");
     exit();
 }
 
+// Function to sanitize and validate inputs
+function sanitize_input($data) {
+    return htmlspecialchars(trim($data), ENT_QUOTES, 'UTF-8');
+}
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $prod_id = $_POST['prod_id'];
-    $prod_name = $_POST['prod_name'];
-    $prod_price = $_POST['prod_price'];
-    
-    // Check if a file is uploaded
-    if(isset($_FILES['prod_img']) && $_FILES['prod_img']['error'] == UPLOAD_ERR_OK) {
-        $prod_img = $_FILES['prod_img']['name'];
-        move_uploaded_file($_FILES["prod_img"]["tmp_name"], "assets/img/products/" . $_FILES["prod_img"]["name"]);
-        
-        $sql = "INSERT INTO rpos_products (prod_id, prod_name, prod_price, prod_img)
-                VALUES ('$prod_id', '$prod_name', '$prod_price', '$prod_img')";
+    // Sanitize input data
+    $prod_id = sanitize_input($_POST['prod_id']);
+    $prod_name = sanitize_input($_POST['prod_name']);
+    $prod_price = sanitize_input($_POST['prod_price']);
 
-        if ($conn->query($sql) === TRUE) {
-            echo '<script>
-                    window.onload = function() {
-                        Swal.fire({
-                            title: "Success!",
-                            text: "Data added successfully",
-                            icon: "success"
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                window.location.href = "product.php";
-                            }
-                        });
-                    };
-                  </script>';
+    // Prepared statement to prevent SQL injection
+    if (isset($_FILES['prod_img']) && $_FILES['prod_img']['error'] == UPLOAD_ERR_OK) {
+        $file_name = basename($_FILES['prod_img']['name']);
+        $file_ext = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
+
+        // Validate file type (allow only certain image types)
+        $allowed_exts = ['jpg', 'jpeg', 'png', 'gif'];
+        if (in_array($file_ext, $allowed_exts)) {
+            // Generate a unique file name to prevent file overwrite
+            $new_file_name = uniqid() . '.' . $file_ext;
+            $upload_dir = 'assets/img/products/';
+            $upload_path = $upload_dir . $new_file_name;
+
+            // Move the uploaded file to the target directory
+            if (move_uploaded_file($_FILES["prod_img"]["tmp_name"], $upload_path)) {
+                // Prepare the SQL query
+                $stmt = $conn->prepare("INSERT INTO rpos_products (prod_id, prod_name, prod_price, prod_img) VALUES (?, ?, ?, ?)");
+                $stmt->bind_param("ssds", $prod_id, $prod_name, $prod_price, $new_file_name);
+
+                if ($stmt->execute()) {
+                    echo '<script>
+                            window.onload = function() {
+                                Swal.fire({
+                                    title: "Success!",
+                                    text: "Data added successfully",
+                                    icon: "success"
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        window.location.href = "product.php";
+                                    }
+                                });
+                            };
+                          </script>';
+                } else {
+                    echo '<script>
+                            window.onload = function() {
+                                Swal.fire({
+                                    title: "Error!",
+                                    text: "Failed to add data.",
+                                    icon: "error"
+                                });
+                            };
+                          </script>';
+                }
+                $stmt->close();
+            } else {
+                echo '<script>
+                        window.onload = function() {
+                            Swal.fire({
+                                title: "Error!",
+                                text: "Failed to upload image.",
+                                icon: "error"
+                            });
+                        };
+                      </script>';
+            }
         } else {
             echo '<script>
                     window.onload = function() {
                         Swal.fire({
-                            title: "Error!",
-                            text: "Failed to add data.",
+                            title: "Invalid File Type!",
+                            text: "Please upload a valid image file.",
                             icon: "error"
                         });
                     };
@@ -53,7 +92,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 window.onload = function() {
                     Swal.fire({
                         title: "Error!",
-                        text: "Failed to upload image.",
+                        text: "No file uploaded or file upload error.",
                         icon: "error"
                     });
                 };
@@ -61,6 +100,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
