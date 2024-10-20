@@ -9,74 +9,86 @@ if (!isset($_SESSION['uname'])) {
   exit();
 }
 
-
+// Function to sanitize and validate room name
+function sanitizeRoomName($input) {
+    // Remove any HTML tags
+    $sanitized = strip_tags($input);
+    // Convert special characters to HTML entities
+    $sanitized = htmlspecialchars($sanitized, ENT_QUOTES, 'UTF-8');
+    // Only allow letters, numbers, spaces, hyphens, and apostrophes
+    $sanitized = preg_replace("/[^a-zA-Z0-9 '-]/", "", $sanitized);
+    return $sanitized;
+}
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $r_name = $_POST['r_name'];
+    $r_name = sanitizeRoomName($_POST['r_name']);
     $available = $_POST['available'];
     $bath = $_POST['bath'];
     $bed = $_POST['bed'];
     $price = $_POST['price'];
 
-    if (isset($_FILES["r_img"]) && $_FILES["r_img"]["error"] == 0) {
-        $target_dir = "uploads/"; // Relative path for front-end
-        if (!is_dir($target_dir)) {
-            mkdir($target_dir, 0777, true); // Create uploads folder if not exists
-        }
-
-        $imageFileType = strtolower(pathinfo($_FILES["r_img"]["name"], PATHINFO_EXTENSION));
-        $target_file = $target_dir . uniqid() . '.' . $imageFileType;
-
-        $uploadOk = 1;
-        $check = getimagesize($_FILES["r_img"]["tmp_name"]);
-
-        if ($check === false) {
-            echo "File is not an image.";
-            $uploadOk = 0;
-        }
-
-        if ($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg" && $imageFileType != "gif") {
-            echo "Sorry, only JPG, JPEG, PNG & GIF files are allowed.";
-            $uploadOk = 0;
-        }
-
-        if ($uploadOk == 1) {
-            if (move_uploaded_file($_FILES["r_img"]["tmp_name"], $target_file)) {
-                echo "File uploaded successfully to: " . $target_file; // Debugging
-
-                $r_img = basename($target_file); // Save just the filename
-                $sql = "INSERT INTO room (r_name, available, bath, bed, price, r_img) VALUES ('$r_name', '$available', '$bath', '$bed', '$price', '$r_img')";
-
-                if ($conn->query($sql) === TRUE) {
-                    echo '<script>
-                            window.onload = function() {
-                                Swal.fire({
-                                    title: "Success!",
-                                    text: "Data added successfully",
-                                    icon: "success"
-                                }).then((result) => {
-                                    if (result.isConfirmed) {
-                                        window.location.href = "room.php";
-                                    }
-                                });
-                            };
-                          </script>';
-                } else {
-                    echo "Error: " . $conn->error;
-                }
-            } else {
-                echo "Sorry, there was an error uploading your file.";
-                var_dump(error_get_last());
-            }
-        }
+    // Validate room name
+    if (empty($r_name) || strlen($r_name) > 100) {
+        echo '<div class="alert alert-danger">Invalid room name. Please enter a valid name (up to 100 characters).</div>';
     } else {
-        echo "No file was uploaded or an error occurred.";
+        if (isset($_FILES["r_img"]) && $_FILES["r_img"]["error"] == 0) {
+            $target_dir = "uploads/";
+            if (!is_dir($target_dir)) {
+                mkdir($target_dir, 0777, true);
+            }
+
+            $imageFileType = strtolower(pathinfo($_FILES["r_img"]["name"], PATHINFO_EXTENSION));
+            $target_file = $target_dir . uniqid() . '.' . $imageFileType;
+
+            $uploadOk = 1;
+            $check = getimagesize($_FILES["r_img"]["tmp_name"]);
+
+            if ($check === false) {
+                echo "File is not an image.";
+                $uploadOk = 0;
+            }
+
+            if ($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg" && $imageFileType != "gif") {
+                echo "Sorry, only JPG, JPEG, PNG & GIF files are allowed.";
+                $uploadOk = 0;
+            }
+
+            if ($uploadOk == 1) {
+                if (move_uploaded_file($_FILES["r_img"]["tmp_name"], $target_file)) {
+                    $r_img = basename($target_file);
+                    $sql = "INSERT INTO room (r_name, available, bath, bed, price, r_img) VALUES (?, ?, ?, ?, ?, ?)";
+                    $stmt = $conn->prepare($sql);
+                    $stmt->bind_param("ssssss", $r_name, $available, $bath, $bed, $price, $r_img);
+
+                    if ($stmt->execute()) {
+                        echo '<script>
+                                window.onload = function() {
+                                    Swal.fire({
+                                        title: "Success!",
+                                        text: "Data added successfully",
+                                        icon: "success"
+                                    }).then((result) => {
+                                        if (result.isConfirmed) {
+                                            window.location.href = "room.php";
+                                        }
+                                    });
+                                };
+                              </script>';
+                    } else {
+                        echo "Error: " . $stmt->error;
+                    }
+                    $stmt->close();
+                } else {
+                    echo "Sorry, there was an error uploading your file.";
+                    var_dump(error_get_last());
+                }
+            }
+        } else {
+            echo "No file was uploaded or an error occurred.";
+        }
     }
 }
 ?>
-
-
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -156,28 +168,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   <div class="row g-3">
     <div class="col-md-12">
     <div class="form-floating">
-        <input type="text" class="form-control" id="r_name" name="r_name" placeholder="Enter Room Name" required 
-        pattern="[A-Za-zÀ-ž' -]+" title="Room Name can contain only letters, hyphens, apostrophes, and spaces." oninput="validateRoomName()">
-        <label for="r_name">Room Name</label>
-    </div>
+                    <input type="text" class="form-control" id="r_name" name="r_name" placeholder="Enter Room Name" required 
+                           pattern="[A-Za-z0-9 '-]{1,100}" title="Room Name can contain only letters, numbers, spaces, hyphens, and apostrophes (up to 100 characters)." oninput="validateRoomName(this)">
+                    <label for="r_name">Room Name</label>
+                </div>
 </div>
 
 <script>
-    // JavaScript function to prevent script tags and allow certain symbols
-    function validateRoomName() {
-        var nameField = document.getElementById('r_name');
-        var value = nameField.value;
-
-        // Regular expression to allow letters, hyphens, apostrophes, and spaces, but no < or > (to prevent script tags)
-        var regex = /^[A-Za-zÀ-ž' -]+$/;
-
+    function validateRoomName(input) {
+        var value = input.value;
+        var regex = /^[A-Za-z0-9 '-]{1,100}$/;
+        
         if (!regex.test(value)) {
-            nameField.setCustomValidity("Please enter a valid room name (letters, hyphens, apostrophes, and spaces allowed).");
+            input.setCustomValidity("Please enter a valid room name (up to 100 characters, letters, numbers, spaces, hyphens, and apostrophes allowed).");
         } else {
-            nameField.setCustomValidity(""); // Clear the message if valid
+            input.setCustomValidity("");
         }
     }
-</script>
+    </script>
 
 <?php
 // Check if the form was submitted
