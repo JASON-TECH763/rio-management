@@ -18,6 +18,6 @@ if (ini_get("session.use_cookies")) {
 }
 
 // Redirect to the index page
-header("Location: index.php");
+header("Location: ../index.php");
 exit();
 ?>
