@@ -7,12 +7,11 @@ if (!isset($_SESSION['csrf_token'])) {
 }
 
 // Set security headers
-header("Content-Security-Policy: default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; img-src 'self' data:; font-src 'self' https://fonts.googleapis.com https://cdn.jsdelivr.net; frame-ancestors 'none'; form-action 'self'; base-uri 'self';");
+header("Content-Security-Policy: default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; style-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; img-src 'self' data:; font-src 'self' https://fonts.googleapis.com https://cdn.jsdelivr.net; frame-ancestors 'none'; form-action 'self'; base-uri 'self';");
 header("X-XSS-Protection: 1; mode=block");
 header("X-Frame-Options: DENY");
 header("X-Content-Type-Options: nosniff");
 header("Referrer-Policy: strict-origin-when-cross-origin");
-header("Permissions-Policy: geolocation=(), microphone=(), camera=()");
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -25,33 +24,8 @@ header("Permissions-Policy: geolocation=(), microphone=(), camera=()");
     <link rel="stylesheet" href="assets/css/font-awesome.min.css">
     <link rel="stylesheet" href="assets/css/style.css">
     <style type="text/css">
-      .divider:after,
-      .divider:before {
-        content: "";
-        flex: 1;
-        height: 1px;
-        background: #eee;
-      }
-      .h-custom {
-        height: calc(100% - 73px);
-      }
-      @media (max-width: 450px) {
-        .h-custom {
-          height: 100%;
-        }
-      }
-      .back-button {
-        position: absolute;
-        top: 20px;
-        left: 20px;
-      }
+      /* ... (existing styles) ... */
     </style>
-    <script>
-        // Protect against XSS
-        function sanitize(str) {
-            return str.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-        }
-    </script>
 </head>
 <body>
 <a href="https://rio-lawis.com/" class="btn btn-light back-button" 
@@ -127,14 +101,18 @@ document.getElementById('loginForm').addEventListener('submit', function(e) {
     });
 });
 
-// Security measures
-document.addEventListener('contextmenu', e => e.preventDefault());
-document.onkeydown = function(e) {
-    if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J')) || (e.ctrlKey && e.key === 'U')) {
+// Modified security measures
+document.addEventListener('contextmenu', function(e) {
+    if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
         e.preventDefault();
     }
+});
+
+document.onkeydown = function(e) {
+    if (e.ctrlKey && (e.keyCode === 85 || e.keyCode === 83)) {
+        return false;
+    }
 };
-document.onselectstart = e => e.preventDefault();
 </script>
 </body>
 </html>
