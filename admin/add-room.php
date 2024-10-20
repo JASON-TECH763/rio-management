@@ -9,6 +9,8 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
+
+<?php include("include/sidenavigation.php"); ?>
     <div class="container">
         <h3>Add New Room</h3>
         <form id="roomForm" enctype="multipart/form-data">
