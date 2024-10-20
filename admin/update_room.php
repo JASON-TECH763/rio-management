@@ -2,6 +2,7 @@
 session_start();
 include("config/connect.php");
 
+// Content Security Policy to protect against XSS
 header("Content-Security-Policy: default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; img-src 'self' data:; font-src 'self' https://fonts.googleapis.com https://cdn.jsdelivr.net; frame-ancestors 'none'; form-action 'self'; base-uri 'self';");
 
 if (!isset($_SESSION['uname'])) {
@@ -9,47 +10,55 @@ if (!isset($_SESSION['uname'])) {
   exit();
 }
 
-
 // Check if `id` is present in the URL and form is submitted
 if (isset($_GET['id']) && isset($_POST['submit'])) {
     $id = intval($_GET['id']); // Ensure ID is an integer
-    $r_name = $_POST['r_name'];
-    $available = $_POST['available'];
-    $bed = $_POST['bed'];
-    $bath = $_POST['bath'];
-    $price = $_POST['price'];
 
-    // Handle image upload
+    // Sanitize and validate input to prevent XSS and injection
+    $r_name = htmlspecialchars($_POST['r_name'], ENT_QUOTES, 'UTF-8');
+    $available = htmlspecialchars($_POST['available'], ENT_QUOTES, 'UTF-8');
+    $bed = htmlspecialchars($_POST['bed'], ENT_QUOTES, 'UTF-8');
+    $bath = htmlspecialchars($_POST['bath'], ENT_QUOTES, 'UTF-8');
+    $price = filter_var($_POST['price'], FILTER_VALIDATE_FLOAT); // Ensure price is a valid number
+
+    if ($price === false) {
+        echo "Invalid price format.";
+        exit();
+    }
+
+    // Handle image upload securely
     $image_path = ""; // Initialize image path
     if (isset($_FILES["r_img"]) && $_FILES["r_img"]["error"] == 0) {
+        $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif'];
         $target_dir = __DIR__ . "/uploads/"; // Absolute path to 'uploads' directory
+
+        // Check if directory exists, otherwise create it
         if (!is_dir($target_dir)) {
-            mkdir($target_dir, 0777, true); // Create the directory if it doesn't exist
+            mkdir($target_dir, 0777, true);
         }
 
         $imageFileType = strtolower(pathinfo($_FILES["r_img"]["name"], PATHINFO_EXTENSION));
         $target_file = $target_dir . uniqid() . '.' . $imageFileType;
 
-        $uploadOk = 1;
+        // Validate the image
         $check = getimagesize($_FILES["r_img"]["tmp_name"]);
-
         if ($check === false) {
-            echo "File is not an image.";
-            $uploadOk = 0;
+            echo "File is not a valid image.";
+            exit();
         }
 
-        if ($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg" && $imageFileType != "gif") {
+        // Validate file type
+        if (!in_array($imageFileType, $allowed_extensions)) {
             echo "Sorry, only JPG, JPEG, PNG & GIF files are allowed.";
-            $uploadOk = 0;
+            exit();
         }
 
-        if ($uploadOk == 1) {
-            if (move_uploaded_file($_FILES["r_img"]["tmp_name"], $target_file)) {
-                $image_path = basename($target_file); // Just the name of the file
-            } else {
-                echo "Sorry, there was an error uploading your file.";
-                var_dump(error_get_last()); // Display error details
-            }
+        // Move the uploaded file to the server
+        if (move_uploaded_file($_FILES["r_img"]["tmp_name"], $target_file)) {
+            $image_path = basename($target_file); // Get file name only
+        } else {
+            echo "Sorry, there was an error uploading your file.";
+            exit();
         }
     }
 
@@ -66,10 +75,8 @@ if (isset($_GET['id']) && isset($_POST['submit'])) {
         mysqli_stmt_bind_param($stmt, "ssssi", $r_name, $available, $bed, $bath, $price, $id);
     }
 
-    // Execute the statement
-    $result = mysqli_stmt_execute($stmt);
-
-    if ($result) {
+    // Execute the statement and handle the result
+    if (mysqli_stmt_execute($stmt)) {
         echo '<script>
                 window.onload = function() {
                     Swal.fire({
@@ -99,7 +106,7 @@ if (isset($_GET['id']) && isset($_POST['submit'])) {
     mysqli_stmt_close($stmt);
 }
 
-// Include the footer or other components here if needed
+mysqli_close($conn);
 ?>
 
 
