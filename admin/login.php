@@ -4,7 +4,9 @@ include('config/connect.php');
 
 // Enhance Content Security Policy (CSP)
 header("Content-Security-Policy: default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; img-src 'self' data:; font-src 'self' https://fonts.googleapis.com https://cdn.jsdelivr.net; frame-ancestors 'none'; form-action 'self'; base-uri 'self';");
-
+header("X-XSS-Protection: 1; mode=block");
+header("X-Frame-Options: DENY");
+header("X-Content-Type-Options: nosniff");
 // Error message
 $error = "";
 $max_attempts = 5; // Maximum login attempts
