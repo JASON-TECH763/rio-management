@@ -1,32 +1,4 @@
-<?php
-// Ensure session is started
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
-// Include database configuration
-include("config/connect.php");
-
-// Check if the MySQLi connection is open and valid before executing any queries
-if ($conn instanceof mysqli && !$conn->connect_errno) {
-    // Your query goes here
-    $result = mysqli_query($conn, "SELECT * FROM some_table WHERE condition = 'value'");
-
-    // Check if the query executed successfully
-    if ($result) {
-        while ($row = mysqli_fetch_assoc($result)) {
-            // Process the result rows
-            echo "Data: " . htmlspecialchars($row['column_name'], ENT_QUOTES, 'UTF-8') . "<br>";
-        }
-    } else {
-        // Log query error if the query failed
-        error_log("Query failed: " . mysqli_error($conn));
-    }
-} else {
-    // Log error if the connection is not available
-    error_log("Error: MySQLi connection is not available.");
-}
-?> 
+ 
  <div class="main-header">
           <div class="main-header-logo">
             <!-- Logo Header -->
