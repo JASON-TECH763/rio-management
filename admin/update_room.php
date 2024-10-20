@@ -1,9 +1,14 @@
 <?php
-
+session_start();
 include("config/connect.php");
 
 // Content Security Policy to protect against XSS
 header("Content-Security-Policy: default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; img-src 'self' data:; font-src 'self' https://fonts.googleapis.com https://cdn.jsdelivr.net; frame-ancestors 'none'; form-action 'self'; base-uri 'self';");
+
+if (!isset($_SESSION['uname'])) {
+  header("location:index.php");
+  exit();
+}
 
 // Check if `id` is present in the URL and form is submitted
 if (isset($_GET['id']) && isset($_POST['submit'])) {
