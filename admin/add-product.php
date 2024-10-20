@@ -12,7 +12,7 @@ if (!isset($_SESSION['uname'])) {
 
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $prod_id = $_POST['prod_id'];
+
     $prod_name = $_POST['prod_name'];
     $prod_price = $_POST['prod_price'];
     
@@ -21,8 +21,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $prod_img = $_FILES['prod_img']['name'];
         move_uploaded_file($_FILES["prod_img"]["tmp_name"], "assets/img/products/" . $_FILES["prod_img"]["name"]);
         
-        $sql = "INSERT INTO rpos_products (prod_id, prod_name, prod_price, prod_img)
-                VALUES ('$prod_id', '$prod_name', '$prod_price', '$prod_img')";
+        $sql = "INSERT INTO rpos_products ( prod_name, prod_price, prod_img)
+                VALUES ( '$prod_name', '$prod_price', '$prod_img')";
 
         if ($conn->query($sql) === TRUE) {
             echo '<script>
