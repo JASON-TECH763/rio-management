@@ -1,3 +1,16 @@
+<?php
+// Start the session at the very beginning of the file
+session_start();
+
+// Check if the user is logged in
+if (!isset($_SESSION['uname'])) {
+    // Redirect to login page if not logged in
+    header("Location: login.php");
+    exit();
+}
+
+// Rest of your header.php code...
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
