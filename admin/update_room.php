@@ -2,37 +2,32 @@
 session_start();
 include("config/connect.php");
 
-// Content Security Policy to protect against XSS
 header("Content-Security-Policy: default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; img-src 'self' data:; font-src 'self' https://fonts.googleapis.com https://cdn.jsdelivr.net; frame-ancestors 'none'; form-action 'self'; base-uri 'self';");
 
 if (!isset($_SESSION['uname'])) {
-  header("location:index.php");
-  exit();
+    header("location:index.php");
+    exit();
 }
 
-// Check if `id` is present in the URL and form is submitted
 if (isset($_GET['id']) && isset($_POST['submit'])) {
-    $id = intval($_GET['id']); // Ensure ID is an integer
-
-    // Sanitize and validate input to prevent XSS and injection
-    $r_name = htmlspecialchars($_POST['r_name'], ENT_QUOTES, 'UTF-8');
-    $available = htmlspecialchars($_POST['available'], ENT_QUOTES, 'UTF-8');
-    $bed = htmlspecialchars($_POST['bed'], ENT_QUOTES, 'UTF-8');
-    $bath = htmlspecialchars($_POST['bath'], ENT_QUOTES, 'UTF-8');
-    $price = filter_var($_POST['price'], FILTER_VALIDATE_FLOAT); // Ensure price is a valid number
-
-    if ($price === false) {
-        echo "Invalid price format.";
-        exit();
-    }
-
+    $id = intval($_GET['id']);
+    $r_name = trim($_POST['r_name']);
+    $available = trim($_POST['available']);
+    $bed = trim($_POST['bed']);
+    $bath = trim($_POST['bath']);
+    $price = trim($_POST['price']);
+    
+    // Sanitize user inputs before using them
+    $r_name = htmlspecialchars($r_name, ENT_QUOTES, 'UTF-8');
+    $available = htmlspecialchars($available, ENT_QUOTES, 'UTF-8');
+    $bed = htmlspecialchars($bed, ENT_QUOTES, 'UTF-8');
+    $bath = htmlspecialchars($bath, ENT_QUOTES, 'UTF-8');
+    $price = htmlspecialchars($price, ENT_QUOTES, 'UTF-8');
+    
     // Handle image upload securely
-    $image_path = ""; // Initialize image path
+    $image_path = ""; 
     if (isset($_FILES["r_img"]) && $_FILES["r_img"]["error"] == 0) {
-        $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif'];
-        $target_dir = __DIR__ . "/uploads/"; // Absolute path to 'uploads' directory
-
-        // Check if directory exists, otherwise create it
+        $target_dir = __DIR__ . "/uploads/";
         if (!is_dir($target_dir)) {
             mkdir($target_dir, 0777, true);
         }
@@ -40,43 +35,51 @@ if (isset($_GET['id']) && isset($_POST['submit'])) {
         $imageFileType = strtolower(pathinfo($_FILES["r_img"]["name"], PATHINFO_EXTENSION));
         $target_file = $target_dir . uniqid() . '.' . $imageFileType;
 
-        // Validate the image
+        $uploadOk = 1;
         $check = getimagesize($_FILES["r_img"]["tmp_name"]);
+
+        // Validate image upload
         if ($check === false) {
-            echo "File is not a valid image.";
-            exit();
+            echo "File is not an image.";
+            $uploadOk = 0;
         }
 
-        // Validate file type
-        if (!in_array($imageFileType, $allowed_extensions)) {
+        $allowed_file_types = ["jpg", "jpeg", "png", "gif"];
+        if (!in_array($imageFileType, $allowed_file_types)) {
             echo "Sorry, only JPG, JPEG, PNG & GIF files are allowed.";
-            exit();
+            $uploadOk = 0;
         }
 
-        // Move the uploaded file to the server
-        if (move_uploaded_file($_FILES["r_img"]["tmp_name"], $target_file)) {
-            $image_path = basename($target_file); // Get file name only
-        } else {
-            echo "Sorry, there was an error uploading your file.";
-            exit();
+        // Limit file size to 5MB
+        if ($_FILES["r_img"]["size"] > 5000000) {
+            echo "Sorry, your file is too large.";
+            $uploadOk = 0;
+        }
+
+        if ($uploadOk == 1) {
+            if (move_uploaded_file($_FILES["r_img"]["tmp_name"], $target_file)) {
+                $image_path = basename($target_file);
+            } else {
+                echo "Sorry, there was an error uploading your file.";
+                var_dump(error_get_last());
+            }
         }
     }
 
-    // Prepare SQL statement for updating the room
+    // Use prepared statements for database updates
     if ($image_path) {
-        // Update with new image
         $sql = "UPDATE room SET r_name = ?, available = ?, bed = ?, bath = ?, price = ?, r_img = ? WHERE id = ?";
         $stmt = mysqli_prepare($conn, $sql);
         mysqli_stmt_bind_param($stmt, "ssssssi", $r_name, $available, $bed, $bath, $price, $image_path, $id);
     } else {
-        // Update without changing the image
         $sql = "UPDATE room SET r_name = ?, available = ?, bed = ?, bath = ?, price = ? WHERE id = ?";
         $stmt = mysqli_prepare($conn, $sql);
-        mysqli_stmt_bind_param($stmt, "ssssi", $r_name, $available, $bed, $bath, $price, $id);
+        mysqli_stmt_bind_param($stmt, "sssssi", $r_name, $available, $bed, $bath, $price, $id);
     }
 
-    // Execute the statement and handle the result
-    if (mysqli_stmt_execute($stmt)) {
+    $result = mysqli_stmt_execute($stmt);
+
+    if ($result) {
         echo '<script>
                 window.onload = function() {
                     Swal.fire({
@@ -102,11 +105,8 @@ if (isset($_GET['id']) && isset($_POST['submit'])) {
               </script>';
     }
 
-    // Close the statement
     mysqli_stmt_close($stmt);
 }
-
-mysqli_close($conn);
 ?>
 
 
