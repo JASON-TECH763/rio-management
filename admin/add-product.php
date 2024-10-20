@@ -3,7 +3,6 @@ session_start();
 include("config/connect.php");
 include("config/code-generator.php");
 
-header("Content-Security-Policy: default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; img-src 'self' data:; font-src 'self' https://fonts.googleapis.com https://cdn.jsdelivr.net; frame-ancestors 'none'; form-action 'self'; base-uri 'self';");
 
 if (!isset($_SESSION['uname'])) {
     header("location:index.php");
@@ -12,7 +11,7 @@ if (!isset($_SESSION['uname'])) {
 
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-
+    $prod_id = $_POST['prod_id'];
     $prod_name = $_POST['prod_name'];
     $prod_price = $_POST['prod_price'];
     
@@ -21,8 +20,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $prod_img = $_FILES['prod_img']['name'];
         move_uploaded_file($_FILES["prod_img"]["tmp_name"], "assets/img/products/" . $_FILES["prod_img"]["name"]);
         
-        $sql = "INSERT INTO rpos_products ( prod_name, prod_price, prod_img)
-                VALUES ( '$prod_name', '$prod_price', '$prod_img')";
+        $sql = "INSERT INTO rpos_products (prod_id, prod_name, prod_price, prod_img)
+                VALUES ('$prod_id', '$prod_name', '$prod_price', '$prod_img')";
 
         if ($conn->query($sql) === TRUE) {
             echo '<script>
@@ -62,7 +61,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
