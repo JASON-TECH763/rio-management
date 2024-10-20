@@ -1,18 +1,78 @@
-<?php
+<?php  
 session_start();
+include('config/connect.php');
+
+// Enhance Content Security Policy (CSP)
+header("Content-Security-Policy: default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; img-src 'self' data:; font-src 'self' https://fonts.googleapis.com https://cdn.jsdelivr.net; frame-ancestors 'none'; form-action 'self'; base-uri 'self';");
+
+// Error message
+$error = "";
+$max_attempts = 5; // Maximum login attempts
+$lockout_time = 30; // Lockout time in seconds
+
+// Initialize attempts if not set
+if (!isset($_SESSION['attempts'])) {
+    $_SESSION['attempts'] = 0;
+    $_SESSION['last_attempt_time'] = time();
+}
 
 // Generate CSRF token if not set
 if (!isset($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32)); // Generate 32-byte random token
 }
 
-// Set security headers
-header("Content-Security-Policy: default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; img-src 'self' data:; font-src 'self' https://fonts.googleapis.com https://cdn.jsdelivr.net; frame-ancestors 'none'; form-action 'self'; base-uri 'self';");
-header("X-XSS-Protection: 1; mode=block");
-header("X-Frame-Options: DENY");
-header("X-Content-Type-Options: nosniff");
-header("Referrer-Policy: strict-origin-when-cross-origin");
-header("Permissions-Policy: geolocation=(), microphone=(), camera=()");
+// Check if the user is locked out
+if ($_SESSION['attempts'] >= $max_attempts) {
+    if ((time() - $_SESSION['last_attempt_time']) < $lockout_time) {
+        $error = "Too many login attempts. Please try again later.";
+    } else {
+        // Reset attempts after lockout time
+        $_SESSION['attempts'] = 0;
+    }
+}
+
+if (isset($_POST['login']) && $_SESSION['attempts'] < $max_attempts) {
+    // CSRF token validation
+    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+        $error = "Invalid CSRF token!";
+    } else {
+        // Sanitize inputs
+        $user = trim($_POST['uname']);
+        $pass = trim($_POST['pass']);
+
+        // Basic input validation
+        if (!empty($user) && !empty($pass)) {
+            // Use prepared statements to prevent SQL injection
+            $stmt = $conn->prepare("SELECT uname, password FROM admin WHERE uname = ?");
+            $stmt->bind_param("s", $user); // Bind parameter safely
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            if ($result->num_rows === 1) {
+                $row = $result->fetch_assoc();
+
+                // Verify the hashed password
+                if (password_verify($pass, $row['password'])) {
+                    session_regenerate_id(true); // Regenerate session ID upon login to prevent session fixation
+                    $_SESSION['uname'] = $user;
+                    $_SESSION['attempts'] = 0; // Reset attempts on successful login
+                    header("Location: dashboard.php");
+                    exit(); // Stop further script execution
+                } else {
+                    $_SESSION['attempts']++;
+                    $error = '* Invalid Username or Password';
+                }
+            } else {
+                $_SESSION['attempts']++;
+                $error = '* Invalid Username or Password';
+            }
+
+            $_SESSION['last_attempt_time'] = time(); // Update last attempt time
+        } else {
+            $error = "* Please Fill all the Fields!";
+        }
+    }
+}   
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -53,9 +113,9 @@ header("Permissions-Policy: geolocation=(), microphone=(), camera=()");
         }
     </script>
 </head>
-<body>
 <a href="https://rio-lawis.com/" class="btn btn-light back-button" 
 style="background-color: #1572e8; color: white; padding-left: 5px; padding-right: 5px;">Back to Site</a>
+<body>
 <section class="vh-100" style="background-color: #2a2f5b; color: white;">
   <div class="container-fluid h-custom">
     <div class="row d-flex justify-content-center align-items-center h-100">
@@ -63,23 +123,23 @@ style="background-color: #1572e8; color: white; padding-left: 5px; padding-right
         <img src="assets/img/1bg.jpg" class="img-fluid" alt="Sample image">
       </div>
       <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
-        <form id="loginForm">
-          <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
+        <form method="post">
+          <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
           <div class="d-flex flex-row align-items-center justify-content-center justify-content-lg-start">
             <div class="d-flex align-items-center mb-3 pb-1">
               <span class="h1 fw-bold mb-0" style="color: #FEA116;">RMS Login</span>
               <i class="fa fa-heart fa-2x me-3"></i>
             </div>
           </div>
-          <p id="error-message" style="color:red;"></p>
+          <p style="color:red;"><?php echo $error; ?></p>
           <div class="form-outline mb-4">
-            <label class="form-label" for="user">Username</label>
-            <input type="text" name="uname" id="user" class="form-control form-control-lg" placeholder="Enter username" required autocomplete="username">
+            <label class="form-label" name="uname" for="user">Username</label>
+            <input type="text" name="uname" id="user" class="form-control form-control-lg" placeholder="Enter username" required />
           </div>
           <div class="form-outline mb-3">
             <label class="form-label" for="pass">Password</label>
-            <input type="password" name="pass" id="psw" class="form-control form-control-lg" placeholder="Enter password" required autocomplete="current-password">
-            <input class="p-2" type="checkbox" onclick="togglePassword()" style="margin-left: 10px; margin-top: 13px;"> <span style="margin-left: 5px;">Show password</span>
+            <input type="password" name="pass" id="psw" class="form-control form-control-lg" placeholder="Enter password" required />
+            <input class="p-2" type="checkbox" onclick="myFunction()" style="margin-left: 10px; margin-top: 13px;"> <span style="margin-left: 5px;">Show password</span>
           </div>
           <div class="d-flex justify-content-between align-items-center">
             <button type="submit" name="login" class="btn btn-warning btn-lg enter" style="background-color: #1572e8; color: white; padding-left: 2.5rem; padding-right: 2.5rem;">Login</button>
@@ -95,46 +155,38 @@ style="background-color: #1572e8; color: white; padding-left: 5px; padding-right
 <script src="assets/js/popper.min.js"></script>
 <script src="assets/js/bootstrap.min.js"></script>
 <script src="assets/js/script.js"></script>
-<script>
-function togglePassword() {
+<script type="text/javascript">
+  function myFunction() {
     var x = document.getElementById("psw");
-    x.type = x.type === "password" ? "text" : "password";
-}
+    if (x.type === "password") {
+      x.type = "text";
+    } else {
+      x.type = "password";
+    }
+  }
+</script>
 
-document.getElementById('loginForm').addEventListener('submit', function(e) {
+<script>
+// Disable right-click
+document.addEventListener('contextmenu', function (e) {
     e.preventDefault();
-    var formData = new FormData(this);
-    formData.append('login', '1');
-
-    fetch('login.php', {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-        },
-        credentials: 'same-origin'
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            window.location.href = data.redirect;
-        } else {
-            document.getElementById('error-message').textContent = data.error;
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-    });
 });
 
-// Security measures
-document.addEventListener('contextmenu', e => e.preventDefault());
-document.onkeydown = function(e) {
-    if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J')) || (e.ctrlKey && e.key === 'U')) {
+// Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U
+document.onkeydown = function (e) {
+    if (
+        e.key === 'F12' ||
+        (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J')) ||
+        (e.ctrlKey && e.key === 'U')
+    ) {
         e.preventDefault();
     }
 };
-document.onselectstart = e => e.preventDefault();
+
+// Disable selecting text
+document.onselectstart = function (e) {
+    e.preventDefault();
+};
 </script>
 </body>
 </html>
