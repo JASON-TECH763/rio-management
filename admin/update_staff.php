@@ -50,14 +50,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $hashed_password = password_hash($staff_password, PASSWORD_BCRYPT);
     }
 
-    // Validate CSRF token
-    if (!hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
-        $_SESSION['status'] = "error";
-        $_SESSION['message'] = "Invalid CSRF token.";
-        header("Location: update_staff.php?id=$staff_id");
-        exit();
-    }
-
     if (!empty($staff_name) && !empty($staff_last_name) && !empty($staff_gender) && !empty($staff_email)) {
         $sql = "UPDATE rpos_staff SET staff_name=?, staff_last_name=?, staff_email=?, staff_password=?, staff_gender=? WHERE id=?";
         
