@@ -1,5 +1,5 @@
 <?php
-session_start();
+
 include("config/connect.php");
 
 // Content Security Policy to protect against XSS
