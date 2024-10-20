@@ -5,46 +5,26 @@ include("config/code-generator.php");
 
 header("Content-Security-Policy: default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; img-src 'self' data:; font-src 'self' https://fonts.googleapis.com https://cdn.jsdelivr.net; frame-ancestors 'none'; form-action 'self'; base-uri 'self';");
 
-// Check if user is authenticated
 if (!isset($_SESSION['uname'])) {
     header("location:index.php");
     exit();
 }
 
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Sanitize inputs
-    $prod_id = htmlspecialchars($_POST['prod_id'], ENT_QUOTES, 'UTF-8');
-    $prod_name = htmlspecialchars($_POST['prod_name'], ENT_QUOTES, 'UTF-8');
-    $prod_price = filter_var($_POST['prod_price'], FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
-
-    // Validate inputs
-    if (!preg_match("/^[A-Za-zÀ-ž' -]+$/", $prod_name)) {
-        echo '<script>alert("Invalid product name.");</script>';
-        exit();
-    }
-
-    // Handle file upload securely
-    if (isset($_FILES['prod_img']) && $_FILES['prod_img']['error'] == UPLOAD_ERR_OK) {
-        $allowed_mime_types = ['image/jpeg', 'image/png', 'image/gif'];
-        $file_mime_type = mime_content_type($_FILES['prod_img']['tmp_name']);
+    $prod_id = $_POST['prod_id'];
+    $prod_name = $_POST['prod_name'];
+    $prod_price = $_POST['prod_price'];
+    
+    // Check if a file is uploaded
+    if(isset($_FILES['prod_img']) && $_FILES['prod_img']['error'] == UPLOAD_ERR_OK) {
+        $prod_img = $_FILES['prod_img']['name'];
+        move_uploaded_file($_FILES["prod_img"]["tmp_name"], "assets/img/products/" . $_FILES["prod_img"]["name"]);
         
-        if (!in_array($file_mime_type, $allowed_mime_types)) {
-            echo '<script>alert("Invalid image format. Only JPG, PNG, GIF allowed.");</script>';
-            exit();
-        }
-        
-        // Secure the uploaded file by renaming it
-        $file_ext = pathinfo($_FILES['prod_img']['name'], PATHINFO_EXTENSION);
-        $new_file_name = uniqid('prod_img_', true) . '.' . $file_ext;
+        $sql = "INSERT INTO rpos_products (prod_id, prod_name, prod_price, prod_img)
+                VALUES ('$prod_id', '$prod_name', '$prod_price', '$prod_img')";
 
-        // Move uploaded file securely
-        move_uploaded_file($_FILES["prod_img"]["tmp_name"], "assets/img/products/" . $new_file_name);
-
-        // Use prepared statements for SQL queries
-        $stmt = $conn->prepare("INSERT INTO rpos_products (prod_id, prod_name, prod_price, prod_img) VALUES (?, ?, ?, ?)");
-        $stmt->bind_param("ssds", $prod_id, $prod_name, $prod_price, $new_file_name);
-
-        if ($stmt->execute()) {
+        if ($conn->query($sql) === TRUE) {
             echo '<script>
                     window.onload = function() {
                         Swal.fire({
@@ -69,7 +49,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     };
                   </script>';
         }
-        $stmt->close();
     } else {
         echo '<script>
                 window.onload = function() {
@@ -83,7 +62,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
