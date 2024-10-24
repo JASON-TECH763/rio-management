@@ -2,69 +2,93 @@
 session_start();
 include("config/connect.php");
 
+// Set security headers
 header("Content-Security-Policy: default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; img-src 'self' data:; font-src 'self' https://fonts.googleapis.com https://cdn.jsdelivr.net; frame-ancestors 'none'; form-action 'self'; base-uri 'self';");
+header("X-Frame-Options: DENY");
+header("X-Content-Type-Options: nosniff");
 
-if (!isset($_SESSION['uname'])) {
-  header("location:index.php");
-  exit();
+// Regenerate session ID to prevent session hijacking
+session_regenerate_id(true);
+
+// Set session cookie to HTTPOnly
+ini_set('session.cookie_httponly', 1);
+
+// CSRF Protection Token
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
+// Check if the user is logged in
+if (!isset($_SESSION['uname'])) {
+    header("location:index.php");
+    exit();
+}
 
-// Check if `prod_id` is present in the URL
+// Handle product update
 if (isset($_GET['prod_id']) && isset($_POST['submit'])) {
-    $prod_id = intval($_GET['prod_id']); // Get the prod_id from the URL
+    // CSRF token validation
+    if ($_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+        die("CSRF token validation failed");
+    }
+
+    $prod_id = intval($_GET['prod_id']);
     $prod_name = $_POST['prod_name'];
     $prod_price = $_POST['prod_price'];
-
-    // Handle file upload
+    
+    // File upload security
     if (isset($_FILES['prod_img']['name']) && $_FILES['prod_img']['name'] != "") {
+        $allowed_ext = ['jpg', 'jpeg', 'png', 'gif'];
+        $file_ext = strtolower(pathinfo($_FILES['prod_img']['name'], PATHINFO_EXTENSION));
+        
+        if (!in_array($file_ext, $allowed_ext)) {
+            die("Invalid file type. Only JPG, JPEG, PNG, and GIF are allowed.");
+        }
+        
         $prod_img = $_FILES['prod_img']['name'];
-        move_uploaded_file($_FILES["prod_img"]["tmp_name"], "assets/img/products/" . $_FILES["prod_img"]["name"]);
+        move_uploaded_file($_FILES["prod_img"]["tmp_name"], "assets/img/products/" . basename($prod_img));
 
         // Prepare SQL statement with image
         $sql = "UPDATE rpos_products SET prod_name = ?, prod_price = ?, prod_img = ? WHERE prod_id = ?";
         $stmt = mysqli_prepare($conn, $sql);
-
-        // Bind parameters and execute
         mysqli_stmt_bind_param($stmt, "sssi", $prod_name, $prod_price, $prod_img, $prod_id);
     } else {
         // Prepare SQL statement without image
         $sql = "UPDATE rpos_products SET prod_name = ?, prod_price = ? WHERE prod_id = ?";
         $stmt = mysqli_prepare($conn, $sql);
-
-        // Bind parameters and execute
         mysqli_stmt_bind_param($stmt, "ssi", $prod_name, $prod_price, $prod_id);
     }
-    $result = mysqli_stmt_execute($stmt);
 
+    $result = mysqli_stmt_execute($stmt);
+    
     if ($result) {
         echo '<script>
-               window.onload = function() {
-            Swal.fire({
-                title: "Success!",
-                text: "Product data successfully updated!",
-                icon: "success"
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.href = "product.php";
-                }
-            });
-        };
-      </script>';
-    } else {
-       echo '<script>
-              window.onload = function() {
+            window.onload = function() {
                 Swal.fire({
-                title: "Error!",
-                text: "Error updating product data.",
-                icon: "error"
-            });
-        };
-      </script>';
+                    title: "Success!",
+                    text: "Product data successfully updated!",
+                    icon: "success"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = "product.php";
+                    }
+                });
+            };
+        </script>';
+    } else {
+        echo '<script>
+            window.onload = function() {
+                Swal.fire({
+                    title: "Error!",
+                    text: "Error updating product data.",
+                    icon: "error"
+                });
+            };
+        </script>';
     }
     mysqli_stmt_close($stmt);
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
