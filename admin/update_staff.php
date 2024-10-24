@@ -2,18 +2,20 @@
 session_start();
 include("config/connect.php");
 
-header("Content-Security-Policy: default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' https://cdn.jsdelivr.net; img-src 'self' data:; font-src 'self' https://fonts.googleapis.com https://cdn.jsdelivr.net; frame-ancestors 'none'; form-action 'self'; base-uri 'self';");
+header("Content-Security-Policy: default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; img-src 'self' data:; font-src 'self' https://fonts.googleapis.com https://cdn.jsdelivr.net; frame-ancestors 'none'; form-action 'self'; base-uri 'self';");
 
 if (!isset($_SESSION['uname'])) {
     header("location:index.php");
     exit();
 }
 
-$staff = [];
+$staff = []; // Initialize an empty staff array
 
+// Check if 'id' is passed in the URL
 if (isset($_GET['id']) && !empty($_GET['id'])) {
-    $staff_id = (int) $_GET['id'];
+    $staff_id = $_GET['id'];
 
+    // Fetch the existing staff record
     $query = "SELECT * FROM rpos_staff WHERE id = ?";
     if ($stmt = $conn->prepare($query)) {
         $stmt->bind_param("i", $staff_id);
@@ -21,47 +23,54 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
         $result = $stmt->get_result();
 
         if ($result->num_rows == 1) {
-            $staff = $result->fetch_assoc();
+            $staff = $result->fetch_assoc(); // Fetch the staff data
         } else {
             $_SESSION['status'] = "error";
             $_SESSION['message'] = "Staff record not found.";
             header("Location: staff.php");
             exit();
         }
+    } else {
+        $_SESSION['status'] = "error";
+        $_SESSION['message'] = "Error fetching staff record.";
+        header("Location: staff.php");
+        exit();
     }
-}
-
+} 
+// Handle form submission
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    // Collect form data
     $staff_name = htmlspecialchars($_POST['staff_name']);
     $staff_last_name = htmlspecialchars($_POST['staff_last_name']);
     $staff_gender = htmlspecialchars($_POST['staff_gender']);
-    $staff_email = filter_var($_POST['staff_email'], FILTER_SANITIZE_EMAIL);
+    $staff_email = htmlspecialchars($_POST['staff_email']);
     $staff_password = $_POST['staff_password'];
 
+    // Sanitize input
     $staff_name = mysqli_real_escape_string($conn, $staff_name);
     $staff_last_name = mysqli_real_escape_string($conn, $staff_last_name);
     $staff_gender = mysqli_real_escape_string($conn, $staff_gender);
     $staff_email = mysqli_real_escape_string($conn, $staff_email);
+    $staff_password = mysqli_real_escape_string($conn, $staff_password);
 
-    // Password handling: use existing password if no new password is provided
-    if (!empty($staff_password)) {
-        $hashed_password = password_hash($staff_password, PASSWORD_BCRYPT);
-    } else {
-        $hashed_password = $staff['staff_password'];
-    }
-
+    // Check if all fields are filled
     if (!empty($staff_name) && !empty($staff_last_name) && !empty($staff_gender) && !empty($staff_email)) {
+        // Prepare the SQL statement to update the record
         $sql = "UPDATE rpos_staff SET staff_name=?, staff_last_name=?, staff_email=?, staff_password=?, staff_gender=? WHERE id=?";
-
+        
         if ($stmt = $conn->prepare($sql)) {
-            $stmt->bind_param("sssssi", $staff_name, $staff_last_name, $staff_email, $hashed_password, $staff_gender, $staff_id);
-
+            // Bind parameters
+            $stmt->bind_param("sssssi", $staff_name, $staff_last_name, $staff_email, $staff_password, $staff_gender, $staff_id);
+            
+            // Execute the query
             if ($stmt->execute()) {
+                // Account updated successfully
                 $_SESSION['status'] = "success";
                 $_SESSION['message'] = "Staff account has been updated successfully.";
-                header("Location: staff.php");
+                header("Location: update_staff.php");
                 exit();
             } else {
+                // Error updating account
                 $_SESSION['status'] = "error";
                 $_SESSION['message'] = "There was an error updating the staff account.";
                 header("Location: update_staff.php?id=$staff_id");
@@ -76,8 +85,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 ?>
-
-
 
 <!DOCTYPE html>
 <html lang="en">
