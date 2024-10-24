@@ -9,7 +9,7 @@ if (!isset($_SESSION['uname'])) {
     exit();
 }
 
-$staff = []; 
+$staff = [];
 
 if (isset($_GET['id']) && !empty($_GET['id'])) {
     $staff_id = (int) $_GET['id'];
@@ -21,7 +21,7 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
         $result = $stmt->get_result();
 
         if ($result->num_rows == 1) {
-            $staff = $result->fetch_assoc(); 
+            $staff = $result->fetch_assoc();
         } else {
             $_SESSION['status'] = "error";
             $_SESSION['message'] = "Staff record not found.";
@@ -29,37 +29,37 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
             exit();
         }
     }
-} 
+}
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Collect and sanitize form data
     $staff_name = htmlspecialchars($_POST['staff_name']);
     $staff_last_name = htmlspecialchars($_POST['staff_last_name']);
     $staff_gender = htmlspecialchars($_POST['staff_gender']);
     $staff_email = filter_var($_POST['staff_email'], FILTER_SANITIZE_EMAIL);
     $staff_password = $_POST['staff_password'];
 
-    // Sanitize inputs before passing to the database
     $staff_name = mysqli_real_escape_string($conn, $staff_name);
     $staff_last_name = mysqli_real_escape_string($conn, $staff_last_name);
     $staff_gender = mysqli_real_escape_string($conn, $staff_gender);
     $staff_email = mysqli_real_escape_string($conn, $staff_email);
 
-    // Password hashing
+    // Password handling: use existing password if no new password is provided
     if (!empty($staff_password)) {
         $hashed_password = password_hash($staff_password, PASSWORD_BCRYPT);
+    } else {
+        $hashed_password = $staff['staff_password'];
     }
 
     if (!empty($staff_name) && !empty($staff_last_name) && !empty($staff_gender) && !empty($staff_email)) {
         $sql = "UPDATE rpos_staff SET staff_name=?, staff_last_name=?, staff_email=?, staff_password=?, staff_gender=? WHERE id=?";
-        
+
         if ($stmt = $conn->prepare($sql)) {
             $stmt->bind_param("sssssi", $staff_name, $staff_last_name, $staff_email, $hashed_password, $staff_gender, $staff_id);
-            
+
             if ($stmt->execute()) {
                 $_SESSION['status'] = "success";
                 $_SESSION['message'] = "Staff account has been updated successfully.";
-                header("Location: update_staff.php");
+                header("Location: staff.php");
                 exit();
             } else {
                 $_SESSION['status'] = "error";
@@ -75,9 +75,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         exit();
     }
 }
-
-
 ?>
+
 
 
 <!DOCTYPE html>
