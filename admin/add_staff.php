@@ -2,6 +2,7 @@
 session_start();
 include("config/connect.php");
 
+// Set strong Content Security Policy (CSP) header
 header("Content-Security-Policy: default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; img-src 'self' data:; font-src 'self' https://fonts.googleapis.com https://cdn.jsdelivr.net; frame-ancestors 'none'; form-action 'self'; base-uri 'self';");
 
 if (!isset($_SESSION['uname'])) {
@@ -9,55 +10,51 @@ if (!isset($_SESSION['uname'])) {
     exit();
 }
 
-
 $error = "";
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Collect form data
-    $staff_name = htmlspecialchars($_POST['staff_name']);
-    $staff_last_name = htmlspecialchars($_POST['staff_last_name']);
-    $staff_gender = htmlspecialchars($_POST['staff_gender']);
-    $staff_email = htmlspecialchars($_POST['staff_email']);
+    // Collect and sanitize form data
+    $staff_name = htmlspecialchars($_POST['staff_name'], ENT_QUOTES, 'UTF-8');
+    $staff_last_name = htmlspecialchars($_POST['staff_last_name'], ENT_QUOTES, 'UTF-8');
+    $staff_gender = htmlspecialchars($_POST['staff_gender'], ENT_QUOTES, 'UTF-8');
+    $staff_email = filter_var($_POST['staff_email'], FILTER_SANITIZE_EMAIL);
     $staff_password = $_POST['staff_password'];
 
-    // Sanitize input to prevent SQL injection
-    $staff_name = mysqli_real_escape_string($conn, $staff_name);
-    $staff_last_name = mysqli_real_escape_string($conn, $staff_last_name);
-    $staff_gender = mysqli_real_escape_string($conn, $staff_gender);
-    $staff_email = mysqli_real_escape_string($conn, $staff_email);
-    $staff_password = mysqli_real_escape_string($conn, $staff_password);
+    // Validate sanitized email
+    if (!filter_var($staff_email, FILTER_VALIDATE_EMAIL)) {
+        $_SESSION['status'] = "error";
+        $_SESSION['message'] = "Invalid email format.";
+        header("Location: add_staff.php");
+        exit();
+    }
 
-    // Check if all fields are filled
-    if (!empty($staff_name) && !empty($staff_last_name) && !empty($staff_gender) && !empty($staff_email) && !empty($staff_password)) {
-        // Check if the email already exists
-        $query = "SELECT * FROM rpos_staff WHERE staff_email='$staff_email'";
-        $result = mysqli_query($conn, $query);
-        $num_rows = mysqli_num_rows($result);
+    // SQL injection prevention with prepared statements
+    $query = "SELECT * FROM rpos_staff WHERE staff_email = ?";
+    if ($stmt = $conn->prepare($query)) {
+        $stmt->bind_param("s", $staff_email);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $num_rows = $result->num_rows;
 
         if ($num_rows > 0) {
-            // Email already exists
             $_SESSION['status'] = "error";
             $_SESSION['message'] = "An account with this email already exists.";
             header("Location: add_staff.php");
             exit();
         } else {
-            // Prepare the SQL statement
+            // Insert new staff record
             $sql = "INSERT INTO rpos_staff (staff_name, staff_last_name, staff_email, staff_password, staff_gender, date_created) 
                     VALUES (?, ?, ?, ?, ?, NOW())";
-            
+
             if ($stmt = $conn->prepare($sql)) {
-                // Bind parameters and pass the plain password (no hashing)
                 $stmt->bind_param("sssss", $staff_name, $staff_last_name, $staff_email, $staff_password, $staff_gender);
                 
-                // Execute the query
                 if ($stmt->execute()) {
-                    // Account created successfully
                     $_SESSION['status'] = "success";
                     $_SESSION['message'] = "Staff account has been created successfully.";
                     header("Location: add_staff.php");
                     exit();
                 } else {
-                    // Error creating account
                     $_SESSION['status'] = "error";
                     $_SESSION['message'] = "There was an error creating the staff account.";
                     header("Location: add_staff.php");
@@ -65,13 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 }
             }
         }
-    } else {
-        $_SESSION['status'] = "error";
-        $_SESSION['message'] = "Please fill all the fields.";
-        header("Location: add_staff.php");
-        exit();
     }
-
 }
 ?>
 
