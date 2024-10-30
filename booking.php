@@ -29,31 +29,51 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $sql = "INSERT INTO reservations (booking_id, checkin_date, checkout_date, r_name, amount, first_name, last_name, email, phone, payment, status)
             VALUES ('$booking_id', '$checkin_date', '$checkout_date', '$r_name', '$amount', '$first_name', '$last_name', '$email', '$phone', '$payment', 'Pending')";
 
-    if ($conn->query($sql) === TRUE) {
-        echo '<script>
-                window.onload = function() {
-                    Swal.fire({
-                        title: "Success!",
-                        text: "Your booking was successful. Booking number is ' . $booking_id . '",
-                        icon: "success"
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            window.location.href = "check_status.php";
-                        }
+if ($conn->query($sql) === TRUE) {
+    echo '<script>
+            window.onload = function() {
+                Swal.fire({
+                    title: "Success!",
+                    html: `Your booking was successful. Booking number is 
+                           <span id="bookingNumber" style="font-weight: bold;">' . $booking_id . '</span> 
+                           <span id="copyIcon" onclick="copyBookingNumber()" style="cursor: pointer; font-size: 18px; margin-left: 5px;">
+                               📋
+                           </span>`,
+                    icon: "success"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = "check_status.php";
+                    }
+                });
+            };
+
+            function copyBookingNumber() {
+                const bookingNumberElement = document.getElementById("bookingNumber");
+                const bookingNumber = bookingNumberElement.innerText;
+
+                navigator.clipboard.writeText(bookingNumber).then(() => {
+                    bookingNumberElement.style.backgroundColor = "#d4edda"; // Highlight the booking number
+                    Swal.fire("Copied!", "Booking number copied to clipboard.", "success").then(() => {
+                        window.location.href = "check_status.php"; // Redirect after "Copied!" alert
                     });
-                };
-              </script>';
-    } else {
-        echo '<script>
-                window.onload = function() {
-                    Swal.fire({
-                        title: "Error!",
-                        text: "Failed to book.",
-                        icon: "error"
-                    });
-                };
-              </script>';
-    }
+                }).catch(err => {
+                    Swal.fire("Error!", "Failed to copy booking number.", "error");
+                });
+            }
+          </script>';
+} else {
+    echo '<script>
+            window.onload = function() {
+                Swal.fire({
+                    title: "Error!",
+                    text: "Failed to book.",
+                    icon: "error"
+                });
+            };
+          </script>';
+}
+
+
 }
 ?>
 
@@ -159,6 +179,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <h1 class="mb-5"><span class="text-primary text-uppercase">Book</span> Now!</h1>
                 </div>
                 <div class="row g-12">
+                    <!-- Centered Row for Room Details and Form -->
+        <div class="row justify-content-center">
                 <?php
 // Check if a room_id is provided in the URL
 if (isset($_GET['room_id'])) {
