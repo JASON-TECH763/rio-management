@@ -53,42 +53,55 @@ if (isset($_POST['add_order'])) {
         </script>';
     }
 }
+// Handle placing the order
 if (isset($_POST['place_order'])) {
-    // Guest email (can be hardcoded or fetched from form)
-    $guest_email = "Guest";  // You can replace this with a dynamic email if needed
-
-    // Insert into orders table with guest email
-    $sql_order = "INSERT INTO orders (order_date, customer_email) VALUES (NOW(), ?)";
-    $stmt_order = $conn->prepare($sql_order);
-    $stmt_order->bind_param('s', $guest_email);
-
-    if ($stmt_order->execute()) {
-        $order_id = $conn->insert_id;
-
-        // Insert into order_details table
-        foreach ($_SESSION['orders'] as $order) {
-            $sql_order_details = "INSERT INTO order_details (order_id, prod_id, prod_name, prod_price, quantity) VALUES (?, ?, ?, ?, ?)";
-            $stmt_order_details = $conn->prepare($sql_order_details);
-            $stmt_order_details->bind_param('issss', $order_id, $order['prod_id'], $order['prod_name'], $order['prod_price'], $order['quantity']);
-            $stmt_order_details->execute();
-        }
-
-        // Clear the session orders
-        unset($_SESSION['orders']);
-
-        // Redirect to order summary with order_id
-        header("Location: order_summary.php?order_id=" . $order_id);
-        exit;
-    } else {
+    // Check if there are items in the order
+    if (empty($_SESSION['orders'])) {
         echo '<script>
             window.onload = function() {
                 Swal.fire({
                     title: "Error!",
-                    text: "Failed to place the order.",
+                    text: "Please add products to the order before placing it.",
                     icon: "error"
                 });
             };
         </script>';
+    } else {
+        $guest_email = "Guest";  // You can replace this with a dynamic email if needed
+
+        // Insert into orders table with guest email
+        $sql_order = "INSERT INTO orders (order_date, customer_email) VALUES (NOW(), ?)";
+        $stmt_order = $conn->prepare($sql_order);
+        $stmt_order->bind_param('s', $guest_email);
+
+        if ($stmt_order->execute()) {
+            $order_id = $conn->insert_id;
+
+            // Insert into order_details table
+            foreach ($_SESSION['orders'] as $order) {
+                $sql_order_details = "INSERT INTO order_details (order_id, prod_id, prod_name, prod_price, quantity) VALUES (?, ?, ?, ?, ?)";
+                $stmt_order_details = $conn->prepare($sql_order_details);
+                $stmt_order_details->bind_param('issss', $order_id, $order['prod_id'], $order['prod_name'], $order['prod_price'], $order['quantity']);
+                $stmt_order_details->execute();
+            }
+
+            // Clear the session orders
+            unset($_SESSION['orders']);
+
+            // Redirect to order summary with order_id
+            header("Location: order_summary.php?order_id=" . $order_id);
+            exit;
+        } else {
+            echo '<script>
+                window.onload = function() {
+                    Swal.fire({
+                        title: "Error!",
+                        text: "Failed to place the order.",
+                        icon: "error"
+                    });
+                };
+            </script>';
+        }
     }
 }
 
