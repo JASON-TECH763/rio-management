@@ -202,8 +202,12 @@ if (isset($_GET['room_id'])) {
         <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
             <div class="room-item shadow rounded overflow-hidden">
                 <div class="position-relative">
-                    <!-- Display the room image -->
-                    <img src="admin/uploads/<?php echo htmlspecialchars($room['r_img']); ?>" alt="<?php echo htmlspecialchars($room['r_name']); ?>" class="img-fluid">
+                   <!-- Display the room image with consistent sizing and inline CSS -->
+<img src="admin/uploads/<?php echo htmlspecialchars($room['r_img']); ?>" 
+     alt="<?php echo htmlspecialchars($room['r_name']); ?>" 
+     class="img-fluid" 
+     style="width: 100%; height: 200px; object-fit: cover;">
+
 
 
 <!-- Bootstrap JS and dependencies -->

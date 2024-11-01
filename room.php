@@ -110,8 +110,7 @@ if ($result->num_rows > 0) {
         <div class="room-item shadow rounded overflow-hidden">
             <div class="position-relative">
                <!-- Display the room image -->
-               <img class="img-fluid" src="admin/uploads/<?php echo htmlspecialchars($row['r_img']); ?>" style="height: auto; width: 100%;" alt="Room Image">
-
+               <img class="img-fluid" src="admin/uploads/<?php echo htmlspecialchars($row['r_img']); ?>"  style="width: 100%; height: 200px; object-fit: cover;"
 
                 <!-- Display the dynamic room price -->
                 <small class="position-absolute start-0 top-100 translate-middle-y bg-primary text-white rounded py-1 px-3 ms-4">₱<?php echo $row['price']; ?>/Night</small>
