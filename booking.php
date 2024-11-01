@@ -319,16 +319,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 ?>
 
-                                <div class="row g-3">
-                                     <div class="form-floating">
-                                            <input type="date" name="checkin_date" class="form-control" id="checkin_date" placeholder="Check-in Date" value="<?php echo date('Y-m-d'); ?>" min="<?php echo date('Y-m-d'); ?>" required>
-                                            <label for="checkin_date">Check-in Date</label>
-                                        </div>
-                                    
-                                       <div class="form-floating">
-                                            <input type="date" id="checkout_date" class="form-control"name="checkout_date" min="<?php echo date('Y-m-d', strtotime('+1 day')); ?>" required>
-                                            <label for="checkout_date">Check-out Date</label>
-                                        </div>
+<div class="row g-3">
+        <div class="form-floating">
+            <input type="date" name="checkin_date" class="form-control" id="checkin_date" placeholder="Check-in Date" value="<?php echo date('Y-m-d'); ?>" min="<?php echo date('Y-m-d'); ?>" required>
+            <label for="checkin_date">Check-in Date</label>
+        </div>
+    
+        <div class="form-floating">
+            <input type="date" name="checkout_date" class="form-control" id="checkout_date" placeholder="Check-out Date" required>
+            <label for="checkout_date">Check-out Date</label>
+        </div>
                                         <div class="col-md-12">
     <div class="form-floating">
         <input id="r_name" name="r_name" class="form-control" readonly placeholder="Selected Room" required>
@@ -465,6 +465,22 @@ function calculateAmount(price, guestCount) {
 
     <!-- SweetAlert JS -->
     <script src="js/sweetalert.js"></script>
+
+    <script>
+        document.getElementById('checkin_date').addEventListener('change', function() {
+            var checkinDate = new Date(this.value);
+            checkinDate.setDate(checkinDate.getDate() + 1); // Set checkout to at least one day after check-in
+            var minCheckoutDate = checkinDate.toISOString().split('T')[0]; // Format to 'YYYY-MM-DD'
+    
+            // Set the min attribute of the checkout date and reset value if it's invalid
+            var checkoutInput = document.getElementById('checkout_date');
+            checkoutInput.min = minCheckoutDate;
+            if (checkoutInput.value < minCheckoutDate) {
+                checkoutInput.value = minCheckoutDate;
+            }
+        });
+    </script>
+    
 
     <script>
 // Disable right-click
