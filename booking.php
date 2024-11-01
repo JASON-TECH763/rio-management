@@ -480,7 +480,7 @@ function calculateAmount(price, guestCount) {
             }
         });
     </script>
-    
+
 
     <script>
 // Disable right-click
