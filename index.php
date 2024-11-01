@@ -67,57 +67,71 @@ header("Clear-Site-Data: \"cache\", \"cookies\", \"storage\", \"executionContext
         <!-- Header End -->
 
 
+        
         <!-- Carousel Start -->
-        <div class="container-fluid p-0 mb-5">
-            <div id="header-carousel" class="carousel slide" data-bs-ride="carousel">
-                <div class="carousel-inner">
-                    <div class="carousel-item active">
-                        <img class="w-100" src="img/carousel-1.jpg" alt="Image">
-                        <div class="carousel-caption d-flex flex-column align-items-center justify-content-center">
-                            <div class="p-3" style="max-width: 700px;">
-                                <h6 class="section-title text-white text-uppercase mb-3 animated slideInDown">Chilling</h6>
-                                <h1 class="display-3 text-white mb-4 animated slideInDown">Discover A Affordable GuestHouse</h1>
-                                <a href="room.php" class="btn btn-primary py-md-3 px-md-5 me-3 animated slideInLeft">Book A Room</a>
-                                 <!--<a href="booking.php" class="btn btn-light py-md-3 px-md-5 animated slideInRight">Our Rooms</a>-->
-                            </div>
-                        </div>
-                    </div>
-                    <div class="carousel-item">
-                        <img class="w-100" src="img/carousel-2.jpg" alt="Image">
-                        <div class="carousel-caption d-flex flex-column align-items-center justify-content-center">
-                            <div class="p-3" style="max-width: 700px;">
-                                <h6 class="section-title text-white text-uppercase mb-3 animated slideInDown">Chilling</h6>
-                                <h1 class="display-3 text-white mb-4 animated slideInDown">Discover A Affordable GuestHouse</h1>
-                                <a href="room.php" class="btn btn-primary py-md-3 px-md-5 me-3 animated slideInLeft">Book A Room</a>
-                                <!--<a href="booking.php" class="btn btn-light py-md-3 px-md-5 animated slideInRight">Our Rooms</a>-->
-                            </div>
-                        </div>
-                    </div>
-                    <div class="carousel-item">
-                        <img class="w-100" src="img/carousel-3.jpg" alt="Image">
-                        <div class="carousel-caption d-flex flex-column align-items-center justify-content-center">
-                            <div class="p-3" style="max-width: 700px;">
-                                <h6 class="section-title text-white text-uppercase mb-3 animated slideInDown">Chilling</h6>
-                                <h1 class="display-3 text-white mb-4 animated slideInDown">Discover A Affordable GuestHouse</h1>
-                                <a href="room.php" class="btn btn-primary py-md-3 px-md-5 me-3 animated slideInLeft">Book A Room</a>
-                                <!--<a href="booking.php" class="btn btn-light py-md-3 px-md-5 animated slideInRight">Our Rooms</a>-->
-                            </div>
-                        </div>
+<div class="container-fluid p-0 mb-5">
+    <div id="header-carousel" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <img class="w-100 carousel-image" src="img/carousel1.jpg" alt="Image">
+                <div class="carousel-caption d-flex flex-column align-items-center justify-content-center">
+                    <div class="p-3" style="max-width: 700px;">
+                        <h6 class="section-title text-white text-uppercase mb-3 animated slideInDown">Chilling</h6>
+                        <h1 class="display-3 text-white mb-4 animated slideInDown">Discover An Affordable GuestHouse</h1>
+                        <a href="room.php" class="btn btn-primary py-md-3 px-md-5 me-3 animated slideInLeft">Book A Room</a>
                     </div>
                 </div>
-                <button class="carousel-control-prev" type="button" data-bs-target="#header-carousel"
-                    data-bs-slide="prev">
-                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Previous</span>
-                </button>
-                <button class="carousel-control-next" type="button" data-bs-target="#header-carousel"
-                    data-bs-slide="next">
-                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Next</span>
-                </button>
+            </div>
+            <div class="carousel-item">
+                <img class="w-100 carousel-image" src="img/carousel2.jpg" alt="Image">
+                <div class="carousel-caption d-flex flex-column align-items-center justify-content-center">
+                    <div class="p-3" style="max-width: 700px;">
+                        <h6 class="section-title text-white text-uppercase mb-3 animated slideInDown">Chilling</h6>
+                        <h1 class="display-3 text-white mb-4 animated slideInDown">Discover An Affordable GuestHouse</h1>
+                        <a href="room.php" class="btn btn-primary py-md-3 px-md-5 me-3 animated slideInLeft">Book A Room</a>
+                    </div>
+                </div>
+            </div>
+            <div class="carousel-item">
+                <img class="w-100 carousel-image" src="img/carousel3.jpg" alt="Image">
+                <div class="carousel-caption d-flex flex-column align-items-center justify-content-center">
+                    <div class="p-3" style="max-width: 700px;">
+                        <h6 class="section-title text-white text-uppercase mb-3 animated slideInDown">Chilling</h6>
+                        <h1 class="display-3 text-white mb-4 animated slideInDown">Discover An Affordable GuestHouse</h1>
+                        <a href="room.php" class="btn btn-primary py-md-3 px-md-5 me-3 animated slideInLeft">Book A Room</a>
+                    </div>
+                </div>
+            </div>
+            <div class="carousel-item">
+                <img class="w-100 carousel-image" src="img/carousel4.jpg" alt="Image">
+                <div class="carousel-caption d-flex flex-column align-items-center justify-content-center">
+                    <div class="p-3" style="max-width: 700px;">
+                        <h6 class="section-title text-white text-uppercase mb-3 animated slideInDown">Chilling</h6>
+                        <h1 class="display-3 text-white mb-4 animated slideInDown">Discover An Affordable GuestHouse</h1>
+                        <a href="room.php" class="btn btn-primary py-md-3 px-md-5 me-3 animated slideInLeft">Book A Room</a>
+                    </div>
+                </div>
             </div>
         </div>
-        <!-- Carousel End -->
+        <button class="carousel-control-prev" type="button" data-bs-target="#header-carousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#header-carousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+</div>
+
+<style>
+    .carousel-image {
+        height: 500px; /* Adjust this height as needed */
+        object-fit: cover;
+        object-position: center;
+    }
+</style>
+<!-- Carousel End -->
 
 
         <!-- Booking Start -->
@@ -253,7 +267,7 @@ if ($result->num_rows > 0) {
                     <!-- Display the dynamic bed and bath information -->
                     <small class="border-end me-3 pe-3"><i class="fa fa-bed text-primary me-2"></i><?php echo $row['bed']; ?></small>
                     <small class="border-end me-3 pe-3"><i class="fa fa-bath text-primary me-2"></i><?php echo $row['bath']; ?></small>
-                    <small><i class="fa fa-wifi text-primary me-2"></i>Wifi</small>
+                    <small><i class="fa fa-snowflake text-primary me-2"></i>Aircon</small>
                 </div>
 
                 <div class="d-flex justify-content-between">
