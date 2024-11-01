@@ -138,7 +138,7 @@ if ($result->num_rows > 0) {
                     <!-- Display the dynamic bed and bath information -->
                     <small class="border-end me-3 pe-3"><i class="fa fa-bed text-primary me-2"></i><?php echo $row['bed']; ?></small>
                     <small class="border-end me-3 pe-3"><i class="fa fa-bath text-primary me-2"></i><?php echo $row['bath']; ?></small>
-                    <small><i class="fa fa-wifi text-primary me-2"></i>Wifi</small>
+                    <small><i class="fa fa-snowflake text-primary me-2"></i>Aircon</small>
                 </div>
 
                 <div class="d-flex justify-content-between">

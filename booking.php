@@ -235,7 +235,7 @@ if (isset($_GET['room_id'])) {
                         <!-- Display bed and bath information dynamically -->
                         <small class="border-end me-3 pe-3"><i class="fa fa-bed text-primary me-2"></i><?php echo htmlspecialchars($room['bed']); ?></small>
                         <small class="border-end me-3 pe-3"><i class="fa fa-bath text-primary me-2"></i><?php echo htmlspecialchars($room['bath']); ?></small>
-                        <small><i class="fa fa-wifi text-primary me-2"></i>Wifi</small>
+                        <small><i class="fa fa-snowflake text-primary me-2"></i>Aircon</small>
                     </div>
 
                     <!-- Guest selection dropdown -->
