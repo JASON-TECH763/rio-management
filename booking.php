@@ -467,28 +467,11 @@ function calculateAmount(price, guestCount) {
     <script src="js/sweetalert.js"></script>
 
     <script>
-    // Function to set the minimum checkout date
-    function setMinCheckoutDate() {
-        var checkinInput = document.getElementById('checkin_date');
-        var checkoutInput = document.getElementById('checkout_date');
-        var checkinDate = new Date(checkinInput.value);
-        checkinDate.setDate(checkinDate.getDate() + 1); // Set checkout to at least one day after check-in
-        var minCheckoutDate = checkinDate.toISOString().split('T')[0]; // Format to 'YYYY-MM-DD'
-
-        checkoutInput.min = minCheckoutDate;
-        // If the current value is less than the minimum, reset it
-        if (checkoutInput.value < minCheckoutDate) {
-            checkoutInput.value = minCheckoutDate;
-        }
-    }
-
-    // Set the minimum checkout date on page load
-    window.onload = function() {
-        setMinCheckoutDate();
-    };
-
-    // Add event listener for check-in date change
-    document.getElementById('checkin_date').addEventListener('change', setMinCheckoutDate);
+    document.getElementById('checkin_date').addEventListener('change', function() {
+        var checkinDate = new Date(this.value);
+        checkinDate.setDate(checkinDate.getDate() + 1); // Ensure checkout is after check-in
+        document.getElementById('checkout_date').min = checkinDate.toISOString().split("T")[0];
+    });
 </script>
 
 
