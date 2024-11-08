@@ -4,53 +4,47 @@ include('config/connect.php');
 $error = "";
 
 if (isset($_POST['login'])) {
-  // Retrieve and sanitize input
-  $user = trim($_POST['uname']);
-  $pass = trim($_POST['pass']);
+    $user = $_REQUEST['uname'];
+    $pass = $_REQUEST['pass'];
 
-  // Use prepared statements to prevent SQL injection
-  if (!empty($user) && !empty($pass)) {
-      // Prepare a parameterized query to prevent SQL injection
-      $query = "SELECT email, password, verified FROM customer WHERE email=?";
-      $stmt = mysqli_prepare($conn, $query);
+    // Sanitize input
+    $user = mysqli_real_escape_string($conn, $user);
 
-      if ($stmt) {
-          // Bind the email (user input) as a parameter to the prepared statement
-          mysqli_stmt_bind_param($stmt, "s", $user);
-          mysqli_stmt_execute($stmt);
-          $result = mysqli_stmt_get_result($stmt);
+    if (!empty($user) && !empty($pass)) {
+        // Prepare statement for login
+        $query = "SELECT email, password, verified FROM customer WHERE email=?";
+        $stmt = mysqli_prepare($conn, $query);
+        mysqli_stmt_bind_param($stmt, "s", $user);
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
 
-          // Fetch the user data
-          $row = mysqli_fetch_array($result);
+        $row = mysqli_fetch_array($result);
 
-          if ($row) {
-              // Verify the hashed password
-              if (password_verify($pass, $row['password'])) {
-                  // Check if the account is verified
-                  if ($row['verified'] == 1) {
-                      // Login successful
-                      $_SESSION['email'] = $row['email'];
-                      $_SESSION['verified'] = $row['verified'];  // Set session variable for verified status
-                      header("Location: order.php");
-                      exit(); // Stop further script execution after redirect
-                  } else {
-                      $_SESSION['status'] = "error";
-                      $_SESSION['message'] = "Your account is not verified. Please use a verified email account.";
-                      header("Location: index.php");
-                      exit();
-                  }
-              } else {
-                  $error = '* Invalid Email or Password';
-              }
-          } else {
-              $error = '* Invalid Email or Password';
-          }
-      } else {
-          $error = '* Failed to prepare the SQL statement';
-      }
-  } else {
-      $error = '* Please fill all the fields!';
-  }
+        if ($row) {
+            // Check if password is correct
+            if (password_verify($pass, $row['password'])) {
+                // Check if account is verified
+                if ($row['verified'] == 1) {
+                    // Login successful, store email and verified status in session
+                    $_SESSION['email'] = $row['email'];
+                    $_SESSION['verified'] = $row['verified'];  // Ensure this is set
+                    header("Location: order.php"); // Redirect to order page
+                    exit(); // Always call exit after a header redirect
+                } else {
+                    $_SESSION['status'] = "error";
+                    $_SESSION['message'] = "Your account is not verified. Please use a verified email account.";
+                    header("Location: index.php");
+                    exit();
+                }
+            } else {
+                $error = '* Invalid Email or Password';
+            }
+        } else {
+            $error = '* Invalid Email or Password';
+        }
+    } else {
+        $error = '* Please fill all the fields!';
+    }
 }
 
 // Handle account creation
@@ -131,7 +125,6 @@ if (isset($_POST['create_account'])) {
 <a href="https://rio-lawis.com/" class="btn btn-light back-button" 
 style="background-color: #1572e8; color: white; padding-left: 5px; padding-right: 5px;">Back to Site</a>
 
-
 <section class="vh-100" style="background-color: #2a2f5b; color: white;">
   <div class="container-fluid h-custom">
     <div class="row d-flex justify-content-center align-items-center h-100">
@@ -159,7 +152,10 @@ style="background-color: #1572e8; color: white; padding-left: 5px; padding-right
             <input class="p-2" type="checkbox" onclick="myFunction()" style="margin-left: 10px; margin-top: 13px;"> 
             <span style="margin-left: 5px;">Show password</span>
           </div>
-
+  <!-- Forgot Password Link -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+        <a href="forgot_password.php" style="color: #FEA116;">Forgot Password?</a>
+    </div>
           <div class="d-flex justify-content-between align-items-center">
             <button type="submit" name="login" class="btn btn-warning btn-lg enter" style="background-color: #1572e8; color: white; padding-left: 2.5rem; padding-right: 2.5rem;">Login</button>
             <a href="create_account.php"  class="btn btn-warning btn-lg enter" style="background-color: #1572e8; color: white; padding-left: 2.5rem; padding-right: 2.5rem;">Create Account</a>
