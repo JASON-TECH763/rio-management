@@ -47,13 +47,13 @@
                   <i class="fa fa-ellipsis-h"></i>
                 </span>
                 <!-- <h4 class="text-section">Components</h4> -->
-              </li>
+               <!--</li>
               <li class="nav-item">
                 <a  href="room.php">
                   <i class="fas fa-home"></i>
                   <p>Manage Room</p>
                  
-                </a>
+                </a>-->
                <li class="nav-item">
                 <a  href="booking_details.php">
                   <i class="fas fa-th-list"></i>
@@ -62,16 +62,16 @@
                 </a>
               </li>
               </li>
-               <!-- <li class="nav-item">
+                 <!--<li class="nav-item">
                 <a  href="staff.php">
-                  <i class="fas fa-list"></i>
-                  <p>Manage Staff</p>-->
+                  <i class="fas fa-user"></i>
+                  <p>Manage Staff</p>
                  
                 </a>
-              </li>
+              </li>-->
               <li class="nav-item">
                 <a  href="customer.php">
-                  <i class="fas fa-user"></i>
+                  <i class="fas fa-users"></i>
                   <p>Manage Customer</p>
                  
                 </a>
@@ -83,13 +83,13 @@
                  
                 </a>
               </li> -->
-              <li class="nav-item">
+              <!-- <li class="nav-item">
                 <a  href="product.php">
                   <i class="fas fa-list"></i>
                   <p>Manage Products</p>
                  
                 </a>
-              </li>
+              </li>-->
               <li class="nav-item">
                 <a  href="order.php">
                   <i class="fas fa-shopping-cart"></i>
@@ -97,13 +97,13 @@
                  
                 </a>
               </li>
-              <!-- <li class="nav-item">
-                <a  href="customer.php">
-                  <i class="far fa-credit-card"></i>
-                  <p>Manage Payments</p>
+              <li class="nav-item">
+                <a  href="manage_summary.php">
+                <i class="fas fa-shopping-cart"></i>
+                  <p>Manage Foods & Drinks</p>
                  
                 </a>
-              </li> -->
+              </li>
               <li class="nav-item">
                 <a  href="manage_order.php">
                   <i class="fas fa-receipt"></i>
@@ -111,13 +111,6 @@
                  
                 </a>
               </li>
-             <!--  <li class="nav-item">
-                <a  href="customer.php">
-                  <i class="fas fa-user-tie"></i>
-                  <p>Manage Staff</p>
-                  
-                </a>
-              </li> -->
               <li class="nav-section">
                 <span class="sidebar-mini-icon">
                   <i class="fa fa-ellipsis-h"></i>
