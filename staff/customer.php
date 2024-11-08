@@ -1,6 +1,7 @@
-<?php
+<?php 
 session_start();
 include("config/connect.php");
+
 
 
 if (!isset($_SESSION['uname'])) {
@@ -146,8 +147,8 @@ if (isset($_GET['delete'])) {
                         </thead>
                         <tbody>
                           <?php
-                          // Change to customer table query
-                          $sql = "SELECT id, name, email, phone FROM customer";
+                          // Change to customer table query to show only verified customers
+                          $sql = "SELECT id, name, email, phone FROM customer WHERE verified = 1";
                           $result = $conn->query($sql);
                           $cnt = 1;
                           if ($result->num_rows > 0) {
@@ -159,29 +160,15 @@ if (isset($_GET['delete'])) {
                                   <td><?php echo $row['email']; ?></td>
                                   <td><?php echo $row['phone']; ?></td>
                                   <td>
-                                      <div class="btn-group dropstart">
-                                      <button
-                                        type="button"
-                                        class="btn btn-primary btn-border dropdown-toggle"
-                                        data-bs-toggle="dropdown"
-                                        aria-haspopup="true"
-                                        aria-expanded="false"
-                                      >
-                                        Action
-                                      </button>
-                                      <ul class="dropdown-menu" role="menu">
-                                        <li>
-                                        <a class="dropdown-item" href="update_customer.php?id=<?php echo $row['id']; ?>"
-                                        ><button class="btn btn-info btn-sm"><i class="fa fa-info"></i> Edit</button></a>
-                                          <div class="dropdown-divider"></div>
-                                          <a class="dropdown-item" href="customer.php?delete=<?php echo $row['id']; ?>"
-                                            ><button type="button" class="btn btn-danger btn-sm"><i class="fa fa-times"></i> Delete</button></a>
+                                  
+                                          <a href="customer.php?delete=<?php echo $row['id']; ?>">
+                                            <button type="button" class="btn btn-danger btn-sm"><i class="fa fa-times"></i> Delete</button></a>
                                         </li>
                                       </ul>
                                     </div>
                                   </td>
                               </tr>
-                          <?php
+                              <?php
                               $cnt++;
                               }
                           }

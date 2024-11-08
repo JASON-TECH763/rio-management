@@ -8,7 +8,6 @@ if (!isset($_SESSION['uname'])) {
   exit();
 }
 
-
 if (isset($_GET['delete'])) {
     // Assuming $conn is your database connection object
 
@@ -55,7 +54,6 @@ if (isset($_GET['delete'])) {
     // Close the statement
     $stmt->close();
 } 
-
 
 
 
@@ -132,88 +130,117 @@ if (isset($_GET['delete'])) {
                     </div>
                   </div>
                   <div class="card-body">
-                    <div class="table-responsive">
-                      <table
-                        id="basic-datatables"
-                        class="display table table-striped table-hover" style="width: 100%;">
-                        <thead>
-                          <tr>
-                                        <th>#</th>
-                                        <!-- <th>Booking No.</th> -->
-                                        <th>Name</th>
-                                        <th>Availability</th>
-                                        <th>Bath</th>
+    <div class="table-responsive">
+        <table id="basic-datatables" class="display table table-striped table-hover" style="width: 100%;">
+        <thead>
+    <tr>
+        <th>#</th>
+        <th>Room</th>
+        <th>Availability</th>
+        <th>Bath</th>
+        <th>Bed</th>
+        <th>Price</th>
+        <th>Image</th> <!-- New column for Room Image -->
+        <th>Action</th>
+    </tr>
+</thead>
+<tbody>
+    <?php
+    // Adjust the SQL query to join the room and room_images tables
+    $sql = "
+        SELECT r.id, r.r_name, r.available, r.bath, r.bed, r.price, ri.image_path
+        FROM room AS r
+        LEFT JOIN room_images AS ri ON r.id = ri.room_id
+    ";
 
-                                        <th>Bed</th>
-                                        
-                                        <th>Price</th>
-                                        
-                                        
-                                       
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                 
-                                   <?php
-                                    $sql = "SELECT id, r_name, available, bath, bed, price FROM room";
-                                    $result = $conn->query($sql);
-                                    $cnt = 1;
-                                    if ($result->num_rows > 0) {
-  // output data of each row
-                                    while($row = $result->fetch_assoc()) {
+    $result = $conn->query($sql);
+    $cnt = 1;
+    if ($result->num_rows > 0) {
+        $rooms = [];
+        while ($row = $result->fetch_assoc()) {
+            $rooms[$row['id']]['id'] = $row['id'];
+            $rooms[$row['id']]['r_name'] = $row['r_name'];
+            $rooms[$row['id']]['available'] = $row['available'];
+            $rooms[$row['id']]['bath'] = $row['bath'];
+            $rooms[$row['id']]['bed'] = $row['bed'];
+            $rooms[$row['id']]['price'] = $row['price'];
+            $rooms[$row['id']]['images'][] = $row['image_path']; // Collect images in an array
+        }
 
-                                    ?>
-                <tr>
-                    <td><?php echo $cnt; ?></td>
-                    <td><?php echo $row['r_name']; ?></td>
-                    <td><?php echo $row['available']; ?></td>
-                    <td><?php echo $row['bath']; ?></td>
-                    <td><?php echo $row['bed']; ?></td>
-                    <td><?php echo $row['price']; ?></td>
-                   
-                    
-                    
-                   
-                         
-                    <td>
-                        <div class="btn-group dropstart">
-                        <button
-                          type="button"
-                          class="btn btn-primary btn-border dropdown-toggle"
-                          data-bs-toggle="dropdown"
-                          aria-haspopup="true"
-                          aria-expanded="false"
-                        >
-                          Action
+        foreach ($rooms as $room) {
+    ?>
+            <tr>
+                <td><?php echo htmlspecialchars($cnt); ?></td>
+                <td><?php echo htmlspecialchars($room['r_name']); ?></td>
+                <td><?php echo htmlspecialchars($room['available']); ?></td>
+                <td><?php echo htmlspecialchars($room['bath']); ?></td>
+                <td><?php echo htmlspecialchars($room['bed']); ?></td>
+                <td><?php echo htmlspecialchars($room['price']); ?></td>
+                <td>
+                    <!-- Carousel for room images -->
+                    <div id="carousel-<?php echo $room['id']; ?>" class="carousel slide" data-bs-ride="carousel">
+                        <div class="carousel-inner">
+                            <?php
+                            // Check if images exist and create carousel items
+                            if (!empty($room['images'])) {
+                                foreach ($room['images'] as $index => $image) {
+                                    if ($index === 0) {
+                                        // Make the first image active
+                                        echo '<div class="carousel-item active">';
+                                    } else {
+                                        echo '<div class="carousel-item">';
+                                    }
+                                    echo '<img src="uploads/' . htmlspecialchars($image) . '" class="d-block w-100" alt="Room Image" style="width: 100px; height: 50px; object-fit: cover;">';
+
+                                    echo '</div>';
+                                }
+                            } else {
+                                echo '<div class="carousel-item active"><img src="uploads/default.jpg" class="d-block w-100" alt="No Image" style="width: 100px; height: 50px; object-fit: cover;"></div>';
+                            }
+                            ?>
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#carousel-<?php echo $room['id']; ?>" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#carousel-<?php echo $room['id']; ?>" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                    </div>
+                </td>
+                <td>
+                    <div class="btn-group dropstart">
+                        <button type="button" class="btn btn-primary btn-border dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Action
                         </button>
                         <ul class="dropdown-menu" role="menu">
-                          <li>
-                            <a class="dropdown-item" href="update_room.php?id=<?php echo $row['id']; ?>"
-                              ><button class="btn btn-info btn-sm"><i class="fa fa-info"></i> Edit</button></a>
-                            
-                            <div class="dropdown-divider"></div>
-                       
-                           
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="room.php?delete=<?php echo $row['id']; ?>"
-                              ><button type="submit" class="btn btn-danger btn-sm"><i class="fa fa-times"></i> Delete</button></a>
-                          </li>
+                            <li>
+                                <a class="dropdown-item" href="update_room.php?id=<?php echo $room['id']; ?>">
+                                    <button class="btn btn-info btn-sm"><i class="fa fa-info"></i> Edit</button>
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="room.php?delete=<?php echo $room['id']; ?>">
+                                    <button type="submit" class="btn btn-danger btn-sm"><i class="fa fa-times"></i> Delete</button>
+                                </a>
+                            </li>
                         </ul>
-                      </div>
-                           
-
-                    </td>
-                </tr>
-                <?php  $cnt = $cnt+1; } } $conn->close(); ?>
-            
-
-                        
-                       
-                                </tbody>
-                            </table>
                     </div>
-                  </div>
+                </td>
+            </tr>
+    <?php
+            $cnt++;
+        }
+    } else {
+        echo "<tr><td colspan='8'>No rooms found.</td></tr>";
+    }
+    ?>
+</tbody>
+
+        </table>
+    </div>
+</div>
+
                 </div>
               </div>
            

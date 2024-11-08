@@ -2,12 +2,10 @@
 session_start();
 include("config/connect.php");
 
-
 if (!isset($_SESSION['uname'])) {
     header("location:index.php");
     exit();
 }
-
 
 // Initialize the orders session if not set
 if (!isset($_SESSION['orders'])) {
@@ -19,7 +17,7 @@ if (isset($_POST['add_order'])) {
     $prod_id = htmlspecialchars($_POST['prod_id']);
     $prod_name = htmlspecialchars($_POST['prod_name']);
     $prod_price = htmlspecialchars($_POST['prod_price']);
-    $quantity = htmlspecialchars($_POST['quantity']); // Get quantity from form
+    $quantity = htmlspecialchars($_POST['quantity']);
 
     if ($quantity <= 0) {
         echo '<script>
@@ -36,7 +34,7 @@ if (isset($_POST['add_order'])) {
             'prod_id' => $prod_id,
             'prod_name' => $prod_name,
             'prod_price' => $prod_price,
-            'quantity' => $quantity // Store quantity
+            'quantity' => $quantity
         ];
 
         echo '<script>
@@ -57,38 +55,57 @@ if (isset($_POST['add_order'])) {
 
 // Handle placing the order
 if (isset($_POST['place_order'])) {
-    // Insert into orders table
-    $sql_order = "INSERT INTO orders (order_date) VALUES (NOW())"; // Adjust as needed
-    if ($conn->query($sql_order)) {
-        $order_id = $conn->insert_id;
-
-        // Insert into order_details table
-        foreach ($_SESSION['orders'] as $order) {
-            $sql_order_details = "INSERT INTO order_details (order_id, prod_id, prod_name, prod_price, quantity) VALUES (?, ?, ?, ?, ?)";
-            $stmt_order_details = $conn->prepare($sql_order_details);
-            $stmt_order_details->bind_param('issss', $order_id, $order['prod_id'], $order['prod_name'], $order['prod_price'], $order['quantity']);
-            $stmt_order_details->execute();
-        }
-
-        // Clear the session orders
-        unset($_SESSION['orders']);
-
-        // Redirect to order summary with order_id
-        header("Location: order_summary.php?order_id=" . $order_id);
-        exit;
-    } else {
+    // Check if there are items in the order
+    if (empty($_SESSION['orders'])) {
         echo '<script>
             window.onload = function() {
                 Swal.fire({
                     title: "Error!",
-                    text: "Failed to place the order.",
+                    text: "Please add products to the order before placing it.",
                     icon: "error"
                 });
             };
         </script>';
+    } else {
+        $guest_email = "Guest";  // You can replace this with a dynamic email if needed
+
+        // Insert into orders table with guest email
+        $sql_order = "INSERT INTO orders (order_date, customer_email) VALUES (NOW(), ?)";
+        $stmt_order = $conn->prepare($sql_order);
+        $stmt_order->bind_param('s', $guest_email);
+
+        if ($stmt_order->execute()) {
+            $order_id = $conn->insert_id;
+
+            // Insert into order_details table
+            foreach ($_SESSION['orders'] as $order) {
+                $sql_order_details = "INSERT INTO order_details (order_id, prod_id, prod_name, prod_price, quantity) VALUES (?, ?, ?, ?, ?)";
+                $stmt_order_details = $conn->prepare($sql_order_details);
+                $stmt_order_details->bind_param('issss', $order_id, $order['prod_id'], $order['prod_name'], $order['prod_price'], $order['quantity']);
+                $stmt_order_details->execute();
+            }
+
+            // Clear the session orders
+            unset($_SESSION['orders']);
+
+            // Redirect to order summary with order_id
+            header("Location: order_summary.php?order_id=" . $order_id);
+            exit;
+        } else {
+            echo '<script>
+                window.onload = function() {
+                    Swal.fire({
+                        title: "Error!",
+                        text: "Failed to place the order.",
+                        icon: "error"
+                    });
+                };
+            </script>';
+        }
     }
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">

@@ -2,6 +2,7 @@
 session_start();
 require("config/connect.php");
 
+
 if (!isset($_SESSION['uname'])) {
     header("location:index.php");
     exit();
@@ -54,6 +55,15 @@ $stmt = $conn->prepare($sql_total_products);
 $stmt->execute();
 $result = $stmt->get_result();
 $total_products = $result->fetch_assoc()['total_products'];
+
+// Get total customers
+$sql_total_customers = "SELECT COUNT(*) as total_customers FROM customer";
+$stmt = $conn->prepare($sql_total_customers);
+$stmt->execute();
+$result = $stmt->get_result();
+$total_customers = $result->fetch_assoc()['total_customers'];
+
+
 
 // Get monthly sales data for the current year
 $sql_monthly_sales = "SELECT MONTH(order_date) AS month, SUM(order_details.prod_price * order_details.quantity) AS total_sales
@@ -285,6 +295,27 @@ while ($row = $result->fetch_assoc()) {
                                 </div>
                             </div>
                         </div>
+
+                        <div class="col-sm-6 col-md-3">
+                            <div class="card card-stats card-round" style="background-color: #2a2f5b;">
+                                <div class="card-body">
+                                    <div class="row align-items-center">
+                                        <div class="col-icon">
+                                            <div class="icon-big text-center icon-warning bubble-shadow-small"  style="background-color: #ff0000;">
+                                                <i class="fas fa-users"  style="background-color: #ff0000;"></i>
+                                            </div>
+                                        </div>
+                                        <div class="col col-stats ms-3 ms-sm-0">
+                                            <div class="numbers">
+                                                <p class="card-category"  style="color: white;">Total Customers</p>
+                                                <h4 class="card-title"  style="color: white;"><?php echo $total_customers; ?></h4>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="row">
     <div class="col-md-6">
         <div class="card">
@@ -393,12 +424,6 @@ const dailySalesChart = new Chart(ctxDaily, {
         scales: {
             y: {
                 beginAtZero: true, // Start y-axis at 0
-                ticks: {
-                    stepSize: 1, // Ensure step size of 1 for whole numbers
-                    callback: function(value) {
-                        return Number(value).toFixed(0); // Convert to whole numbers
-                    }
-                }
             }
         }
     }

@@ -9,7 +9,6 @@ if (!isset($_SESSION['uname'])) {
 }
 
 
-
 // Check if order_id is provided
 if (!isset($_GET['order_id'])) {
     die("No order ID provided");
