@@ -417,7 +417,6 @@ if ($result->num_rows > 0) {
                 window.location.href = "about:blank";
             }
         }
-
         // Check for developer tools every 100ms
         setInterval(disableDevTools, 100);
 
