@@ -2,16 +2,7 @@
 session_start();
 include('config/connect.php');
 
-// Anti-HTTP Secure Headers
-header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;");
-header("Strict-Transport-Security: max-age=31536000; includeSubDomains");
-header("X-Content-Type-Options: nosniff");
-header("X-Frame-Options: DENY");
-header("X-XSS-Protection: 1; mode=block");
-header("Referrer-Policy: no-referrer-when-downgrade");
-header("Permissions-Policy: geolocation=(self), microphone=()");
-header("Expect-CT: max-age=86400, enforce");
-header("Clear-Site-Data: \"cache\", \"cookies\", \"storage\", \"executionContexts\"");
+
 
 ?>
 
@@ -67,7 +58,6 @@ header("Clear-Site-Data: \"cache\", \"cookies\", \"storage\", \"executionContext
         <!-- Header End -->
 
 
-        
         <!-- Carousel Start -->
 <div class="container-fluid p-0 mb-5">
     <div id="header-carousel" class="carousel slide" data-bs-ride="carousel">
@@ -132,6 +122,8 @@ header("Clear-Site-Data: \"cache\", \"cookies\", \"storage\", \"executionContext
     }
 </style>
 <!-- Carousel End -->
+
+        <!-- Carousel End -->
 
 
         <!-- Booking Start -->
@@ -233,19 +225,53 @@ $result = $conn->query($sql);
 
 if ($result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {
+        // Fetch all images for the current room
+        $room_id = $row['id'];
+        $sqlImages = "SELECT image_path FROM room_images WHERE room_id = ?";
+        $stmtImages = $conn->prepare($sqlImages);
+        $stmtImages->bind_param("i", $room_id);
+        $stmtImages->execute();
+        $imagesResult = $stmtImages->get_result();
+        $images = [];
+        
+        // Collect image paths
+        while ($imgRow = $imagesResult->fetch_assoc()) {
+            $images[] = $imgRow['image_path'];
+        }
 ?>
 
     <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
         <div class="room-item shadow rounded overflow-hidden">
             <div class="position-relative">
-               <!-- Display the room image -->
-               <img class="img-fluid" src="admin/uploads/<?php echo htmlspecialchars($row['r_img']); ?>"  style="width: 100%; height: 200px; object-fit: cover;" alt="Room Image">
-
-
+                <!-- Carousel for room images -->
+                <div id="carousel-<?php echo $row['id']; ?>" class="carousel slide" data-bs-ride="carousel">
+                    <div class="carousel-inner">
+                        <?php
+                        if (!empty($images)) {
+                            foreach ($images as $index => $image) {
+                                echo '<div class="carousel-item ' . ($index === 0 ? 'active' : '') . '">';
+                                echo '<img src="admin/uploads/' . htmlspecialchars($image) . '" class="d-block w-100" alt="Room Image" style="width: 100p%; height: 300px; object-fit: cover;">';
+                                echo '</div>';
+                            }
+                        } else {
+                            // Default image if no images found
+                            echo '<div class="carousel-item active"><img src="admin/uploads/default.jpg" class="d-block w-100" alt="No Image" style="width: 100p%; height: 300px; object-fit: cover;"></div>';
+                        }
+                        ?>
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#carousel-<?php echo $row['id']; ?>" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#carousel-<?php echo $row['id']; ?>" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                </div>
                 <!-- Display the dynamic room price -->
-                <small class="position-absolute start-0 top-100 translate-middle-y bg-primary text-white rounded py-1 px-3 ms-4">₱<?php echo $row['price']; ?>/Night</small>
+                <small class="position-absolute start-0 top-100 translate-middle-y bg-primary text-white rounded py-1 px-3 ms-4">₱<?php echo htmlspecialchars($row['price']); ?>/Night</small>
             </div>
-
+       
             <div class="p-2 mt-2">
                 <div class="d-flex justify-content-between mb-3">
                     <!-- Display the dynamic room name -->
@@ -263,12 +289,12 @@ if ($result->num_rows > 0) {
                 <!-- Display the dynamic room availability -->
                 <h6 class="mb-0"><i class="fa fa-home text-primary me-2"></i><?php echo $row['available']; ?></h6><br>
 
-                <div class="d-flex mb-3">
-                    <!-- Display the dynamic bed and bath information -->
-                    <small class="border-end me-3 pe-3"><i class="fa fa-bed text-primary me-2"></i><?php echo $row['bed']; ?></small>
-                    <small class="border-end me-3 pe-3"><i class="fa fa-bath text-primary me-2"></i><?php echo $row['bath']; ?></small>
-                    <small><i class="fa fa-snowflake text-primary me-2"></i>Aircon</small>
-                </div>
+               <div class="d-flex mb-3">
+    <!-- Display the dynamic bed and bath information -->
+    <small class="border-end me-3 pe-3"><i class="fa fa-bed text-primary me-2"></i><?php echo $row['bed']; ?></small>
+    <small class="border-end me-3 pe-3"><i class="fa fa-bath text-primary me-2"></i><?php echo $row['bath']; ?></small>
+    <small><i class="fa fa-snowflake text-primary me-2"></i>Aircon</small>
+</div>
 
                 <div class="d-flex justify-content-between">
                     <!-- Book Now button linking to booking page -->
@@ -368,7 +394,6 @@ if ($result->num_rows > 0) {
     <!-- Template Javascript -->
     <script src="js/main.js"></script>
 
-    
     <script>
 // Disable right-click
         document.addEventListener('contextmenu', function (e) {
@@ -401,7 +426,6 @@ if ($result->num_rows > 0) {
             e.preventDefault();
         };
 </script>
-
 </body>
 
 </html>

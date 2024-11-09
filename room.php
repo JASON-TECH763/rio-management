@@ -1,21 +1,19 @@
 <?php 
 include("config/connect.php");
 
-// Anti-HTTP Secure Headers
-header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;");
-header("Strict-Transport-Security: max-age=31536000; includeSubDomains");
-header("X-Content-Type-Options: nosniff");
-header("X-Frame-Options: DENY");
-header("X-XSS-Protection: 1; mode=block");
-header("Referrer-Policy: no-referrer-when-downgrade");
-header("Permissions-Policy: geolocation=(self), microphone=()");
-header("Expect-CT: max-age=86400, enforce");
-header("Clear-Site-Data: \"cache\", \"cookies\", \"storage\", \"executionContexts\"");
+// Fetch all rooms and their images from the database
+$sql = "
+    SELECT r.id, r.r_name, r.available, r.bath, r.bed, r.price, ri.image_path
+    FROM room AS r
+    LEFT JOIN room_images AS ri ON r.id = ri.room_id
+";
 
-// Fetch all rooms from the database
-$sql = "SELECT * FROM room";
 $result = $conn->query($sql);
 
+// Check if the query was successful
+if (!$result) {
+    die("Query failed: " . $conn->error);
+}
 
 ?>
 
@@ -86,107 +84,106 @@ $result = $conn->query($sql);
         <!-- Page Header End -->
 
 
-       
 
-
-        <!-- Room Start -->
-        <div class="container-xxl py-5">
-            <div class="container">
-                <div class="text-center wow fadeInUp" data-wow-delay="0.1s">
-                    <h6 class="section-title text-center text-primary text-uppercase">Our Rooms</h6>
-                    <h1 class="mb-5">Explore Our <span class="text-primary text-uppercase">Rooms</span></h1>
-                </div>
-                <div class="row g-4">
-                <?php
-// Fetch all rooms from the 'room' table
-$sql = "SELECT * FROM room";
-$result = $conn->query($sql);
-
-if ($result->num_rows > 0) {
-    while($row = $result->fetch_assoc()) {
-?>
-
-    <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
-        <div class="room-item shadow rounded overflow-hidden">
-            <div class="position-relative">
-               <!-- Display the room image -->
-               <img class="img-fluid" src="admin/uploads/<?php echo htmlspecialchars($row['r_img']); ?>"  style="width: 100%; height: 200px; object-fit: cover;"
-
-                <!-- Display the dynamic room price -->
-                <small class="position-absolute start-0 top-100 translate-middle-y bg-primary text-white rounded py-1 px-3 ms-4">₱<?php echo $row['price']; ?>/Night</small>
+    <div class="container-xxl py-5">
+        <div class="container">
+            <div class="text-center wow fadeInUp" data-wow-delay="0.1s">
+                <h6 class="section-title text-center text-primary text-uppercase">Our Rooms</h6>
+                <h1 class="mb-5">Explore Our <span class="text-primary text-uppercase">Rooms</span></h1>
             </div>
+            <div class="row g-4">
 
-            <div class="p-2 mt-2">
-                <div class="d-flex justify-content-between mb-3">
-                    <!-- Display the dynamic room name -->
-                    <h5 class="mb-0"><?php echo $row['r_name']; ?></h5>
-                    <div class="ps-2">
-                        <!-- Display 5 stars -->
-                        <small class="fa fa-star text-primary"></small>
-                        <small class="fa fa-star text-primary"></small>
-                        <small class="fa fa-star text-primary"></small>
-                        <small class="fa fa-star text-primary"></small>
-                        <small class="fa fa-star text-primary"></small>
+            <?php
+            if ($result->num_rows > 0) {
+                // Prepare an array to collect room data
+                $rooms = [];
+                while ($row = $result->fetch_assoc()) {
+                    $rooms[$row['id']]['id'] = $row['id'];
+                    $rooms[$row['id']]['r_name'] = $row['r_name'];
+                    $rooms[$row['id']]['available'] = $row['available'];
+                    $rooms[$row['id']]['bath'] = $row['bath'];
+                    $rooms[$row['id']]['bed'] = $row['bed'];
+                    $rooms[$row['id']]['price'] = $row['price'];
+                    $rooms[$row['id']]['images'][] = $row['image_path']; // Collect images in an array
+                }
+
+                // Display each room
+                foreach ($rooms as $room) {
+            ?>
+                <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
+                    <div class="room-item shadow rounded overflow-hidden">
+                        <div class="position-relative">
+                            <!-- Carousel for room images -->
+                            <div id="carousel-<?php echo $room['id']; ?>" class="carousel slide" data-bs-ride="carousel">
+                                <div class="carousel-inner">
+                                    <?php
+                                    // Check if images exist and create carousel items
+                                    if (!empty($room['images'])) {
+                                        foreach ($room['images'] as $index => $image) {
+                                            if (!empty($image)) { // Check if image path is not empty
+                                                echo '<div class="carousel-item ' . ($index === 0 ? 'active' : '') . '">';
+                                                echo '<img src="admin/uploads/' . htmlspecialchars($image) . '" class="d-block w-100" alt="Room Image" style="width: 100%; height: 300px; object-fit: cover;">';
+                                                echo '</div>';
+                                            }
+                                        }
+                                    } else {
+                                        // Display a default image if no images are found
+                                        echo '<div class="carousel-item active"><img src="admin/uploads/default.jpg" class="d-block w-100" alt="No Image" style="width: 100p%; height: 300px; object-fit: cover;"></div>';
+                                    }
+                                    ?>
+                                </div>
+                                <button class="carousel-control-prev" type="button" data-bs-target="#carousel-<?php echo $room['id']; ?>" data-bs-slide="prev">
+                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Previous</span>
+                                </button>
+                                <button class="carousel-control-next" type="button" data-bs-target="#carousel-<?php echo $room['id']; ?>" data-bs-slide="next">
+                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Next</span>
+                                </button>
+                            </div>
+                            <!-- Display the dynamic room price -->
+                            <small class="position-absolute start-0 top-100 translate-middle-y bg-primary text-white rounded py-1 px-3 ms-4">₱<?php echo htmlspecialchars($room['price']); ?>/Night</small>
+                        </div>
+                        <div class="p-2 mt-2">
+                            <div class="d-flex justify-content-between mb-3">
+                                <h5 class="mb-0"><?php echo htmlspecialchars($room['r_name']); ?></h5>
+                                <div class="ps-2">
+                                    <small class="fa fa-star text-primary"></small>
+                                    <small class="fa fa-star text-primary"></small>
+                                    <small class="fa fa-star text-primary"></small>
+                                    <small class="fa fa-star text-primary"></small>
+                                    <small class="fa fa-star text-primary"></small>
+                                </div>
+                            </div>
+                            <h6 class="mb-0"><i class="fa fa-home text-primary me-2"></i><?php echo htmlspecialchars($room['available']); ?></h6><br>
+                            <div class="d-flex mb-3">
+                                <small class="border-end me-3 pe-3"><i class="fa fa-bed text-primary me-2"></i><?php echo htmlspecialchars($room['bed']); ?></small>
+                                <small class="border-end me-3 pe-3"><i class="fa fa-bath text-primary me-2"></i><?php echo htmlspecialchars($room['bath']); ?></small>
+                                <small><i class="fa fa-snowflake text-primary me-2"></i>Aircon</small>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <a class="btn btn-sm btn-dark rounded py-2 px-4" href="booking.php?room_id=<?php echo $room['id']; ?>">Book Now</a>
+                            </div>
+                        </div>
                     </div>
                 </div>
-
-                <!-- Display the dynamic room availability -->
-                <h6 class="mb-0"><i class="fa fa-home text-primary me-2"></i><?php echo $row['available']; ?></h6><br>
-
-                <div class="d-flex mb-3">
-                    <!-- Display the dynamic bed and bath information -->
-                    <small class="border-end me-3 pe-3"><i class="fa fa-bed text-primary me-2"></i><?php echo $row['bed']; ?></small>
-                    <small class="border-end me-3 pe-3"><i class="fa fa-bath text-primary me-2"></i><?php echo $row['bath']; ?></small>
-                    <small><i class="fa fa-snowflake text-primary me-2"></i>Aircon</small>
-                </div>
-
-                <div class="d-flex justify-content-between">
-                    <!-- Book Now button linking to booking page -->
-<a class="btn btn-sm btn-dark rounded py-2 px-4" href="booking.php?room_id=<?php echo $row['id']; ?>">Book Now</a>
-
-                </div>
+            <?php
+                }
+            } else {
+                echo "No rooms available.";
+            }
+            ?>
             </div>
         </div>
     </div>
 
-<?php
-    }
-} else {
-    echo "No rooms available.";
-}
-?>
-                                                
-                </div>
-            </div>
-        </div><br><br><br><br>
-        <!-- Room End -->
-
-
-      
-        
-
-        <!-- Footer Start -->
-        <?php include("footer.php");?>
-        <!-- Footer End -->
-
-
-        <!-- Back to Top -->
-        <a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
-    </div>
+    <!-- Footer Start -->
+    <?php include("footer.php");?>
+    <!-- Footer End -->
 
     <!-- JavaScript Libraries -->
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="lib/wow/wow.min.js"></script>
-    <script src="lib/easing/easing.min.js"></script>
-    <script src="lib/waypoints/waypoints.min.js"></script>
-    <script src="lib/counterup/counterup.min.js"></script>
-    <script src="lib/owlcarousel/owl.carousel.min.js"></script>
-    <script src="lib/tempusdominus/js/moment.min.js"></script>
-    <script src="lib/tempusdominus/js/moment-timezone.min.js"></script>
-    <script src="lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js"></script>
-
-    <!-- Template Javascript -->
     <script src="js/main.js"></script>
 
     <script>
@@ -221,8 +218,6 @@ if ($result->num_rows > 0) {
             e.preventDefault();
         };
 </script>
-
 </body>
 
 </html>
-
