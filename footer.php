@@ -1,6 +1,24 @@
-<?php
+<style>
+     /* Footer styling to ensure it stays at the bottom */
+body, html {
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+}
 
-?>
+.container-xxl {
+    flex: 1;
+}
+
+/* Ensures the footer doesn't overlap with other content */
+.footer {
+    margin-top: auto;
+    padding-bottom: 20px;
+    position: relative;
+}
+</style>
 
 <div class="container-fluid bg-dark text-light footer wow fadeIn" data-wow-delay="0.1s">
             <div class="container pb-5">
