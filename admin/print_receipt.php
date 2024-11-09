@@ -195,9 +195,11 @@ $stmt->close();
         </div>
 
         <!-- Print Button -->
-        <div class="print-btn">
-            <button onclick="window.print()" class="btn btn-primary">Print Receipt</button>
-        </div>
+        <!-- Print and Back Buttons -->
+<div class="print-btn">
+    <button onclick="window.print()" class="btn btn-primary">Print Receipt</button>
+    <button onclick="window.history.back()" class="btn btn-secondary">Back</button>
+</div>
     </div>
 </body>
 </html>
