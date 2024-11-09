@@ -197,11 +197,9 @@ include('config/connect.php');
                                 <img class="img-fluid rounded w-100 wow zoomIn" data-wow-delay="0.3s" src="img/js.jpg">
                             </div>
                             <div class="col-6 text-end">
-                                <img class="img-fluid rounded w-50 wow zoomIn" data-wow-delay="0.5s" src="img/room-1.jpg">
+                                <img class="img-fluid rounded w-50 wow zoomIn" data-wow-delay="0.5s" src="img/b.jpg">
                             </div>
-                            <div class="col-6 text-start">
-                                <img class="img-fluid rounded w-75 wow zoomIn" data-wow-delay="0.7s" src="img/room-3.jpg">
-                            </div>
+        
                         </div>
                     </div>
                 </div>
