@@ -1,30 +1,20 @@
-<?php 
+<?php
 session_start();
 include('config/connect.php');
 
-// Anti-HTTP Secure Headers
-header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;");
-header("Strict-Transport-Security: max-age=31536000; includeSubDomains");
-header("X-Content-Type-Options: nosniff");
-header("X-Frame-Options: DENY");
-header("X-XSS-Protection: 1; mode=block");
-header("Referrer-Policy: no-referrer-when-downgrade");
-header("Permissions-Policy: geolocation=(self), microphone=()");
-header("Expect-CT: max-age=86400, enforce");
-header("Clear-Site-Data: \"cache\", \"cookies\", \"storage\", \"executionContexts\"");
 
 // Handle form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $booking_id = mt_rand(10000000, 99999999);
-    $checkin_date = htmlspecialchars($_POST['checkin_date'], ENT_QUOTES, 'UTF-8');
-    $checkout_date = htmlspecialchars($_POST['checkout_date'], ENT_QUOTES, 'UTF-8');
-    $r_name = htmlspecialchars($_POST['r_name'], ENT_QUOTES, 'UTF-8'); // Room name from the fetched data
-    $amount = htmlspecialchars($_POST['amount'], ENT_QUOTES, 'UTF-8');  // Room price from the fetched data
-    $first_name = htmlspecialchars($_POST['first_name'], ENT_QUOTES, 'UTF-8');
-    $last_name = htmlspecialchars($_POST['last_name'], ENT_QUOTES, 'UTF-8');
-    $email = htmlspecialchars($_POST['email'], ENT_QUOTES, 'UTF-8');
-    $phone = htmlspecialchars($_POST['phone'], ENT_QUOTES, 'UTF-8');
-    $payment = htmlspecialchars($_POST['payment'], ENT_QUOTES, 'UTF-8');
+    $checkin_date = $_POST['checkin_date'];
+    $checkout_date = $_POST['checkout_date'];
+    $r_name = $_POST['r_name']; // Room name from the fetched data
+    $amount = $_POST['amount'];  // Room price from the fetched data
+    $first_name = $_POST['first_name'];
+    $last_name = $_POST['last_name'];
+    $email = $_POST['email'];
+    $phone = $_POST['phone'];
+    $payment = $_POST['payment'];
 
     $sql = "INSERT INTO reservations (booking_id, checkin_date, checkout_date, r_name, amount, first_name, last_name, email, phone, payment, status)
             VALUES ('$booking_id', '$checkin_date', '$checkout_date', '$r_name', '$amount', '$first_name', '$last_name', '$email', '$phone', '$payment', 'Pending')";
@@ -75,8 +65,8 @@ if ($conn->query($sql) === TRUE) {
 
 
 }
-?>
 
+?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -159,15 +149,7 @@ if ($conn->query($sql) === TRUE) {
         <?php include("header.php");?>
         <!-- Header End -->
 
-
-       
-
-
-       
-        
-
-
-            <!-- Booking Start -->
+          <!-- Booking Start -->
             <div class="container-xxl py-5">
                 <div class="container">
                
@@ -179,51 +161,74 @@ if ($conn->query($sql) === TRUE) {
                     <h1 class="mb-5"><span class="text-primary text-uppercase">Book</span> Now!</h1>
                 </div>
                 <div class="row g-12">
-                    <!-- Centered Row for Room Details and Form -->
+                       <!-- Centered Row for Room Details and Form -->
         <div class="row justify-content-center">
                 <?php
+
 // Check if a room_id is provided in the URL
 if (isset($_GET['room_id'])) {
     $room_id = $_GET['room_id'];
     
-    // Prepare the query to fetch the specific room
+    // Fetch the specific room details
     $sql = "SELECT * FROM room WHERE id = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $room_id);
     $stmt->execute();
-    $result = $stmt->get_result();
-    
-    // Check if the room exists
-    if ($result->num_rows > 0) {
-        $room = $result->fetch_assoc(); // Fetch room data
-?>
+    $roomResult = $stmt->get_result();
 
-        <!-- Display the room details -->
-        <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
+    // Check if the room exists
+    if ($roomResult->num_rows > 0) {
+        $room = $roomResult->fetch_assoc();
+
+        // Fetch all images for this room
+        $sqlImages = "SELECT image_path FROM room_images WHERE room_id = ?";
+        $stmtImages = $conn->prepare($sqlImages);
+        $stmtImages->bind_param("i", $room_id);
+        $stmtImages->execute();
+        $imagesResult = $stmtImages->get_result();
+        $images = [];
+        
+        // Collect image paths
+        while ($imgRow = $imagesResult->fetch_assoc()) {
+            $images[] = $imgRow['image_path'];
+        }
+?> 
+
+<!-- Display the room details -->
+<div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
             <div class="room-item shadow rounded overflow-hidden">
                 <div class="position-relative">
-                   <!-- Display the room image with consistent sizing and inline CSS -->
-<img src="admin/uploads/<?php echo htmlspecialchars($room['r_img']); ?>" 
-     alt="<?php echo htmlspecialchars($room['r_name']); ?>" 
-     class="img-fluid" 
-     style="width: 100%; height: 200px; object-fit: cover;">
-
-
-
-<!-- Bootstrap JS and dependencies -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-
-
-                    <!-- Display the room price -->
-                    <small class="position-absolute start-0 top-100 translate-middle-y bg-primary text-white rounded py-1 px-3 ms-4">₱<?php echo $room['price']; ?>/Night</small>
+                    <!-- Carousel for room images -->
+                    <div id="carousel-<?php echo $room['id']; ?>" class="carousel slide" data-bs-ride="carousel">
+                        <div class="carousel-inner">
+                            <?php
+                            if (!empty($images)) {
+                                foreach ($images as $index => $image) {
+                                    echo '<div class="carousel-item ' . ($index === 0 ? 'active' : '') . '">';
+                                    echo '<img src="admin/uploads/' . htmlspecialchars($image) . '" class="d-block w-100" alt="Room Image" style="width: 100p%; height: 300px; object-fit: cover;">';
+                                    echo '</div>';
+                                }
+                            } else {
+                                // Default image if no images found
+                                echo '<div class="carousel-item active"><img src="admin/uploads/default.jpg" class="d-block w-100" alt="No Image" style="width: 100p%; height: 300px; object-fit: cover;"></div>';
+                            }
+                            ?>
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#carousel-<?php echo $room['id']; ?>" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#carousel-<?php echo $room['id']; ?>" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                    </div>
+                    <small class="position-absolute start-0 top-100 translate-middle-y bg-primary text-white rounded py-1 px-3 ms-4">₱<?php echo htmlspecialchars($room['price']); ?>/Night</small>
                 </div>
-
                 <div class="p-2 mt-2">
                     <div class="d-flex justify-content-between mb-3">
-                        <!-- Display the room name dynamically -->
                         <h5 class="mb-0"><?php echo htmlspecialchars($room['r_name']); ?></h5>
                         <div class="ps-2">
-                            <!-- Display 5 stars -->
                             <small class="fa fa-star text-primary"></small>
                             <small class="fa fa-star text-primary"></small>
                             <small class="fa fa-star text-primary"></small>
@@ -231,12 +236,8 @@ if (isset($_GET['room_id'])) {
                             <small class="fa fa-star text-primary"></small>
                         </div>
                     </div>
-
-                    <!-- Display room availability -->
                     <h6 class="mb-0"><i class="fa fa-home text-primary me-2"></i><?php echo htmlspecialchars($room['available']); ?></h6><br>
-
                     <div class="d-flex mb-3">
-                        <!-- Display bed and bath information dynamically -->
                         <small class="border-end me-3 pe-3"><i class="fa fa-bed text-primary me-2"></i><?php echo htmlspecialchars($room['bed']); ?></small>
                         <small class="border-end me-3 pe-3"><i class="fa fa-bath text-primary me-2"></i><?php echo htmlspecialchars($room['bath']); ?></small>
                         <small><i class="fa fa-snowflake text-primary me-2"></i>Aircon</small>
@@ -244,31 +245,28 @@ if (isset($_GET['room_id'])) {
 
                     <!-- Guest selection dropdown -->
                     <div class="d-flex justify-content-between">
-                    <div class="col-md-12">
-                        <div class="form-floating">
-                            <select id="guest-count-<?php echo $row['id']; ?>" class="form-control" name="guest-count-<?php echo $row['id']; ?>" onchange="updateRoomName('<?php echo $room['r_name']; ?>'); calculateAmount(<?php echo $room['price']; ?>, this.value)">
-                                <option value="0">--Select--</option>
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <!-- Add more options as needed -->
-                            </select>
-                            <label for="guest-count-<?php echo $row['id']; ?>">Select Guest</label>
+                        <div class="col-md-12">
+                            <div class="form-floating">
+                                <select id="guest-count-<?php echo $room['id']; ?>" class="form-control" name="guest-count-<?php echo $room['id']; ?>" onchange="updateRoomName('<?php echo $room['r_name']; ?>'); calculateAmount(<?php echo $room['price']; ?>, this.value)">
+                                    <option value="0">--Select--</option>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <!-- Add more options as needed -->
+                                </select>
+                                <label for="guest-count-<?php echo $room['id']; ?>">Select Guest</label>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
 <?php
     } else {
-        // Room not found
-        echo "<p class='alert alert-danger'>Room not found.</p>";
+        echo "<p>Room not found.</p>";
     }
 } else {
-    // No room_id provided
-    echo "<p class='alert alert-warning'>No room selected. Please provide a room_id.</p>";
+    echo "<p>No room ID provided.</p>";
 }
 ?>
 
@@ -277,49 +275,46 @@ if (isset($_GET['room_id'])) {
                             <form method="POST">
 
                             
-                            <?php
-// Function to limit input size early to avoid large payloads being processed
-function limit_input_size($input, $max_length = 100) {
-    if (strlen($input) > $max_length) {
-        return false; // Return false if input exceeds the allowed size
-    }
-    return true;
-}
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Limit input size and exit early if too large
-    if (!limit_input_size($_POST['first_name']) || !limit_input_size($_POST['last_name'])) {
-        echo '<div class="alert alert-danger">Invalid input: Name too long. Maximum 100 characters allowed.</div>';
-        exit; // Stop further execution to save resources
-    }
 
-    // Efficient sanitization using trim and filter_input
-    $first_name = trim(filter_input(INPUT_POST, 'first_name', FILTER_SANITIZE_STRING));
-    $last_name = trim(filter_input(INPUT_POST, 'last_name', FILTER_SANITIZE_STRING));
+ <?php
+        // Check if the form was submitted
+        if ($_SERVER["REQUEST_METHOD"] == "POST") {
+            $first_name = $_POST['first_name'];
 
-    // Sanitize to block any HTML or script tags
-    $first_name_sanitized = htmlspecialchars($first_name, ENT_QUOTES, 'UTF-8');
-    $last_name_sanitized = htmlspecialchars($last_name, ENT_QUOTES, 'UTF-8');
+            // Sanitize input to remove any HTML or script tags
+            $first_name_sanitized = htmlspecialchars($first_name, ENT_QUOTES, 'UTF-8');
 
-    // Efficient regex processing: Validates the input in one step
-    $name_pattern = "/^[A-Za-z\s'-]+$/";
+            // Validate the input: allow letters, hyphens, apostrophes, and spaces, but block < or >
+            if (!preg_match("/^[A-Za-z\s'-]+$/", $first_name)) {
+                echo '<div class="alert alert-danger">Invalid input: Please enter a valid name (letters, hyphens, apostrophes, and spaces only).</div>';
+            } else if ($first_name !== $first_name_sanitized) {
+                echo '<div class="alert alert-danger">Invalid input: HTML or script tags are not allowed.</div>';
+            } else {
+                // If valid, display success message
+                echo '<div class="alert alert-success">Input is valid. Form submitted successfully!</div>';
+                // Here, you can proceed with storing or processing the sanitized input.
+            }
 
-    // Validate names and avoid unnecessary computations
-    if (!preg_match($name_pattern, $first_name) || $first_name !== $first_name_sanitized) {
-        echo '<div class="alert alert-danger">Invalid input: Please enter a valid first name (letters, hyphens, apostrophes, and spaces only).</div>';
-    } elseif (!preg_match($name_pattern, $last_name) || $last_name !== $last_name_sanitized) {
-        echo '<div class="alert alert-danger">Invalid input: Please enter a valid last name (letters, hyphens, apostrophes, and spaces only).</div>';
-    } else {
-        // Proceed with valid input and reduce unnecessary operations
-        echo '<div class="alert alert-success">Input is valid. Form submitted successfully!</div>';
+            $last_name = $_POST['last_name'];
 
-        // Efficiently handle data here (e.g., store in the database) without redundant file access or memory usage
-        // Make sure to batch operations if interacting with the database or external resources
-    }
-}
-?>
+            // Sanitize input to remove any HTML or script tags
+            $last_name_sanitized = htmlspecialchars($last_name, ENT_QUOTES, 'UTF-8');
 
-<div class="row g-3">
+            // Validate the input: allow letters, hyphens, apostrophes, and spaces, but block < or >
+            if (!preg_match("/^[A-Za-z\s'-]+$/", $last_name)) {
+                echo '<div class="alert alert-danger">Invalid input: Please enter a valid name (letters, hyphens, apostrophes, and spaces only).</div>';
+            } else if ($last_name !== $last_name_sanitized) {
+                echo '<div class="alert alert-danger">Invalid input: HTML or script tags are not allowed.</div>';
+            } else {
+                // If valid, display success message
+                echo '<div class="alert alert-success">Input is valid. Form submitted successfully!</div>';
+                // Here, you can proceed with storing or processing the sanitized input.
+            }
+        }
+        ?>
+        
+        <div class="row g-3">
     <div class="form-floating">
         <input type="date" name="checkin_date" class="form-control" id="checkin_date" placeholder="Check-in Date" 
                value="<?php echo date('Y-m-d'); ?>" min="<?php echo date('Y-m-d'); ?>" required>
@@ -331,6 +326,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                min="<?php echo date('Y-m-d', strtotime('+1 day')); ?>" required>
         <label for="checkout_date">Check-out Date</label>
     </div>
+
+
+<script>
+    document.getElementById('checkin_date').addEventListener('change', function() {
+        var checkinDate = new Date(this.value);
+        checkinDate.setDate(checkinDate.getDate() + 1); // Ensure checkout is after check-in
+        document.getElementById('checkout_date').min = checkinDate.toISOString().split("T")[0];
+    });
+</script>
+
+
                                         <div class="col-md-12">
     <div class="form-floating">
         <input id="r_name" name="r_name" class="form-control" readonly placeholder="Selected Room" required>
@@ -464,51 +470,8 @@ function calculateAmount(price, guestCount) {
 }
 </script>
 
-
     <!-- SweetAlert JS -->
     <script src="js/sweetalert.js"></script>
-
-    <script>
-    document.getElementById('checkin_date').addEventListener('change', function() {
-        var checkinDate = new Date(this.value);
-        checkinDate.setDate(checkinDate.getDate() + 1); // Ensure checkout is after check-in
-        document.getElementById('checkout_date').min = checkinDate.toISOString().split("T")[0];
-    });
-</script>
-
-
-    <script>
-// Disable right-click
-        document.addEventListener('contextmenu', function (e) {
-            e.preventDefault();
-        });
-
-        // Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U
-        document.onkeydown = function (e) {
-            if (
-                e.key === 'F12' ||
-                (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J')) ||
-                (e.ctrlKey && e.key === 'U')
-            ) {
-                e.preventDefault();
-            }
-        };
-
-        // Disable developer tools
-        function disableDevTools() {
-            if (window.devtools.isOpen) {
-                window.location.href = "about:blank";
-            }
-        }
-
-        // Check for developer tools every 100ms
-        setInterval(disableDevTools, 100);
-
-        // Disable selecting text
-        document.onselectstart = function (e) {
-            e.preventDefault();
-        };
-</script>
 </body>
 
 </html>
