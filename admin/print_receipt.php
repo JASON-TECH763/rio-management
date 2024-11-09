@@ -194,11 +194,10 @@ $stmt->close();
             <p>This document is not valid for claim of input taxes.</p>
         </div>
 
-        <!-- Print Button -->
-        <!-- Print and Back Buttons -->
+     <!-- Back and Print Buttons -->
 <div class="print-btn">
+    <button onclick="window.location.href='order.php'" class="btn btn-secondary">Back</button>
     <button onclick="window.print()" class="btn btn-primary">Print Receipt</button>
-    <button onclick="window.history.back()" class="btn btn-secondary">Back</button>
 </div>
     </div>
 </body>
