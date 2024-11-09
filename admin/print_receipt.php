@@ -2,13 +2,13 @@
 session_start();
 include("config/connect.php");
 
-header("Content-Security-Policy: default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; img-src 'self' data:; font-src 'self' https://fonts.googleapis.com https://cdn.jsdelivr.net; frame-ancestors 'none'; form-action 'self'; base-uri 'self';");
+// Set timezone to Philippines
+date_default_timezone_set('Asia/Manila');
 
 if (!isset($_SESSION['uname'])) {
     header("location:index.php");
     exit();
 }
-
 
 if (!isset($_GET['order_id']) || !isset($_GET['payment_amount']) || !isset($_GET['change'])) {
     die("Invalid request.");
@@ -37,53 +37,76 @@ $stmt->close();
     <title>Receipt</title>
     <meta content="width=device-width, initial-scale=1.0, shrink-to-fit=no" name="viewport" />
     <link rel="stylesheet" href="assets/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="assets/css/plugins.min.css" />
-    <link rel="stylesheet" href="assets/css/kaiadmin.min.css" />
-    <link rel="stylesheet" href="assets/css/demo.css" />
     <style>
         .receipt {
-            max-width: 600px;
+            max-width: 700px;
             margin: auto;
             padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 10px;
+            border: 1px solid #000;
             font-family: Arial, sans-serif;
+            position: relative;
         }
-        .address-header {
-            margin-bottom: 20px;
+        .header-section {
             text-align: center;
+            margin-bottom: 20px;
         }
-        .address-header h2 {
+        .header-section h2 {
             margin: 0;
             font-size: 18px;
+            font-weight: bold;
         }
-        .address-header p {
+        .header-section p {
             margin: 5px 0;
             font-size: 14px;
         }
-        .receipt h1 {
-            text-align: center;
-            margin-bottom: 20px;
+        .invoice-number {
+            text-align: right;
+            font-size: 16px;
+            font-weight: bold;
         }
-        .receipt table {
+        .details-section {
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        .details-section p {
+            margin: 2px 0;
+        }
+        table {
             width: 100%;
             border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 14px;
         }
-        .receipt th, .receipt td {
-            border: 1px solid #ddd;
+        table, th, td {
+            border: 1px solid #000;
+        }
+        th, td {
             padding: 8px;
             text-align: left;
         }
-        .receipt th {
-            background-color: #f2f2f2;
+        .totals {
+            font-weight: bold;
         }
-        .receipt-footer {
+        .footer {
             margin-top: 20px;
-            text-align: right;
+            text-align: center;
+            font-size: 14px;
+        }
+        .footer .signature {
+            margin-top: 10px;
+            text-align: left;
+            padding-left: 10px;
+            font-family: 'Brush Script MT', cursive; /* Apply a cursive font for the signature */
+            font-size: 20px;
         }
         .print-btn {
             text-align: center;
             margin-top: 20px;
+        }
+        .logo {
+            position: absolute;
+            top: 10px;
+            left: 10px;
         }
         @media print {
             .print-btn {
@@ -94,25 +117,38 @@ $stmt->close();
 </head>
 <body>
     <div class="receipt">
-        <!-- Address Header Section -->
-         <center>
-        <div class="address-header">
-        <img src="assets/img/a.jpg" alt="navbar brand" class="navbar-brand" height="70">
-            <h2>RIO MANAGEMENT</h2>
-       
-            <p>Poblacion, Madridejos, Cebu</p>
-            <p>Phone: (123) 456-7890</p>
-            <p>Email: riomanagement123@gmail.com</p>
+        <!-- Logo -->
+        <div class="logo">
+            <img src="assets/img/a.jpg" alt="navbar brand" height="70">
         </div>
-    </center>
+        
+        <!-- Header Section -->
+        <div class="header-section">
+            <h2>RIO CAFE & RESTOBAR</h2>
+            <p>Poblacion Madridejos, 6053 Madridejos, Cebu, Philippines</p>
+            <p>VAT Reg. TIN: 108-427-007-00008</p>
+        </div>
+
+        <div class="invoice-number">
+            No. 001177
+        </div>
+
+        <!-- Customer and Transaction Details -->
+        <div class="details-section">
+    <p><strong>Date:</strong> <?php echo date('Y-m-d'); ?></p>
+    <p><strong>Time:</strong> <?php echo date('H:i:s'); ?></p>
+</div>
+
+
+        <!-- Order Table -->
         <table>
             <thead>
                 <tr>
                     <th>#</th>
-                    <th>Product Name</th>
-                    <th>Price</th>
+                    <th>Article/Description</th>
+                    <th>Unit Price</th>
                     <th>Quantity</th>
-                    <th>Total</th>
+                    <th>Amount (P)</th>
                 </tr>
             </thead>
             <tbody>
@@ -136,23 +172,29 @@ $stmt->close();
                     $cnt++;
                 }
                 ?>
-                <tr>
-                    <td colspan="4" class="text-right"><strong>Total:</strong></td>
+                <!-- Totals -->
+                <tr class="totals">
+                    <td colspan="4" class="text-right">Total Sales:</td>
                     <td><?php echo number_format($total_price, 2); ?></td>
                 </tr>
                 <tr>
-                    <td colspan="4" class="text-right"><strong>Payment Amount:</strong></td>
+                    <td colspan="4" class="text-right">Payment Amount:</td>
                     <td><?php echo number_format($payment_amount, 2); ?></td>
                 </tr>
                 <tr>
-                    <td colspan="4" class="text-right"><strong>Change:</strong></td>
+                    <td colspan="4" class="text-right">Change:</td>
                     <td><?php echo number_format($change, 2); ?></td>
                 </tr>
             </tbody>
         </table>
-        <div class="receipt-footer">
+
+        <!-- Footer Section -->
+        <div class="footer">
             <p>Thank you for your purchase!</p>
+            <p>This document is not valid for claim of input taxes.</p>
         </div>
+
+        <!-- Print Button -->
         <div class="print-btn">
             <button onclick="window.print()" class="btn btn-primary">Print Receipt</button>
         </div>
