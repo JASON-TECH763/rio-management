@@ -1,15 +1,3 @@
-<?php
-// Anti-HTTP Secure Headers
-header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;");
-header("Strict-Transport-Security: max-age=31536000; includeSubDomains");
-header("X-Content-Type-Options: nosniff");
-header("X-Frame-Options: DENY");
-header("X-XSS-Protection: 1; mode=block");
-header("Referrer-Policy: no-referrer-when-downgrade");
-header("Permissions-Policy: geolocation=(self), microphone=()");
-header("Expect-CT: max-age=86400, enforce");
-header("Clear-Site-Data: \"cache\", \"cookies\", \"storage\", \"executionContexts\"");
-?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -112,19 +100,20 @@ header("Clear-Site-Data: \"cache\", \"cookies\", \"storage\", \"executionContext
                         <a class="btn btn-primary py-3 px-5 mt-2" href="">Explore More</a>
                     </div>
                     <div class="col-lg-6">
-                        <div class="row g-3">
+                    <div class="row g-3">
                             <div class="col-6 text-end">
                                 <img class="img-fluid rounded w-75 wow zoomIn" data-wow-delay="0.1s" src="img/jp.jpg" style="margin-top: 25%;">
                             </div>
                             <div class="col-6 text-start">
-                                <img class="img-fluid rounded w-100 wow zoomIn" data-wow-delay="0.3s" src="img/js.jpg">
+                                <img class="img-fluid rounded w-100 wow zoomIn" data-wow-delay="0.3s" src="img/b.jpg">
                             </div>
                             <div class="col-6 text-end">
-                                <img class="img-fluid rounded w-50 wow zoomIn" data-wow-delay="0.5s" src="img/room-1.jpg">
+                                <img class="img-fluid rounded w-50 wow zoomIn" data-wow-delay="0.5s" src="img/js.jpg">
                             </div>
                             <div class="col-6 text-start">
-                                <img class="img-fluid rounded w-75 wow zoomIn" data-wow-delay="0.7s" src="img/room-3.jpg">
+                                <img class="img-fluid rounded w-75 wow zoomIn" data-wow-delay="0.7s" src="img/carousel1.jpg">
                             </div>
+        
                         </div>
                     </div>
                 </div>
