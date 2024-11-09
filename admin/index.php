@@ -24,7 +24,28 @@ header("Referrer-Policy: strict-origin-when-cross-origin");
     <link rel="stylesheet" href="assets/css/font-awesome.min.css">
     <link rel="stylesheet" href="assets/css/style.css">
     <style type="text/css">
-      /* ... (existing styles) ... */
+     <style type="text/css">
+      .divider:after,
+      .divider:before {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: #eee;
+      }
+      .h-custom {
+        height: calc(100% - 73px);
+      }
+      @media (max-width: 450px) {
+        .h-custom {
+          height: 100%;
+        }
+      }
+      .back-button {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+      }
+    </style>
     </style>
 </head>
 <body>
