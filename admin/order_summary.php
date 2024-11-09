@@ -2,13 +2,10 @@
 session_start();
 include("config/connect.php");
 
-header("Content-Security-Policy: default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; img-src 'self' data:; font-src 'self' https://fonts.googleapis.com https://cdn.jsdelivr.net; frame-ancestors 'none'; form-action 'self'; base-uri 'self';");
-
 if (!isset($_SESSION['uname'])) {
     header("location:index.php");
     exit();
 }
-
 
 // Check if order_id is provided
 if (!isset($_GET['order_id'])) {
@@ -58,24 +55,28 @@ if (isset($_POST['confirm_payment'])) {
 
         $show_receipt = true;
     } else {
-        $receipt = '<div class="alert alert-danger">Payment amount is insufficient.</div>';
+        // Show SweetAlert for insufficient payment
+        echo '<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>';
+        echo '<script>
+                document.addEventListener("DOMContentLoaded", function() {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Payment Error",
+                        text: "Your payment amount is insufficient. Please enter an amount equal to or greater than the total price.",
+                    });
+                });
+              </script>';
     }
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <title>Rio Management System</title>
-    <meta
-      content="width=device-width, initial-scale=1.0, shrink-to-fit=no"
-      name="viewport"
-    />
-    <link
-      rel="icon"
-      href="assets/img/a.jpg"
-      type="image/x-icon"
-    />
+    <meta content="width=device-width, initial-scale=1.0, shrink-to-fit=no" name="viewport" />
+    <link rel="icon" href="assets/img/a.jpg" type="image/x-icon" />
 
     <!-- Fonts and icons -->
     <script src="assets/js/plugin/webfont/webfont.min.js"></script>
@@ -83,12 +84,7 @@ if (isset($_POST['confirm_payment'])) {
       WebFont.load({
         google: { families: ["Public Sans:300,400,500,600,700"] },
         custom: {
-          families: [
-            "Font Awesome 5 Solid",
-            "Font Awesome 5 Regular",
-            "Font Awesome 5 Brands",
-            "simple-line-icons",
-          ],
+          families: ["Font Awesome 5 Solid", "Font Awesome 5 Regular", "Font Awesome 5 Brands", "simple-line-icons"],
           urls: ["assets/css/fonts.min.css"],
         },
         active: function () {
@@ -101,7 +97,7 @@ if (isset($_POST['confirm_payment'])) {
     <link rel="stylesheet" href="assets/css/bootstrap.min.css" />
     <link rel="stylesheet" href="assets/css/plugins.min.css" />
     <link rel="stylesheet" href="assets/css/kaiadmin.min.css" />
-<link rel="stylesheet" href="assets/css/demo.css" />
+    <link rel="stylesheet" href="assets/css/demo.css" />
    
   </head>
 <body>
@@ -172,12 +168,6 @@ if (isset($_POST['confirm_payment'])) {
                                         </div>
                                         <button type="submit" name="confirm_payment" class="btn btn-primary">Confirm Payment</button>
                                     </form>
-                                    <!-- Receipt Display -->
-                                    <?php if ($show_receipt): ?>
-                                    <div class="receipt mt-4">
-                                        <!-- The receipt will be displayed in a new window -->
-                                    </div>
-                                    <?php endif; ?>
                                 </div>
                             </div>
                         </div>
