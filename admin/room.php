@@ -129,7 +129,7 @@ if (isset($_GET['delete'])) {
                       </button>
                     </div>
                   </div>
-                  <div class="card-body">
+                  <div class="container">
     <div class="table-responsive">
         <table id="basic-datatables" class="display table table-striped table-hover" style="width: 100%;">
         <thead>
