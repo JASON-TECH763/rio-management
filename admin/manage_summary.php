@@ -280,7 +280,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                             <th>Order ID</th>
                                             <th>Order Date</th>
                                             <th>Email</th>
-                                            <th>Total Price</th> <!-- Added Total Price Column -->
+                                            <th>Total Price (₱)</th> <!-- Added Total Price Column -->
                                             <th>Status</th>
                                             <th>Action</th>
                                         </tr>
@@ -377,7 +377,7 @@ if ($result_orders->num_rows > 0) {
                                 <th>Product Name</th>
                                 <th>Product Price</th>
                                 <th>Quantity</th>
-                                <th>Subtotal</th> <!-- Added Subtotal column -->
+                                <th>Subtotal (₱)</th> <!-- Added Subtotal column -->
                             </tr>
                         </thead>
                         <tbody>
