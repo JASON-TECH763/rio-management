@@ -364,9 +364,10 @@ if ($result_orders->num_rows > 0) {
                                 </form>
                                 <div class="dropdown-divider"></div>
                     <!-- Print Action -->
-                <form method="get" action="receipt.php" target="_blank" style="display: inline;">
+                <!-- payment Action -->
+                <form method="get" action="payment.php" target="_blank" style="display: inline;">
                     <input type="hidden" name="order_id" value="<?php echo $row['order_id']; ?>">
-                    <button type="submit" class="btn btn-info btn-sm"><i class="fa fa-print"></i> Print</button>
+                    <button type="submit" class="btn btn-info btn-sm"><i class="fa fa-credit-card"></i> Payment</button>
                 </form>
                             </li>
                         </ul>
