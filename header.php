@@ -1,3 +1,11 @@
+<style>
+ @media (max-width: 576px) {
+    .navbar-brand h1 {
+        font-size: 1rem;
+        padding: 1rem;
+    }
+}
+</style>
  <div class="container-fluid bg-dark px-0">
             <div class="row gx-0">
                 <div class="col-lg-6 bg-dark d-none d-lg-block">
@@ -10,7 +18,7 @@
                  
                     <nav class="navbar navbar-expand-lg bg-dark navbar-dark p-3 p-lg-0">
                         <a href="index.php" class="navbar-brand d-block d-lg-none">
-                            <h1 class="m-0 text-primary text-uppercase">Rio Management System</h1>
+                            <h1 class="m-0 text-primary text-uppercase display-6 display-md-4">Rio Management System</h1>
                         </a>
                         <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
                             <span class="navbar-toggler-icon"></span>
