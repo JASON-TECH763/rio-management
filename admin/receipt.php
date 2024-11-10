@@ -2,13 +2,21 @@
 session_start();
 include("config/connect.php");
 
+// Set timezone to Philippines
+date_default_timezone_set('Asia/Manila');
+
 // Check for required parameters
-if (!isset($_GET['order_id'])) {
-    echo "Order ID not specified.";
+if (!isset($_SESSION['uname'])) {
+    header("location:index.php");
     exit();
+}
+if (!isset($_GET['order_id']) || !isset($_GET['payment_amount']) || !isset($_GET['change'])) {
+    die("Invalid request.");
 }
 
 $order_id = intval($_GET['order_id']);
+$payment_amount = floatval($_GET['payment_amount']);
+$change = floatval($_GET['change']);
 
 // Fetch order and customer details
 $sql = "SELECT o.order_id, o.order_date, o.status, c.name, c.email 
@@ -37,7 +45,6 @@ $result_products = $stmt_products->get_result();
 
 $total_price = 0;
 $products = [];
-
 while ($product = $result_products->fetch_assoc()) {
     $products[] = $product;
     $total_price += $product['prod_price'] * $product['quantity'];
@@ -106,16 +113,10 @@ while ($product = $result_products->fetch_assoc()) {
             <p>VAT Reg. TIN: 108-427-007-00008</p>
         </div>
 
-        <?php
-// Set the timezone to Philippine Standard Time
-date_default_timezone_set('Asia/Manila');
-?>
-
-<!-- Order & Customer Details -->
-<p><strong>Order Date:</strong> <?php echo date('Y-m-d H:i:s', strtotime($order['order_date'])); ?></p>
-<p><strong>Customer Name:</strong> <?php echo htmlspecialchars($order['name']); ?></p>
-<p><strong>Email:</strong> <?php echo htmlspecialchars($order['email']); ?></p>
-
+        <!-- Order & Customer Details -->
+        <p><strong>Order Date:</strong> <?php echo date('Y-m-d H:i:s', strtotime($order['order_date'])); ?></p>
+        <p><strong>Customer Name:</strong> <?php echo htmlspecialchars($order['name']); ?></p>
+        <p><strong>Email:</strong> <?php echo htmlspecialchars($order['email']); ?></p>
 
         <!-- Order Table -->
         <table class="receipt-table">
@@ -140,6 +141,14 @@ date_default_timezone_set('Asia/Manila');
                 <tr class="totals-row">
                     <td colspan="3">Total Price</td>
                     <td>₱<?php echo number_format($total_price, 2); ?></td>
+                </tr>
+                <tr class="totals-row">
+                    <td colspan="3">Payment Amount</td>
+                    <td>₱<?php echo number_format($payment_amount, 2); ?></td>
+                </tr>
+                <tr class="totals-row">
+                    <td colspan="3">Change</td>
+                    <td>₱<?php echo number_format($change, 2); ?></td>
                 </tr>
             </tbody>
         </table>
