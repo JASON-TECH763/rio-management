@@ -44,23 +44,7 @@
 
 
     
-    <!-- Toggler for mobile view -->
-    <button
-      class="navbar-toggler"
-      type="button"
-      data-bs-toggle="collapse"
-      data-bs-target="#navbarResponsive"
-      aria-controls="navbarResponsive"
-      aria-expanded="false"
-      aria-label="Toggle navigation"
-    >
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    
-    <!-- Navbar content -->
-    <div class="collapse navbar-collapse" id="navbarResponsive">
-      <ul class="navbar-nav ms-auto topbar-nav align-items-center">
-        <li class="nav-item topbar-user dropdown hidden-caret">
+  
           <!-- Dropdown trigger -->
           <a class="dropdown-toggle profile-pic" href="#" id="loginTrigger" role="button">
             <!-- Dynamically display the login name -->
