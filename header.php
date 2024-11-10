@@ -1,7 +1,7 @@
 <style>
  @media (max-width: 576px) {
     .navbar-brand h1 {
-        font-size: 1rem;
+        font-size: 1.30rem;
         padding: 1rem;
     }
 }
