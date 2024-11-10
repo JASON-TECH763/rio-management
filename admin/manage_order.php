@@ -2,7 +2,7 @@
 session_start();
 include("config/connect.php");
 
-header("Content-Security-Policy: default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; img-src 'self' data:; font-src 'self' https://fonts.googleapis.com https://cdn.jsdelivr.net; frame-ancestors 'none'; form-action 'self'; base-uri 'self';");
+
 if (!isset($_SESSION['uname'])) {
     header("location:index.php");
     exit();
@@ -118,79 +118,73 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             <h4 class="card-title">List of Reservations</h4>
                         </div>
                         <div class="card-body">
-                            <div class="table-responsive">
-                                <table id="summary-datatables" class="display table table-striped table-hover" style="width: 100%;">
-                                    <thead>
-                                        <tr>
-                                            <th>Order ID</th>
-                                            <th>Order Date</th>
-                                            <th>Product Name</th>
-                                            <th>Product Price</th>
-                                            <th>Quantity</th>
-                                            <th>Total Price</th>
-                                            <th>Status</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php
-                                        // Fetch order details
-                                        $sql_orders = "SELECT o.order_id, o.order_date, o.status, od.prod_name, od.prod_price, od.quantity 
-                                                       FROM orders o 
-                                                       JOIN order_details od ON o.order_id = od.order_id 
-                                                       ORDER BY o.order_date DESC";
-                                        $result_orders = $conn->query($sql_orders);
-                                        if ($result_orders->num_rows > 0) {
-                                            while ($row = $result_orders->fetch_assoc()) {
-                                                $total_price = $row['prod_price'] * $row['quantity'];
-                                        ?>
-                                            <tr>
-                                            <tr data-order-id="<?php echo $row['order_id']; ?>">
-    <td class="order-id"><?php echo $row['order_id']; ?></td>
-    <td class="order-date"><?php echo date('Y-m-d H:i:s', strtotime($row['order_date'])); ?></td>
-    <td class="product-name"><?php echo $row['prod_name']; ?></td>
-    <td class="product-price"><?php echo number_format($row['prod_price'], 2); ?></td>
-    <td class="quantity"><?php echo $row['quantity']; ?></td>
-    <td class="total-price"><?php echo number_format($total_price, 2); ?></td>
-    <td class="status"><?php echo $row['status']; ?></td>
-    
-                                               
-                                                <td>
-    <div class="btn-group dropstart">
-        <button type="button" class="btn btn-primary btn-border dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Action
-        </button>
-        <ul class="dropdown-menu" role="menu">
-            <li>
-
-                <div class="dropdown-divider"></div>
-                <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" style="display: inline;">
-                    <input type="hidden" name="order_id" value="<?php echo $row['order_id']; ?>">
-                    <input type="hidden" name="action" value="delete">
-                    <a class="dropdown-item" href="#"><button type="submit" class="btn btn-warning btn-sm"><i class="fa fa-exclamation-circle"></i>Delete</button></a>
-                </form>
-                <div class="dropdown-divider"></div>
-                <!-- Print Button -->
-                <a class="dropdown-item" href="#" onclick="printOrder(<?php echo $row['order_id']; ?>);">
-    <button type="button" class="btn btn-info btn-sm"><i class="fa fa-print"></i> Print</button>
-</a>
-
-            </li>
-        </ul>
-    </div>
-</td>
-
-                                            </tr>
-                                        <?php
-                                            }
-                                        } else {
-                                            echo "<tr><td colspan='8'>No orders found.</td></tr>";
-                                        }
-                                        ?>
-                                    </tbody>
-                                </table>
+    <div class="table-responsive">
+        <table id="summary-datatables" class="display table table-striped table-hover" style="width: 100%;">
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Order Date</th>
+                    <th>Product Name</th>
+                    <th>Product Price</th>
+                    <th>Quantity</th>
+                    <th>Total Price</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="ordersTableBody">
+                <?php
+                // Fetch order details
+                $sql_orders = "SELECT o.order_id, o.order_date, o.status, od.prod_name, od.prod_price, od.quantity 
+                               FROM orders o 
+                               JOIN order_details od ON o.order_id = od.order_id 
+                               ORDER BY o.order_date DESC";
+                $result_orders = $conn->query($sql_orders);
+                if ($result_orders->num_rows > 0) {
+                    while ($row = $result_orders->fetch_assoc()) {
+                        $total_price = $row['prod_price'] * $row['quantity'];
+                ?>
+                    <tr data-order-id="<?php echo $row['order_id']; ?>">
+                        <td class="order-id"><?php echo $row['order_id']; ?></td>
+                        <td class="order-date"><?php echo date('Y-m-d H:i:s', strtotime($row['order_date'])); ?></td>
+                        <td class="product-name"><?php echo $row['prod_name']; ?></td>
+                        <td class="product-price"><?php echo number_format($row['prod_price'], 2); ?></td>
+                        <td class="quantity"><?php echo $row['quantity']; ?></td>
+                        <td class="total-price"><?php echo number_format($total_price, 2); ?></td>
+                        <td class="status"><?php echo $row['status']; ?></td>
+                        <td>
+                            <div class="btn-group dropstart">
+                                <button type="button" class="btn btn-primary btn-border dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Action
+                                </button>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li>
+                                        <div class="dropdown-divider"></div>
+                                        <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" style="display: inline;">
+                                            <input type="hidden" name="order_id" value="<?php echo $row['order_id']; ?>">
+                                            <input type="hidden" name="action" value="delete">
+                                            <a class="dropdown-item" href="#"><button type="submit" class="btn btn-warning btn-sm"><i class="fa fa-exclamation-circle"></i>Delete</button></a>
+                                        </form>
+                                        <div class="dropdown-divider"></div>
+                                        <a class="dropdown-item" href="#" onclick="printOrder(<?php echo $row['order_id']; ?>);">
+                                            <button type="button" class="btn btn-info btn-sm"><i class="fa fa-print"></i> Print</button>
+                                        </a>
+                                    </li>
+                                </ul>
                             </div>
-                        </div>
+                        </td>
+                    </tr>
+                <?php
+                    }
+                } else {
+                    echo "<tr><td colspan='8'>No orders found.</td></tr>";
+                }
+                ?>
+            </tbody>
+        </table>
+    </div>
+</div>
+
                     </div>
                 </div>
             </div>
@@ -206,7 +200,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <script src="assets/js/plugin/datatables/datatables.min.js"></script>
 <script src="assets/js/kaiadmin.min.js"></script>
 <script>
-   
+
 function searchOrders() {
     const input = document.getElementById('searchField').value.toLowerCase();
     const rows = document.querySelectorAll('#ordersTableBody tr');
