@@ -362,6 +362,12 @@ if ($result_orders->num_rows > 0) {
                                     <input type="hidden" name="action" value="delete">
                                     <button type="submit" class="btn btn-warning btn-sm"><i class="fa fa-exclamation-circle"></i> Delete</button>
                                 </form>
+                                <div class="dropdown-divider"></div>
+                    <!-- Print Action -->
+                <form method="get" action="receipt.php" target="_blank" style="display: inline;">
+                    <input type="hidden" name="order_id" value="<?php echo $row['order_id']; ?>">
+                    <button type="submit" class="btn btn-info btn-sm"><i class="fa fa-print"></i> Print</button>
+                </form>
                             </li>
                         </ul>
                     </div>
