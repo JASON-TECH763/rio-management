@@ -206,6 +206,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <script src="assets/js/plugin/datatables/datatables.min.js"></script>
 <script src="assets/js/kaiadmin.min.js"></script>
 <script>
+   
+function searchOrders() {
+    const input = document.getElementById('searchField').value.toLowerCase();
+    const rows = document.querySelectorAll('#ordersTableBody tr');
+
+    rows.forEach(row => {
+        const orderId = row.querySelector('.order-id').innerText.toLowerCase();
+        const productName = row.querySelector('.product-name').innerText.toLowerCase();
+        if (orderId.includes(input) || productName.includes(input)) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+
     $(document).ready(function() {
         $('#summary-datatables').DataTable();
     });
