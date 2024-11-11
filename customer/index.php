@@ -100,79 +100,65 @@ if (isset($_POST['create_account'])) {
     <!-- Add Font Awesome CSS if not included -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
-    <style>
-    /* Ensure body and html take full viewport height */
-    html, body {
-            min-height: 100vh;
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            overflow-x: hidden;
-        }
+ 
+     <!-- Add Font Awesome CSS if not included -->
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
-        /* Ensure the section takes full height on mobile */
-        section.vh-100 {
-            height: 100%;
-            min-height: 100vh;
-            background-color: #2a2f5b;
-            color: white;
-        }
-        
-        .divider:after,
-        .divider:before {
-            content: "";
-            flex: 1;
-            height: 1px;
-            background: #eee;
-        }
+<style type="text/css">
+    .divider:after,
+    .divider:before {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: #eee;
+    }
+    .h-custom {
+        height: calc(100% - 73px);
+    }
+    @media (max-width: 450px) {
         .h-custom {
-            height: calc(100% - 73px);
+            height: 100%;
         }
-        @media (max-width: 450px) {
-            .h-custom {
-                height: 100%;
-            }
-        }
+    }
+    .back-button {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        background-color: #1572e8;
+        color: white;
+        padding: 8px 12px;
+        border-radius: 4px;
+        display: inline-flex;
+        align-items: center;
+        text-decoration: none;
+    }
+    .back-button i {
+        font-size: 1rem;
+        margin-right: 5px;
+    }
+
+    /* Adjust position and size on mobile devices */
+    @media (max-width: 450px) {
         .back-button {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background-color: #1572e8;
-            color: white;
-            padding: 8px 12px;
-            border-radius: 4px;
-            display: inline-flex;
-            align-items: center;
-            text-decoration: none;
+            top: 10px;
+            left: 10px;
+            padding: 6px 10px; /* Slightly smaller padding */
         }
         .back-button i {
-            font-size: 1rem;
-            margin-right: 5px;
+            font-size: 0.9rem; /* Slightly smaller icon size */
         }
-
-        /* Adjust position and size on mobile devices */
-        @media (max-width: 450px) {
-            .back-button {
-                top: 10px;
-                left: 10px;
-                padding: 6px 10px; /* Slightly smaller padding */
-            }
-            .back-button i {
-                font-size: 0.9rem; /* Slightly smaller icon size */
-            }
-        }
-    </style>
+    }
+</style>
 </head>
 
 <body>
-    <a href="http://localhost/RIO" class="btn btn-light back-button">
-        <i class="fas fa-arrow-left"></i>
-    </a>
- 
-    <section class="vh-100 d-flex align-items-center">
-  <div class="container-fluid h-custom">
-  <br>
-  <br>
+<a href="http://localhost/RIO" class="btn btn-light back-button">
+    <i class="fas fa-arrow-left"></i>
+</a>
+
+<section class="vh-100" style="background-color: #2a2f5b; color: white;">
+<br><br>
+
     <div class="row d-flex justify-content-center align-items-center h-100">
       <div class="col-md-9 col-lg-6 col-xl-5 position-relative">
         <img src="assets/img/1bg.jpg" class="img-fluid" alt="Sample image">
