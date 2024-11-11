@@ -180,18 +180,24 @@ if (isset($_POST['create_account'])) {
                             <div class="form-group">
     <label for="name"></label>
     <input type="text" name="name" id="name" class="form-control" placeholder="Enter your name" required 
-    pattern="[A-Za-zÀ-ž' -]+" title="Name can contain only letters, hyphens, apostrophes, and spaces.">
+    pattern="[A-Za-zÀ-ž' -]+" title="Name can contain only letters, hyphens, apostrophes, and spaces." oninput="validateName()">
 </div>
 
 <script>
-    document.getElementById('name').addEventListener('input', function (e) {
-        var regex = /^[A-Za-zÀ-ž' -]*$/;
-        if (!regex.test(e.target.value)) {
-            e.target.value = e.target.value.replace(/[^A-Za-zÀ-ž' -]+/, '');
-        }
-    });
-</script>
+    function validateName() {
+        var nameField = document.getElementById('name');
+        var value = nameField.value;
 
+        // Regular expression to allow multiple capitalized words with letters, hyphens, apostrophes, and spaces
+        var regex = /^([A-Z][a-zÀ-ž'-]+\s?)+$/;
+
+        if (!regex.test(value)) {
+            nameField.setCustomValidity("");
+        } else {
+            nameField.setCustomValidity(""); // Clear the message if valid
+        }
+    }
+</script>
 
 <?php
 // Check if the form was submitted
@@ -201,18 +207,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Sanitize input to remove any HTML or script tags
     $name_sanitized = htmlspecialchars($name, ENT_QUOTES, 'UTF-8');
 
-    // Validate the input: allow letters, hyphens, apostrophes, and spaces, but block < or >
-    if (!preg_match("/^[A-Za-zÀ-ž'-]+$/", $name)) {
-        echo '<div class="alert alert-danger">Invalid input: Please enter a valid name (letters, hyphens, apostrophes, and spaces only).</div>';
+    // Validate the input format with multiple capitalized words
+    if (!preg_match("/^([A-Z][a-zÀ-ž'-]+\s?)+$/", $name)) {
+        echo '<div class="alert alert-danger">Invalid input: Please enter a valid name</div>';
     } else if ($name !== $name_sanitized) {
         echo '<div class="alert alert-danger">Invalid input: HTML or script tags are not allowed.</div>';
-    } else {
-        // If valid, display success message
-        echo '<div class="alert alert-success">Input is valid. Form submitted successfully!</div>';
-        // Here, you can proceed with storing or processing the sanitized input.
-    }
+    } 
 }
 ?>
+
 
                                 <br>
                                 <div class="form-group">
