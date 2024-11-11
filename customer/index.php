@@ -99,7 +99,7 @@ if (isset($_POST['create_account'])) {
 
     <!-- Add Font Awesome CSS if not included -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    
+
     <style type="text/css">
         .divider:after,
         .divider:before {
@@ -129,16 +129,29 @@ if (isset($_POST['create_account'])) {
             text-decoration: none;
         }
         .back-button i {
-            font-size: 1rem; /* Adjust icon size here */
+            font-size: 1rem;
             margin-right: 5px;
+        }
+
+        /* Adjust position and size on mobile devices */
+        @media (max-width: 450px) {
+            .back-button {
+                top: 10px;
+                left: 10px;
+                padding: 6px 10px; /* Slightly smaller padding */
+            }
+            .back-button i {
+                font-size: 0.9rem; /* Slightly smaller icon size */
+            }
         }
     </style>
 </head>
 
 <body>
     <a href="http://localhost/RIO" class="btn btn-light back-button">
-        <i class="fas fa-arrow-left"></i> <!-- Arrow icon with adjusted size -->
+        <i class="fas fa-arrow-left"></i>
     </a>
+ 
 <section class="vh-100" style="background-color: #2a2f5b; color: white;">
   <br>
   <div class="container-fluid h-custom">
