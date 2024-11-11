@@ -154,6 +154,7 @@ if (isset($_POST['create_account'])) {
  
 <section class="vh-100" style="background-color: #2a2f5b; color: white;">
   <br>
+  <br>
   <div class="container-fluid h-custom">
     <div class="row d-flex justify-content-center align-items-center h-100">
       <div class="col-md-9 col-lg-6 col-xl-5 position-relative">
