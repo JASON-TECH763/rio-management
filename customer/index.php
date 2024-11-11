@@ -152,7 +152,7 @@ if (isset($_POST['create_account'])) {
 </head>
 
 <body>
-<a href="http://localhost/RIO" class="btn btn-light back-button">
+<a href="https://rio-lawis.com/" class="btn btn-light back-button">
     <i class="fas fa-arrow-left"></i>
 </a>
 
