@@ -97,35 +97,50 @@ if (isset($_POST['create_account'])) {
     <link rel="stylesheet" href="assets/css/font-awesome.min.css">
     <link rel="stylesheet" href="assets/css/style.css">
 
+    <!-- Add Font Awesome CSS if not included -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
     <style type="text/css">
-      .divider:after,
-      .divider:before {
-        content: "";
-        flex: 1;
-        height: 1px;
-        background: #eee;
-      }
-      .h-custom {
-        height: calc(100% - 73px);
-      }
-      @media (max-width: 450px) {
-        .h-custom {
-          height: 100%;
+        .divider:after,
+        .divider:before {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: #eee;
         }
-      }
-      .back-button {
-        position: absolute;
-        top: 20px;
-        left: 20px;
-      }
+        .h-custom {
+            height: calc(100% - 73px);
+        }
+        @media (max-width: 450px) {
+            .h-custom {
+                height: 100%;
+            }
+        }
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: #1572e8;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            display: inline-flex;
+            align-items: center;
+            text-decoration: none;
+        }
+        .back-button i {
+            font-size: 1rem; /* Adjust icon size here */
+            margin-right: 5px;
+        }
     </style>
 </head>
 
 <body>
-<a href="https://rio-lawis.com/" class="btn btn-light back-button" 
-style="background-color: #1572e8; color: white; padding-left: 5px; padding-right: 5px;">Back to Site</a>
-
+    <a href="http://localhost/RIO" class="btn btn-light back-button">
+        <i class="fas fa-arrow-left"></i> <!-- Arrow icon with adjusted size -->
+    </a>
 <section class="vh-100" style="background-color: #2a2f5b; color: white;">
+  <br>
   <div class="container-fluid h-custom">
     <div class="row d-flex justify-content-center align-items-center h-100">
       <div class="col-md-9 col-lg-6 col-xl-5 position-relative">
