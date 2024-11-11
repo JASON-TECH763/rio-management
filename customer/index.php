@@ -100,7 +100,24 @@ if (isset($_POST['create_account'])) {
     <!-- Add Font Awesome CSS if not included -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
-    <style type="text/css">
+    <style>
+    /* Ensure body and html take full viewport height */
+    html, body {
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow-x: hidden;
+        }
+
+        /* Ensure the section takes full height on mobile */
+        section.vh-100 {
+            height: 100%;
+            min-height: 100vh;
+            background-color: #2a2f5b;
+            color: white;
+        }
+        
         .divider:after,
         .divider:before {
             content: "";
@@ -152,7 +169,7 @@ if (isset($_POST['create_account'])) {
         <i class="fas fa-arrow-left"></i>
     </a>
  
-<section class="vh-100" style="background-color: #2a2f5b; color: white;">
+    <section class="vh-100 d-flex align-items-center">
   <br>
   <br>
   <div class="container-fluid h-custom">
