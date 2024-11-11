@@ -30,7 +30,7 @@
                                 <a href="service.php" class="nav-item nav-link">Services</a>
                                 <a href="room.php" class="nav-item nav-link">Rooms</a>         
                                 <a href="contact.php" class="nav-item nav-link">Contact</a>
-                                <a href="check_status.php" class="nav-item nav-link">Check Status</a>
+                                <a href="check_status.php" class="nav-item nav-link">Status</a>
                                  
                                 <style>
   .dropdown-menu {
@@ -51,60 +51,62 @@
 
 </style>
 
+<!-- Navbar container -->
+<div class="container">
+   
+   <!-- Navbar items -->
+   <ul class="navbar-nav ms-auto">
+     <!-- Dropdown trigger -->
+     <li class="nav-item dropdown">
+       <a class="nav-link dropdown-toggle profile-pic" href="#" id="loginTrigger" role="button">
+         <span class="fw-bold">Login</span>
+       </a>
 
-    
-  
-          <!-- Dropdown trigger -->
-          <a class="dropdown-toggle profile-pic" href="#" id="loginTrigger" role="button">
-            <!-- Dynamically display the login name -->
-            <span class="fw-bold">Login</span>
-          </a>
-          <!-- Dropdown menu (hidden by default) -->
-          <ul class="dropdown-menu dropdown-user animated fadeIn" id="loginDropdown" style="display: none;">
-            <div class="dropdown-user-scroll scrollbar-outer">
-              <div class="dropdown-divider"></div>
-              <a class="dropdown-item" href="staff">
-                <i class="fas fa-user-tie"></i> Staff
-              </a>
-              <div class="dropdown-divider"></div>
-              <a class="dropdown-item" href="customer">
-                <i class="fas fa-users"></i> Customer
-              </a>
-              <div class="dropdown-divider"></div>
-              <a class="dropdown-item" href="admin">
-                <i class="fas fa-user-shield"></i> Admin
-              </a>
-            </div>
-          </ul>
-        </li>
-      </ul>
-    </div>
-  </div>
+       <!-- Dropdown menu -->
+       <ul class="dropdown-menu dropdown-user animated fadeIn" id="loginDropdown">
+         <div class="dropdown-user-scroll scrollbar-outer">
+           <div class="dropdown-divider"></div>
+           <a class="dropdown-item" href="staff">
+             <i class="fas fa-user-tie"></i> Staff
+           </a>
+           <div class="dropdown-divider"></div>
+           <a class="dropdown-item" href="customer">
+             <i class="fas fa-users"></i> Customer
+           </a>
+           <div class="dropdown-divider"></div>
+           <a class="dropdown-item" href="admin">
+             <i class="fas fa-user-shield"></i> Admin
+           </a>
+         </div>
+       </ul>
+     </li>
+   </ul>
+ </div>
 </nav>
 
-<!-- JavaScript to control the dropdown behavior -->
+<!-- JavaScript to toggle the dropdown -->
 <script>
-  // Get the login trigger and dropdown elements
-  const loginTrigger = document.getElementById('loginTrigger');
-  const loginDropdown = document.getElementById('loginDropdown');
+ document.addEventListener('DOMContentLoaded', function () {
+   const loginTrigger = document.getElementById('loginTrigger');
+   const loginDropdown = document.getElementById('loginDropdown');
 
-  // Add a click event listener to the login trigger
-  loginTrigger.addEventListener('click', function (event) {
-    event.preventDefault(); // Prevent default anchor behavior
-    loginDropdown.style.display = (loginDropdown.style.display === 'none' || loginDropdown.style.display === '') ? 'block' : 'none';
-  });
+   // Toggle the dropdown on click
+   loginTrigger.addEventListener('click', function (e) {
+     e.preventDefault();
+     loginDropdown.style.display = loginDropdown.style.display === 'none' ? 'block' : 'none';
+   });
 
-  // Close the dropdown if the user clicks outside of it
-  document.addEventListener('click', function (event) {
-    const isClickInside = loginTrigger.contains(event.target) || loginDropdown.contains(event.target);
-    if (!isClickInside) {
-      loginDropdown.style.display = 'none';
-    }
-  });
+   // Close dropdown if clicked outside
+   document.addEventListener('click', function (e) {
+     if (!loginTrigger.contains(e.target) && !loginDropdown.contains(e.target)) {
+       loginDropdown.style.display = 'none';
+     }
+   });
+ });
 </script>
-              
-                              
-                            </div>
+    
+  
+                        </div>
                            
                         </div>
                     </nav>
