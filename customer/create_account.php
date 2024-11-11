@@ -180,25 +180,18 @@ if (isset($_POST['create_account'])) {
                             <div class="form-group">
     <label for="name"></label>
     <input type="text" name="name" id="name" class="form-control" placeholder="Enter your name" required 
-    pattern="[A-Za-zÀ-ž' -]+" title="Name can contain only letters, hyphens, apostrophes, and spaces." oninput="validateName()">
+    pattern="[A-Za-zÀ-ž' -]+" title="Name can contain only letters, hyphens, apostrophes, and spaces.">
 </div>
 
 <script>
-    // JavaScript function to prevent script tags and allow certain symbols
-    function validateName() {
-        var nameField = document.getElementById('name');
-        var value = nameField.value;
-
-        // Regular expression to allow letters, hyphens, apostrophes, and spaces, but no < or > (to prevent script tags)
-        var regex = /^[A-Za-zÀ-ž'-]+$/;
-
-        if (!regex.test(value)) {
-            nameField.setCustomValidity("Please enter a valid name!");
-        } else {
-            nameField.setCustomValidity(""); // Clear the message if valid
+    document.getElementById('name').addEventListener('input', function (e) {
+        var regex = /^[A-Za-zÀ-ž' -]*$/;
+        if (!regex.test(e.target.value)) {
+            e.target.value = e.target.value.replace(/[^A-Za-zÀ-ž' -]+/, '');
         }
-    }
+    });
 </script>
+
 
 <?php
 // Check if the form was submitted
