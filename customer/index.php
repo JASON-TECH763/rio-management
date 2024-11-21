@@ -67,8 +67,8 @@ if (isset($_POST['login'])) {
         }
     }
 }
-
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -80,55 +80,53 @@ if (isset($_POST['login'])) {
     <link rel="stylesheet" href="assets/css/font-awesome.min.css">
     <link rel="stylesheet" href="assets/css/style.css">
     
- 
-     <!-- Add Font Awesome CSS if not included -->
-     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
-<style type="text/css">
-    .divider:after,
-    .divider:before {
-        content: "";
-        flex: 1;
-        height: 1px;
-        background: #eee;
-    }
-    .h-custom {
-        height: calc(100% - 73px);
-    }
-    @media (max-width: 450px) {
-        .h-custom {
-            height: 100%;
+    <style type="text/css">
+        .divider:after,
+        .divider:before {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: #eee;
         }
-    }
-    .back-button {
-        position: absolute;
-        top: 20px;
-        left: 20px;
-        background-color: #1572e8;
-        color: white;
-        padding: 8px 12px;
-        border-radius: 4px;
-        display: inline-flex;
-        align-items: center;
-        text-decoration: none;
-    }
-    .back-button i {
-        font-size: 1rem;
-        margin-right: 5px;
-    }
-
-    /* Adjust position and size on mobile devices */
-    @media (max-width: 450px) {
+        .h-custom {
+            height: calc(100% - 73px);
+        }
+        @media (max-width: 450px) {
+            .h-custom {
+                height: 100%;
+            }
+        }
         .back-button {
-            top: 10px;
-            left: 10px;
-            padding: 6px 10px; /* Slightly smaller padding */
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: #1572e8;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            display: inline-flex;
+            align-items: center;
+            text-decoration: none;
         }
         .back-button i {
-            font-size: 0.9rem; /* Slightly smaller icon size */
+            font-size: 1rem;
+            margin-right: 5px;
         }
-    }
-</style>
+
+        /* Adjust position and size on mobile devices */
+        @media (max-width: 450px) {
+            .back-button {
+                top: 10px;
+                left: 10px;
+                padding: 6px 10px; /* Slightly smaller padding */
+            }
+            .back-button i {
+                font-size: 0.9rem; /* Slightly smaller icon size */
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -164,11 +162,12 @@ if (isset($_POST['login'])) {
             <input class="p-2" type="checkbox" onclick="myFunction()" style="margin-left: 10px; margin-top: 13px;"> 
             <span style="margin-left: 5px;">Show password</span>
           </div>
- <!-- Forgot Password Link -->
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <a href="forgot_password.php" style="color: #FEA116;">Forgot Password?</a>
-    <div id="countdown-timer" style="color: #FEA116; float: right;"></div>
-</div>
+
+          <!-- Forgot Password Link -->
+          <div class="d-flex justify-content-between align-items-center mb-4">
+              <a href="forgot_password.php" style="color: #FEA116;">Forgot Password?</a>
+              <div id="countdown-timer" style="color: #FEA116; float: right;"></div>
+          </div>
 
           <div class="d-flex justify-content-between align-items-center">
             <button type="submit" name="login" class="btn btn-warning btn-lg enter" style="background-color: #1572e8; color: white; padding-left: 2.5rem; padding-right: 2.5rem;">Login</button>
@@ -219,39 +218,20 @@ if (isset($_POST['login'])) {
             if (seconds < 10) seconds = '0' + seconds;
 
             countdownTimer.text('Please wait: ' + minutes + ':' + seconds);
+
             remainingTime--;
 
-            // Once the countdown reaches zero, re-enable the login button
             if (remainingTime < 0) {
+                // Enable the login button when countdown finishes
                 $("button[name='login']").prop('disabled', false);
                 countdownTimer.text('');
-            } else {
-                setTimeout(updateCountdown, 1000);
             }
         }
 
-        // Start the countdown
-        updateCountdown();
+        setInterval(updateCountdown, 1000); // Update countdown every second
     }
-});
-
+  });
 </script>
 
-<!-- SweetAlert -->
-<?php if (isset($_SESSION['status']) && $_SESSION['status'] != ""): ?>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-    Swal.fire({
-        title: '<?php echo ($_SESSION["status"] == "success") ? "Success!" : "Error!"; ?>',
-        text: '<?php echo $_SESSION["message"]; ?>',
-        icon: '<?php echo $_SESSION["status"]; ?>',
-        confirmButtonText: 'OK'
-    });
-</script>
-<?php
-    unset($_SESSION['status']);
-    unset($_SESSION['message']);
-endif;
-?>
 </body>
 </html>
