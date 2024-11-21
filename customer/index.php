@@ -3,49 +3,74 @@ session_start();
 include('config/connect.php');
 $error = "";
 
-if (isset($_POST['login'])) {
-    $user = $_REQUEST['uname'];
-    $pass = $_REQUEST['pass'];
-
-    // Sanitize input
-    $user = mysqli_real_escape_string($conn, $user);
-
-    if (!empty($user) && !empty($pass)) {
-        // Prepare statement for login
-        $query = "SELECT email, password, verified FROM customer WHERE email=?";
-        $stmt = mysqli_prepare($conn, $query);
-        mysqli_stmt_bind_param($stmt, "s", $user);
-        mysqli_stmt_execute($stmt);
-        $result = mysqli_stmt_get_result($stmt);
-
-        $row = mysqli_fetch_array($result);
-
-        if ($row) {
-            // Check if password is correct
-            if (password_verify($pass, $row['password'])) {
-                // Check if account is verified
-                if ($row['verified'] == 1) {
-                    // Login successful, store email and verified status in session
-                    $_SESSION['email'] = $row['email'];
-                    $_SESSION['verified'] = $row['verified'];  // Ensure this is set
-                    header("Location: order.php"); // Redirect to order page
-                    exit(); // Always call exit after a header redirect
-                } else {
-                    $_SESSION['status'] = "error";
-                    $_SESSION['message'] = "Your account is not verified. Please use a verified email account.";
-                    header("Location: index.php");
-                    exit();
-                }
-            } else {
-                $error = '* Invalid Email or Password';
-            }
-        } else {
-            $error = '* Invalid Email or Password';
-        }
-    } else {
-        $error = '* Please fill all the fields!';
-    }
+// Initialize or reset login attempts
+if (!isset($_SESSION['attempts'])) {
+  $_SESSION['attempts'] = 0;
+  $_SESSION['last_attempt_time'] = time(); // Track the time of the first attempt
 }
+
+if (isset($_POST['login'])) {
+  $user = $_REQUEST['uname'];
+  $pass = $_REQUEST['pass'];
+
+  // Sanitize input
+  $user = mysqli_real_escape_string($conn, $user);
+
+  // Check if the user has exceeded the 3 attempts rule and if the lockout period has passed
+  if ($_SESSION['attempts'] >= 3) {
+      // Check if 3 minutes have passed since the last attempt
+      $time_elapsed = time() - $_SESSION['last_attempt_time'];
+      if ($time_elapsed < 180) { // 3 minutes = 180 seconds
+          $error = '* You have exceeded the maximum number of attempts. Please try again in ' . (3 - intval($time_elapsed / 60)) . ' minutes.';
+      } else {
+          // Reset attempts after 3 minutes
+          $_SESSION['attempts'] = 0;
+          $_SESSION['last_attempt_time'] = time();
+      }
+  }
+
+  if (!empty($user) && !empty($pass) && $_SESSION['attempts'] < 3) {
+      // Prepare statement for login
+      $query = "SELECT email, password, verified FROM customer WHERE email=?";
+      $stmt = mysqli_prepare($conn, $query);
+      mysqli_stmt_bind_param($stmt, "s", $user);
+      mysqli_stmt_execute($stmt);
+      $result = mysqli_stmt_get_result($stmt);
+
+      $row = mysqli_fetch_array($result);
+
+      if ($row) {
+          // Check if password is correct
+          if (password_verify($pass, $row['password'])) {
+              // Check if account is verified
+              if ($row['verified'] == 1) {
+                  // Login successful, store email and verified status in session
+                  $_SESSION['email'] = $row['email'];
+                  $_SESSION['verified'] = $row['verified'];
+                  $_SESSION['attempts'] = 0; // Reset attempts on successful login
+                  header("Location: order.php"); // Redirect to order page
+                  exit();
+              } else {
+                  $_SESSION['status'] = "error";
+                  $_SESSION['message'] = "Your account is not verified. Please use a verified email account.";
+                  header("Location: index.php");
+                  exit();
+              }
+          } else {
+              $_SESSION['attempts']++;
+              $_SESSION['last_attempt_time'] = time();
+              $error = '* Invalid Email or Password';
+          }
+      } else {
+          $_SESSION['attempts']++;
+          $_SESSION['last_attempt_time'] = time();
+          $error = '* Invalid Email or Password';
+      }
+  } else {
+      $error = '* Please fill all the fields!';
+  }
+}
+
 
 // Handle account creation
 if (isset($_POST['create_account'])) {
@@ -96,7 +121,7 @@ if (isset($_POST['create_account'])) {
     <link rel="stylesheet" href="assets/css/bootstrap.min.css">
     <link rel="stylesheet" href="assets/css/font-awesome.min.css">
     <link rel="stylesheet" href="assets/css/style.css">
-    
+
  
      <!-- Add Font Awesome CSS if not included -->
      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -154,7 +179,7 @@ if (isset($_POST['create_account'])) {
 </a>
 
 <section class="vh-100" style="background-color: #2a2f5b; color: white;">
-<br><br>
+    <br><br>
 
     <div class="row d-flex justify-content-center align-items-center h-100">
       <div class="col-md-9 col-lg-6 col-xl-5 position-relative">
@@ -178,18 +203,18 @@ if (isset($_POST['create_account'])) {
           <div class="form-outline mb-3">
             <label class="form-label" for="pass">Password</label>
             <input type="password" name="pass" id="psw" class="form-control form-control-lg" placeholder="Enter password" />
-            <input class="p-2" type="checkbox" onclick="myFunction()" style="margin-left: 10px; margin-top: 13px;"> 
+            <input class="p-2" type="checkbox" onclick="myFunction()" style="margin-left: 10px; margin-top: 13px;">
             <span style="margin-left: 5px;">Show password</span>
           </div>
-  <!-- Forgot Password Link -->
-  <div class="d-flex justify-content-between align-items-center mb-4">
-        <a href="forgot_password.php" style="color: #FEA116;">Forgot Password?</a>
-    </div>
+
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <a href="forgot_password.php" style="color: #FEA116;">Forgot Password?</a>
+        </div>
+
           <div class="d-flex justify-content-between align-items-center">
-            <button type="submit" name="login" class="btn btn-warning btn-lg enter" style="background-color: #1572e8; color: white; padding-left: 2.5rem; padding-right: 2.5rem;">Login</button>
+            <button type="submit" name="login" class="btn btn-warning btn-lg enter" style="background-color: #1572e8; color: white; padding-left: 2.5rem; padding-right: 2.5rem;" <?php if ($_SESSION['attempts'] >= 3) echo 'disabled'; ?>>Login</button>
             <a href="create_account.php"  class="btn btn-warning btn-lg enter" style="background-color: #1572e8; color: white; padding-left: 2.5rem; padding-right: 2.5rem;">Sign Up</a>
           </div>
-          
         </form>
       </div>
     </div>
