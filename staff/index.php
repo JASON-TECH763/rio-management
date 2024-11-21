@@ -57,7 +57,6 @@ if (isset($_POST['login']) && $_SESSION['attempt_count'] < 3) {
         $_SESSION['attempt_count']++;
     }
   }
-}
   // Lockout after 3 failed attempts
   if ($_SESSION['attempt_count'] >= 3) {
       $_SESSION['lockout_time'] = time() + (3 * 60); // 3 minutes lockout
