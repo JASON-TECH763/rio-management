@@ -3,74 +3,73 @@ session_start();
 include('config/connect.php');
 $error = "";
 
-// Initialize or reset login attempts
-if (!isset($_SESSION['attempts'])) {
-  $_SESSION['attempts'] = 0;
-  $_SESSION['last_attempt_time'] = time(); // Track the time of the first attempt
+// Initialize attempt tracking
+if (!isset($_SESSION['attempt_count'])) {
+    $_SESSION['attempt_count'] = 0;
+    $_SESSION['lockout_time'] = 0;
 }
 
-if (isset($_POST['login'])) {
-  $user = $_REQUEST['uname'];
-  $pass = $_REQUEST['pass'];
-
-  // Sanitize input
-  $user = mysqli_real_escape_string($conn, $user);
-
-  // Check if the user has exceeded the 3 attempts rule and if the lockout period has passed
-  if ($_SESSION['attempts'] >= 3) {
-      // Check if 3 minutes have passed since the last attempt
-      $time_elapsed = time() - $_SESSION['last_attempt_time'];
-      if ($time_elapsed < 180) { // 3 minutes = 180 seconds
-          $error = '* You have exceeded the maximum number of attempts. Please try again in ' . (3 - intval($time_elapsed / 60)) . ' minutes.';
-      } else {
-          // Reset attempts after 3 minutes
-          $_SESSION['attempts'] = 0;
-          $_SESSION['last_attempt_time'] = time();
-      }
-  }
-
-  if (!empty($user) && !empty($pass) && $_SESSION['attempts'] < 3) {
-      // Prepare statement for login
-      $query = "SELECT email, password, verified FROM customer WHERE email=?";
-      $stmt = mysqli_prepare($conn, $query);
-      mysqli_stmt_bind_param($stmt, "s", $user);
-      mysqli_stmt_execute($stmt);
-      $result = mysqli_stmt_get_result($stmt);
-
-      $row = mysqli_fetch_array($result);
-
-      if ($row) {
-          // Check if password is correct
-          if (password_verify($pass, $row['password'])) {
-              // Check if account is verified
-              if ($row['verified'] == 1) {
-                  // Login successful, store email and verified status in session
-                  $_SESSION['email'] = $row['email'];
-                  $_SESSION['verified'] = $row['verified'];
-                  $_SESSION['attempts'] = 0; // Reset attempts on successful login
-                  header("Location: order.php"); // Redirect to order page
-                  exit();
-              } else {
-                  $_SESSION['status'] = "error";
-                  $_SESSION['message'] = "Your account is not verified. Please use a verified email account.";
-                  header("Location: index.php");
-                  exit();
-              }
-          } else {
-              $_SESSION['attempts']++;
-              $_SESSION['last_attempt_time'] = time();
-              $error = '* Invalid Email or Password';
-          }
-      } else {
-          $_SESSION['attempts']++;
-          $_SESSION['last_attempt_time'] = time();
-          $error = '* Invalid Email or Password';
-      }
-  } else {
-      $error = '* Please fill all the fields!';
-  }
+// Check if lockout period is active
+if ($_SESSION['attempt_count'] >= 3 && time() < $_SESSION['lockout_time']) {
+    $error = '* Too many failed attempts. Try again in ' . (3 - intval((time() - $_SESSION['lockout_time']) / 60)) . ' minutes.';
+} elseif ($_SESSION['attempt_count'] >= 3 && time() >= $_SESSION['lockout_time']) {
+    // Reset attempts after lockout period
+    $_SESSION['attempt_count'] = 0;
+    $_SESSION['lockout_time'] = 0;
 }
 
+// Handle login
+if (isset($_POST['login']) && $_SESSION['attempt_count'] < 3) {
+    $user = $_REQUEST['uname'];
+    $pass = $_REQUEST['pass'];
+
+    // Sanitize input
+    $user = mysqli_real_escape_string($conn, $user);
+
+    if (!empty($user) && !empty($pass)) {
+        // Prepare statement for login
+        $query = "SELECT email, password, verified FROM customer WHERE email=?";
+        $stmt = mysqli_prepare($conn, $query);
+        mysqli_stmt_bind_param($stmt, "s", $user);
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
+
+        $row = mysqli_fetch_array($result);
+
+        if ($row) {
+            // Check if password is correct
+            if (password_verify($pass, $row['password'])) {
+                // Check if account is verified
+                if ($row['verified'] == 1) {
+                    // Login successful
+                    $_SESSION['email'] = $row['email'];
+                    $_SESSION['verified'] = $row['verified'];
+                    $_SESSION['attempt_count'] = 0; // Reset attempt count
+                    header("Location: order.php");
+                    exit();
+                } else {
+                    $_SESSION['status'] = "error";
+                    $_SESSION['message'] = "Your account is not verified. Please use a verified email account.";
+                    header("Location: index.php");
+                    exit();
+                }
+            } else {
+                $_SESSION['attempt_count']++;
+                $error = '* Invalid Email or Password';
+            }
+        } else {
+            $_SESSION['attempt_count']++;
+            $error = '* Invalid Email or Password';
+        }
+
+        // Lockout after 3 failed attempts
+        if ($_SESSION['attempt_count'] >= 3) {
+            $_SESSION['lockout_time'] = time() + (3 * 60); // 3 minutes lockout
+        }
+    } else {
+        $error = '* Please fill all the fields!';
+    }
+}
 
 // Handle account creation
 if (isset($_POST['create_account'])) {
@@ -122,9 +121,7 @@ if (isset($_POST['create_account'])) {
     <link rel="stylesheet" href="assets/css/font-awesome.min.css">
     <link rel="stylesheet" href="assets/css/style.css">
 
- 
-     <!-- Add Font Awesome CSS if not included -->
-     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
 <style type="text/css">
     .divider:after,
@@ -159,15 +156,14 @@ if (isset($_POST['create_account'])) {
         margin-right: 5px;
     }
 
-    /* Adjust position and size on mobile devices */
     @media (max-width: 450px) {
         .back-button {
             top: 10px;
             left: 10px;
-            padding: 6px 10px; /* Slightly smaller padding */
+            padding: 6px 10px;
         }
         .back-button i {
-            font-size: 0.9rem; /* Slightly smaller icon size */
+            font-size: 0.9rem;
         }
     }
 </style>
@@ -212,9 +208,8 @@ if (isset($_POST['create_account'])) {
     <span id="countdown" style="color: #FEA116;"></span>
 </div>
 
-
           <div class="d-flex justify-content-between align-items-center">
-            <button type="submit" name="login" class="btn btn-warning btn-lg enter" style="background-color: #1572e8; color: white; padding-left: 2.5rem; padding-right: 2.5rem;" <?php if ($_SESSION['attempts'] >= 3) echo 'disabled'; ?>>Login</button>
+            <button type="submit" name="login" class="btn btn-warning btn-lg enter" style="background-color: #1572e8; color: white; padding-left: 2.5rem; padding-right: 2.5rem;" <?php if ($_SESSION['attempt_count'] >= 3) echo 'disabled'; ?>>Login</button>
             <a href="create_account.php"  class="btn btn-warning btn-lg enter" style="background-color: #1572e8; color: white; padding-left: 2.5rem; padding-right: 2.5rem;">Sign Up</a>
           </div>
         </form>
@@ -223,60 +218,15 @@ if (isset($_POST['create_account'])) {
   </div>
 </section>
 
-<!-- jQuery -->
-<script src="assets/js/jquery-3.2.1.min.js"></script>
-<!-- Bootstrap Core JS -->
-<script src="assets/js/popper.min.js"></script>
-<script src="assets/js/bootstrap.min.js"></script>
-<!-- Custom JS -->
-<script src="assets/js/script.js"></script>
-
 <script type="text/javascript">
-  function myFunction() {
-    var x = document.getElementById("psw");
-    if (x.type === "password") {
-      x.type = "text";
-    } else {
-      x.type = "password";
-    }
-  }
-</script>
-
-<!-- SweetAlert -->
-<?php if (isset($_SESSION['status']) && $_SESSION['status'] != ""): ?>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-    Swal.fire({
-        title: '<?php echo ($_SESSION["status"] == "success") ? "Success!" : "Error!"; ?>',
-        text: '<?php echo $_SESSION["message"]; ?>',
-        icon: '<?php echo $_SESSION["status"]; ?>',
-        confirmButtonText: 'OK'
-    });
-
-      // Check if there are remaining attempts and calculate time left
-      <?php if ($_SESSION['attempts'] >= 3): ?>
-        var lockoutTime = <?php echo 180 - (time() - $_SESSION['last_attempt_time']); ?>; // Time remaining in seconds
-        if (lockoutTime > 0) {
-            var countdownInterval = setInterval(function() {
-                var minutes = Math.floor(lockoutTime / 60);
-                var seconds = lockoutTime % 60;
-                document.getElementById("countdown").innerHTML = "Please wait " + minutes + "m " + seconds + "s";
-
-                lockoutTime--; // Decrement the countdown timer
-
-                // If the lockout time is over, reset the countdown
-                if (lockoutTime <= 0) {
-                    clearInterval(countdownInterval);
-                    document.getElementById("countdown").innerHTML = "";
-                }
-            }, 1000);
+    function myFunction() {
+        var x = document.getElementById("psw");
+        if (x.type === "password") {
+            x.type = "text";
+        } else {
+            x.type = "password";
         }
-    <?php endif; ?>
+    }
 </script>
-<?php
-    unset($_SESSION['status']);
-    unset($_SESSION['message']);
-endif;
-?>
 </body>
 </html>
