@@ -43,6 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
         $user = trim($_POST['uname']);
         $pass = trim($_POST['pass']);
 
+        
         if (!empty($user) && !empty($pass)) {
             $stmt = $conn->prepare("SELECT uname, password FROM admin WHERE uname = ?");
             $stmt->bind_param("s", $user);
