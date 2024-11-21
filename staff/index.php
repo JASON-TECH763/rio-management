@@ -38,19 +38,25 @@ if (isset($_POST['login']) && $_SESSION['attempt_count'] < 3) {
       $row = mysqli_fetch_array($result);
 
       if ($row && $pass === $row['staff_password']) {
-          // Login successful
-          $_SESSION['staff_email'] = $row['staff_email'];
-          $_SESSION['attempt_count'] = 0; // Reset attempt count
-          header("Location: dashboard.php");
-          exit();
-      } else {
-          $error = '* Invalid Email or Password';
-          $_SESSION['attempt_count']++;
-      }
-  } else {
-      $error = '* Please fill all the fields!';
-  }
-
+        // Login successful
+        $_SESSION['staff_email'] = $row['staff_email'];
+        $_SESSION['attempt_count'] = 0; // Reset attempt count
+        header("Location: dashboard.php");
+        exit();
+    } else {
+        echo "<script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Login Failed',
+                    text: 'Invalid Email or Password',
+                    confirmButtonColor: '#1572e8'
+                });
+            });
+        </script>";
+        $_SESSION['attempt_count']++;
+    }
+    
   // Lockout after 3 failed attempts
   if ($_SESSION['attempt_count'] >= 3) {
       $_SESSION['lockout_time'] = time() + (3 * 60); // 3 minutes lockout
@@ -99,7 +105,7 @@ if (isset($_POST['login']) && $_SESSION['attempt_count'] < 3) {
     <link rel="stylesheet" href="assets/css/font-awesome.min.css">
     <!-- Main CSS -->
     <link rel="stylesheet" href="assets/css/style.css">
-
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
      <!-- Add Font Awesome CSS if not included -->
      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
@@ -170,7 +176,7 @@ if (isset($_POST['login']) && $_SESSION['attempt_count'] < 3) {
               <span class="h1 fw-bold mb-0" style="color: #FEA116;">Staff Login</span>
             </div>
           </div>
-          <p style="color:red;"><?php echo $error; ?></p>
+          
           <div class="form-outline mb-4">
             <label class="form-label" for="user">Email</label>
             <input type="text" name="uname" id="user" class="form-control form-control-lg" placeholder="Enter email" />
