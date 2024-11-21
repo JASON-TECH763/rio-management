@@ -4,15 +4,30 @@
   $error = "";
 
   
-  // Handle staff login
-  if (isset($_POST['login'])) {
-    $user = $_REQUEST['uname'];
-    $pass = $_REQUEST['pass'];
+  // Initialize attempt tracking
+if (!isset($_SESSION['attempt_count'])) {
+  $_SESSION['attempt_count'] = 0;
+  $_SESSION['lockout_time'] = 0;
+}
 
-    // Sanitize input
-    $user = mysqli_real_escape_string($conn, $user);
+// Check if lockout period is active
+if ($_SESSION['attempt_count'] >= 3 && time() < $_SESSION['lockout_time']) {
+  $error = '* Too many failed attempts. Try again in 3 minutes.';
+} elseif ($_SESSION['attempt_count'] >= 3 && time() >= $_SESSION['lockout_time']) {
+  // Reset attempts after lockout period
+  $_SESSION['attempt_count'] = 0;
+  $_SESSION['lockout_time'] = 0;
+}
 
-    if (!empty($user) && !empty($pass)) {
+// Handle staff login
+if (isset($_POST['login']) && $_SESSION['attempt_count'] < 3) {
+  $user = $_REQUEST['uname'];
+  $pass = $_REQUEST['pass'];
+
+  // Sanitize input
+  $user = mysqli_real_escape_string($conn, $user);
+
+  if (!empty($user) && !empty($pass)) {
       // Prepare statement for login
       $query = "SELECT staff_email, staff_password FROM rpos_staff WHERE staff_email=?";
       $stmt = mysqli_prepare($conn, $query);
@@ -23,17 +38,24 @@
       $row = mysqli_fetch_array($result);
 
       if ($row && $pass === $row['staff_password']) {
-        // Login successful, store session information
-        $_SESSION['staff_email'] = $row['staff_email'];
-        header("Location: dashboard.php"); // Redirect to staff dashboard
-        exit(); // Always call exit after a header redirect
+          // Login successful
+          $_SESSION['staff_email'] = $row['staff_email'];
+          $_SESSION['attempt_count'] = 0; // Reset attempt count
+          header("Location: dashboard.php");
+          exit();
       } else {
-        $error = '* Invalid Email or Password';
+          $error = '* Invalid Email or Password';
+          $_SESSION['attempt_count']++;
       }
-    } else {
+  } else {
       $error = '* Please fill all the fields!';
-    }
   }
+
+  // Lockout after 3 failed attempts
+  if ($_SESSION['attempt_count'] >= 3) {
+      $_SESSION['lockout_time'] = time() + (3 * 60); // 3 minutes lockout
+  }
+}
 
   // Handle staff account creation
   if (isset($_POST['create_account'])) {
@@ -184,6 +206,19 @@
       x.type = "password";
     }
   }
+  // Check server-side lockout state
+  const attemptCount = <?php echo $_SESSION['attempt_count']; ?>;
+    const lockoutTime = <?php echo $_SESSION['lockout_time'] - time(); ?>; // Remaining lockout time in seconds
+
+    const loginButton = document.querySelector('button[name="login"]');
+    if (attemptCount >= 3 && lockoutTime > 0) {
+        loginButton.disabled = true;
+
+        // Re-enable after lockout period
+        setTimeout(() => {
+            loginButton.disabled = false;
+        }, lockoutTime * 1000);
+    }
 </script>
 </body>
 </html>
