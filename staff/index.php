@@ -181,9 +181,11 @@ if (isset($_POST['login']) && $_SESSION['attempt_count'] < 3) {
             <input class="p-2" type="checkbox" onclick="myFunction()" style="margin-left: 10px; margin-top: 13px;"> <span style="margin-left: 5px;">Show password</span>
           </div>
           <div class="d-flex justify-content-between align-items-center">
-            <button type="submit" name="login" class="btn btn-warning btn-lg enter" style="background-color: #1572e8; color: white; padding-left: 2.5rem; padding-right: 2.5rem;">Login</button>
-        
-          </div>
+    <!-- Countdown Timer -->
+    <span id="countdown-timer" style="margin-right: 20px; font-weight: bold; color: #ff0000;"></span>
+    <button type="submit" name="login" class="btn btn-warning btn-lg enter" style="background-color: #1572e8; color: white; padding-left: 2.5rem; padding-right: 2.5rem;" disabled>Login</button>
+       </div>
+
         </form>
       </div>
     </div>
@@ -206,18 +208,39 @@ if (isset($_POST['login']) && $_SESSION['attempt_count'] < 3) {
       x.type = "password";
     }
   }
-  // Check server-side lockout state
   const attemptCount = <?php echo $_SESSION['attempt_count']; ?>;
-    const lockoutTime = <?php echo $_SESSION['lockout_time'] - time(); ?>; // Remaining lockout time in seconds
+    const lockoutTimeRemaining = <?php echo max(0, $_SESSION['lockout_time'] - time()); ?>; // Remaining lockout time in seconds
 
     const loginButton = document.querySelector('button[name="login"]');
-    if (attemptCount >= 3 && lockoutTime > 0) {
+    const countdownTimer = document.getElementById('countdown-timer');
+
+    if (attemptCount >= 3 && lockoutTimeRemaining > 0) {
+        let remainingTime = lockoutTimeRemaining;
+
+        const updateTimer = () => {
+            const minutes = Math.floor(remainingTime / 60);
+            const seconds = remainingTime % 60;
+            countdownTimer.textContent = `${minutes}:${seconds.toString().padStart(2, '0')} remaining`;
+
+            if (remainingTime > 0) {
+                remainingTime--;
+            } else {
+                // Enable the login button once the timer ends
+                loginButton.disabled = false;
+                countdownTimer.textContent = '';
+                clearInterval(timerInterval);
+            }
+        };
+
+        // Disable login button initially
         loginButton.disabled = true;
 
-        // Re-enable after lockout period
-        setTimeout(() => {
-            loginButton.disabled = false;
-        }, lockoutTime * 1000);
+        // Start the countdown
+        const timerInterval = setInterval(updateTimer, 1000);
+        updateTimer();
+    } else {
+        // Enable the login button if no lockout
+        loginButton.disabled = false;
     }
 </script>
 </body>
