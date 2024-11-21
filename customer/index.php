@@ -3,23 +3,7 @@ session_start();
 include('config/connect.php');
 $error = "";
 
-// Initialize attempt tracking
-if (!isset($_SESSION['attempt_count'])) {
-    $_SESSION['attempt_count'] = 0;
-    $_SESSION['lockout_time'] = 0;
-}
-
-// Check if lockout period is active
-if ($_SESSION['attempt_count'] >= 3 && time() < $_SESSION['lockout_time']) {
-    $error = '* Too many failed attempts. Try again in ' . (3 - intval((time() - $_SESSION['lockout_time']) / 60)) . ' minutes.';
-} elseif ($_SESSION['attempt_count'] >= 3 && time() >= $_SESSION['lockout_time']) {
-    // Reset attempts after lockout period
-    $_SESSION['attempt_count'] = 0;
-    $_SESSION['lockout_time'] = 0;
-}
-
-// Handle login
-if (isset($_POST['login']) && $_SESSION['attempt_count'] < 3) {
+if (isset($_POST['login'])) {
     $user = $_REQUEST['uname'];
     $pass = $_REQUEST['pass'];
 
@@ -41,12 +25,11 @@ if (isset($_POST['login']) && $_SESSION['attempt_count'] < 3) {
             if (password_verify($pass, $row['password'])) {
                 // Check if account is verified
                 if ($row['verified'] == 1) {
-                    // Login successful
+                    // Login successful, store email and verified status in session
                     $_SESSION['email'] = $row['email'];
-                    $_SESSION['verified'] = $row['verified'];
-                    $_SESSION['attempt_count'] = 0; // Reset attempt count
-                    header("Location: order.php");
-                    exit();
+                    $_SESSION['verified'] = $row['verified'];  // Ensure this is set
+                    header("Location: order.php"); // Redirect to order page
+                    exit(); // Always call exit after a header redirect
                 } else {
                     $_SESSION['status'] = "error";
                     $_SESSION['message'] = "Your account is not verified. Please use a verified email account.";
@@ -54,17 +37,10 @@ if (isset($_POST['login']) && $_SESSION['attempt_count'] < 3) {
                     exit();
                 }
             } else {
-                $_SESSION['attempt_count']++;
                 $error = '* Invalid Email or Password';
             }
         } else {
-            $_SESSION['attempt_count']++;
             $error = '* Invalid Email or Password';
-        }
-
-        // Lockout after 3 failed attempts
-        if ($_SESSION['attempt_count'] >= 3) {
-            $_SESSION['lockout_time'] = time() + (3 * 60); // 3 minutes lockout
         }
     } else {
         $error = '* Please fill all the fields!';
@@ -120,8 +96,10 @@ if (isset($_POST['create_account'])) {
     <link rel="stylesheet" href="assets/css/bootstrap.min.css">
     <link rel="stylesheet" href="assets/css/font-awesome.min.css">
     <link rel="stylesheet" href="assets/css/style.css">
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+ 
+     <!-- Add Font Awesome CSS if not included -->
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
 <style type="text/css">
     .divider:after,
@@ -156,14 +134,15 @@ if (isset($_POST['create_account'])) {
         margin-right: 5px;
     }
 
+    /* Adjust position and size on mobile devices */
     @media (max-width: 450px) {
         .back-button {
             top: 10px;
             left: 10px;
-            padding: 6px 10px;
+            padding: 6px 10px; /* Slightly smaller padding */
         }
         .back-button i {
-            font-size: 0.9rem;
+            font-size: 0.9rem; /* Slightly smaller icon size */
         }
     }
 </style>
@@ -175,7 +154,7 @@ if (isset($_POST['create_account'])) {
 </a>
 
 <section class="vh-100" style="background-color: #2a2f5b; color: white;">
-    <br><br>
+<br><br>
 
     <div class="row d-flex justify-content-center align-items-center h-100">
       <div class="col-md-9 col-lg-6 col-xl-5 position-relative">
@@ -199,34 +178,58 @@ if (isset($_POST['create_account'])) {
           <div class="form-outline mb-3">
             <label class="form-label" for="pass">Password</label>
             <input type="password" name="pass" id="psw" class="form-control form-control-lg" placeholder="Enter password" />
-            <input class="p-2" type="checkbox" onclick="myFunction()" style="margin-left: 10px; margin-top: 13px;">
+            <input class="p-2" type="checkbox" onclick="myFunction()" style="margin-left: 10px; margin-top: 13px;"> 
             <span style="margin-left: 5px;">Show password</span>
           </div>
-
-          <div class="d-flex justify-content-between align-items-center mb-4">
-    <a href="forgot_password.php" style="color: #FEA116;">Forgot Password?</a>
-    <span id="countdown" style="color: #FEA116;"></span>
-</div>
-
+  <!-- Forgot Password Link -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+        <a href="forgot_password.php" style="color: #FEA116;">Forgot Password?</a>
+    </div>
           <div class="d-flex justify-content-between align-items-center">
-            <button type="submit" name="login" class="btn btn-warning btn-lg enter" style="background-color: #1572e8; color: white; padding-left: 2.5rem; padding-right: 2.5rem;" <?php if ($_SESSION['attempt_count'] >= 3) echo 'disabled'; ?>>Login</button>
+            <button type="submit" name="login" class="btn btn-warning btn-lg enter" style="background-color: #1572e8; color: white; padding-left: 2.5rem; padding-right: 2.5rem;">Login</button>
             <a href="create_account.php"  class="btn btn-warning btn-lg enter" style="background-color: #1572e8; color: white; padding-left: 2.5rem; padding-right: 2.5rem;">Sign Up</a>
           </div>
+          
         </form>
       </div>
     </div>
   </div>
 </section>
 
+<!-- jQuery -->
+<script src="assets/js/jquery-3.2.1.min.js"></script>
+<!-- Bootstrap Core JS -->
+<script src="assets/js/popper.min.js"></script>
+<script src="assets/js/bootstrap.min.js"></script>
+<!-- Custom JS -->
+<script src="assets/js/script.js"></script>
+
 <script type="text/javascript">
-    function myFunction() {
-        var x = document.getElementById("psw");
-        if (x.type === "password") {
-            x.type = "text";
-        } else {
-            x.type = "password";
-        }
+  function myFunction() {
+    var x = document.getElementById("psw");
+    if (x.type === "password") {
+      x.type = "text";
+    } else {
+      x.type = "password";
     }
+  }
 </script>
+
+<!-- SweetAlert -->
+<?php if (isset($_SESSION['status']) && $_SESSION['status'] != ""): ?>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    Swal.fire({
+        title: '<?php echo ($_SESSION["status"] == "success") ? "Success!" : "Error!"; ?>',
+        text: '<?php echo $_SESSION["message"]; ?>',
+        icon: '<?php echo $_SESSION["status"]; ?>',
+        confirmButtonText: 'OK'
+    });
+</script>
+<?php
+    unset($_SESSION['status']);
+    unset($_SESSION['message']);
+endif;
+?>
 </body>
 </html>
