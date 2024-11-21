@@ -4,29 +4,31 @@
   $error = "";
 
   // Initialize login attempts session variable
-if (!isset($_SESSION['login_attempts'])) {
-  $_SESSION['login_attempts'] = 0;
-  $_SESSION['lockout_time'] = null;
-}
+  if (!isset($_SESSION['login_attempts'])) {
+    $_SESSION['login_attempts'] = 0;
+    $_SESSION['lockout_time'] = null;
+  }
 
-// Check lockout status
-if (isset($_SESSION['lockout_time'])) {
-  $current_time = time();
-  if ($current_time - $_SESSION['lockout_time'] >= 180) { // 3 minutes
+  // Check lockout status
+  if (isset($_SESSION['lockout_time'])) {
+    $current_time = time();
+    if ($current_time - $_SESSION['lockout_time'] >= 180) { // 3 minutes
       $_SESSION['login_attempts'] = 0; // Reset attempts after lockout period
       $_SESSION['lockout_time'] = null;
+    } else {
+      $remaining_time = 180 - ($current_time - $_SESSION['lockout_time']);
+    }
   }
-}
 
-// Handle staff login
-if (isset($_POST['login']) && !isset($_SESSION['lockout_time'])) {
-  $user = $_REQUEST['uname'];
-  $pass = $_REQUEST['pass'];
+  // Handle staff login
+  if (isset($_POST['login']) && !isset($_SESSION['lockout_time'])) {
+    $user = $_REQUEST['uname'];
+    $pass = $_REQUEST['pass'];
 
-  // Sanitize input
-  $user = mysqli_real_escape_string($conn, $user);
+    // Sanitize input
+    $user = mysqli_real_escape_string($conn, $user);
 
-  if (!empty($user) && !empty($pass)) {
+    if (!empty($user) && !empty($pass)) {
       // Prepare statement for login
       $query = "SELECT staff_email, staff_password FROM rpos_staff WHERE staff_email=?";
       $stmt = mysqli_prepare($conn, $query);
@@ -37,52 +39,26 @@ if (isset($_POST['login']) && !isset($_SESSION['lockout_time'])) {
       $row = mysqli_fetch_array($result);
 
       if ($row && $pass === $row['staff_password']) {
-          // Login successful, reset attempts
-          $_SESSION['login_attempts'] = 0;
-          $_SESSION['staff_email'] = $row['staff_email'];
-          header("Location: dashboard.php"); // Redirect to staff dashboard
-          exit();
+        // Login successful, reset attempts
+        $_SESSION['login_attempts'] = 0;
+        $_SESSION['staff_email'] = $row['staff_email'];
+        header("Location: dashboard.php"); // Redirect to staff dashboard
+        exit();
       } else {
-          $_SESSION['login_attempts']++;
-          if ($_SESSION['login_attempts'] >= 3) {
-              $_SESSION['lockout_time'] = time(); // Start lockout timer
-              $error = 'Too many failed attempts. Please try again after 3 minutes.';
-          } else {
-              $error = '* Invalid Email or Password';
-          }
-      }
-  } else {
-      $error = '* Please fill all the fields!';
-  }
-}
-  // Handle staff account creation
-  if (isset($_POST['create_account'])) {
-    $staff_name = $_POST['name'];
-    $staff_last_name = $_POST['last_name'];
-    $staff_email = $_POST['email'];
-    $staff_password = $_POST['password'];
-    $staff_gender = $_POST['gender'];
-
-    if (!empty($staff_name) && !empty($staff_last_name) && !empty($staff_email) && !empty($staff_password) && !empty($staff_gender)) {
-      // Prepare statement for account creation
-      $query = "INSERT INTO rpos_staff (staff_name, staff_last_name, staff_email, staff_password, staff_gender, date_created) 
-                VALUES (?, ?, ?, ?, ?, NOW())";
-      $stmt = mysqli_prepare($conn, $query);
-      mysqli_stmt_bind_param($stmt, "sssss", $staff_name, $staff_last_name, $staff_email, $staff_password, $staff_gender);
-      $result = mysqli_stmt_execute($stmt);
-
-      if ($result) {
-        echo "<script>alert('Account created successfully! Please login.');</script>";
-      } else {
-        echo "<script>alert('Error creating account.');</script>";
+        $_SESSION['login_attempts']++;
+        if ($_SESSION['login_attempts'] >= 3) {
+          $_SESSION['lockout_time'] = time(); // Start lockout timer
+          $error = 'Too many failed attempts. Please try again after 3 minutes.';
+          $remaining_time = 180; // Start countdown at 3 minutes
+        } else {
+          $error = '* Invalid Email or Password';
+        }
       }
     } else {
       $error = '* Please fill all the fields!';
     }
   }
 ?>
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -97,55 +73,57 @@ if (isset($_POST['login']) && !isset($_SESSION['lockout_time'])) {
     <link rel="stylesheet" href="assets/css/font-awesome.min.css">
     <!-- Main CSS -->
     <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
-     <!-- Add Font Awesome CSS if not included -->
-     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
-<style type="text/css">
-    .divider:after,
-    .divider:before {
-        content: "";
-        flex: 1;
-        height: 1px;
-        background: #eee;
-    }
-    .h-custom {
-        height: calc(100% - 73px);
-    }
-    @media (max-width: 450px) {
-        .h-custom {
-            height: 100%;
+    <style type="text/css">
+        .divider:after,
+        .divider:before {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: #eee;
         }
-    }
-    .back-button {
-        position: absolute;
-        top: 20px;
-        left: 20px;
-        background-color: #1572e8;
-        color: white;
-        padding: 8px 12px;
-        border-radius: 4px;
-        display: inline-flex;
-        align-items: center;
-        text-decoration: none;
-    }
-    .back-button i {
-        font-size: 1rem;
-        margin-right: 5px;
-    }
-
-    /* Adjust position and size on mobile devices */
-    @media (max-width: 450px) {
+        .h-custom {
+            height: calc(100% - 73px);
+        }
+        @media (max-width: 450px) {
+            .h-custom {
+                height: 100%;
+            }
+        }
         .back-button {
-            top: 10px;
-            left: 10px;
-            padding: 6px 10px; /* Slightly smaller padding */
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: #1572e8;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            display: inline-flex;
+            align-items: center;
+            text-decoration: none;
         }
         .back-button i {
-            font-size: 0.9rem; /* Slightly smaller icon size */
+            font-size: 1rem;
+            margin-right: 5px;
         }
-    }
-</style>
+
+        @media (max-width: 450px) {
+            .back-button {
+                top: 10px;
+                left: 10px;
+                padding: 6px 10px;
+            }
+            .back-button i {
+                font-size: 0.9rem;
+            }
+        }
+        #timer {
+            color: red;
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
 </head>
 
 <body>
@@ -164,27 +142,31 @@ if (isset($_POST['login']) && !isset($_SESSION['lockout_time'])) {
       <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
         <form method="post">
           <div class="d-flex flex-row align-items-center justify-content-center justify-content-lg-start">
-            <div class="d-flex align-items e-center mb-3 pb-1">
+            <div class="d-flex align-items-center mb-3 pb-1">
               <span class="h1 fw-bold mb-0" style="color: #FEA116;">Staff Login</span>
             </div>
           </div>
           <p style="color:red;"><?php echo $error; ?></p>
+          <?php if (isset($remaining_time)): ?>
+            <div id="timer"></div>
+          <?php endif; ?>
           <div class="form-outline mb-4">
             <label class="form-label" for="user">Email</label>
-            <input type="text" name="uname" id="user" class="form-control form-control-lg" placeholder="Enter email" />
+            <input type="text" name="uname" id="user" class="form-control form-control-lg" placeholder="Enter email" 
+            <?php echo isset($_SESSION['lockout_time']) ? 'disabled' : ''; ?> />
           </div>
           <div class="form-outline mb-3">
             <label class="form-label" for="pass">Password</label>
-            <input type="password" name="pass" id="psw" class="form-control form-control-lg" placeholder="Enter password" />
+            <input type="password" name="pass" id="psw" class="form-control form-control-lg" placeholder="Enter password" 
+            <?php echo isset($_SESSION['lockout_time']) ? 'disabled' : ''; ?> />
             <input class="p-2" type="checkbox" onclick="myFunction()" style="margin-left: 10px; margin-top: 13px;"> <span style="margin-left: 5px;">Show password</span>
           </div>
           <div class="d-flex justify-content-between align-items-center">
-          <button type="submit" name="login" class="btn btn-warning btn-lg enter" 
-    style="background-color: #1572e8; color: white; padding-left: 2.5rem; padding-right: 2.5rem;" 
-    <?php echo isset($_SESSION['lockout_time']) ? 'disabled' : ''; ?>>
-    Login
+            <button type="submit" name="login" class="btn btn-warning btn-lg enter" 
+              style="background-color: #1572e8; color: white; padding-left: 2.5rem; padding-right: 2.5rem;" 
+              <?php echo isset($_SESSION['lockout_time']) ? 'disabled' : ''; ?>>
+              Login
             </button>
-
           </div>
         </form>
       </div>
@@ -208,6 +190,25 @@ if (isset($_POST['login']) && !isset($_SESSION['lockout_time'])) {
       x.type = "password";
     }
   }
+
+  // Countdown timer logic
+  <?php if (isset($remaining_time)): ?>
+    let countdown = <?php echo $remaining_time; ?>;
+    const timerElement = document.getElementById('timer');
+
+    function updateTimer() {
+      const minutes = Math.floor(countdown / 60);
+      const seconds = countdown % 60;
+      timerElement.innerHTML = `Try again in ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+      if (countdown > 0) {
+        countdown--;
+        setTimeout(updateTimer, 1000);
+      } else {
+        location.reload();
+      }
+    }
+    updateTimer();
+  <?php endif; ?>
 </script>
 </body>
 </html>
