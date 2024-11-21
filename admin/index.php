@@ -200,7 +200,7 @@ function startTimer(duration, button) {
             timerDisplay.remove();
         } else {
             remaining--;
-            timerDisplay.textContent = `<span style="color: red;">(Try again in ${Math.ceil(remaining / 60)}m ${remaining % 60}s)`;
+            timerDisplay.textContent = `<span style="color: red;">(Try again in ${Math.ceil(remaining / 60)}m ${remaining % 60}s)</span>`;
         }
     }, 1000);
 }
