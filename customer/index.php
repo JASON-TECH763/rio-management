@@ -135,6 +135,8 @@ if ($_SESSION['attempts'] >= 3 && (time() - $_SESSION['last_failed_attempt']) < 
 </a>
 
 <section class="vh-100" style="background-color: #2a2f5b; color: white;">
+<br><br>
+
     <div class="container-fluid h-custom">
         <div class="row d-flex justify-content-center align-items-center h-100">
             <div class="col-md-9 col-lg-6 col-xl-5 position-relative">
@@ -157,9 +159,15 @@ if ($_SESSION['attempts'] >= 3 && (time() - $_SESSION['last_failed_attempt']) < 
                         <input type="password" name="pass" id="psw" class="form-control form-control-lg" placeholder="Enter password" />
                         <input class="p-2" type="checkbox" onclick="myFunction()" style="margin-left: 10px; margin-top: 13px;"> <span style="margin-left: 5px;">Show password</span>
                     </div>
+                      <!-- Forgot Password Link -->
+          <div class="d-flex justify-content-between align-items-center">
+              <a href="forgot_password.php" style="color: #FEA116;">Forgot Password?</a>
+              <span id="countdown-timer" style="margin-right: 20px; font-weight: bold; color: #ff0000;"></span> 
+              
+          </div>
                     <div class="d-flex justify-content-between align-items-center">
                         <button type="submit" name="login" class="btn btn-warning btn-lg enter" id="login-btn" style="background-color: #1572e8; color: white; padding-left: 2.5rem; padding-right: 2.5rem;" <?php echo ($_SESSION['attempts'] >= 3 && (time() - $_SESSION['last_failed_attempt']) < 180) ? 'disabled' : ''; ?>>Login</button>
-                        <span id="countdown-timer" style="margin-right: 20px; font-weight: bold; color: #ff0000;"></span> 
+                        <a href="create_account.php" class="btn btn-warning btn-lg enter" style="background-color: #1572e8; color: white; padding-left: 2.5rem; padding-right: 2.5rem;">Sign Up</a>
                     </div>
                 </form>
             </div>
