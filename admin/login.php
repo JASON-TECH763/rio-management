@@ -3,7 +3,7 @@ session_start();
 include('config/connect.php');
 
 // Content Security Policy (CSP) and security headers
-header("Content-Security-Policy: default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://www.google.com/recaptcha/ 'unsafe-inline'; style-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; img-src 'self' data:; font-src 'self' https://fonts.googleapis.com https://cdn.jsdelivr.net; frame-ancestors 'none'; form-action 'self'; base-uri 'self';");
+header("Content-Security-Policy: default-src 'self'; script-src 'self' https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/ 'unsafe-inline'; style-src 'self' https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/ 'unsafe-inline'; img-src 'self' data:; frame-src https://www.google.com/recaptcha/; font-src 'self'; frame-ancestors 'none'; form-action 'self'; base-uri 'self';");
 header("X-XSS-Protection: 1; mode=block");
 header("X-Frame-Options: DENY");
 header("X-Content-Type-Options: nosniff");
@@ -12,8 +12,8 @@ $error = "";
 $max_attempts = 3;       // Maximum number of login attempts
 $lockout_time = 180;     // Lockout time in seconds (3 minutes)
 
-// reCAPTCHA secret key (replace with your actual secret key)
-$recaptcha_secret = '6LdO2IUqAAAAAFrvkoQY1xdLiEFKd94qf9JH4ivC';
+// reCAPTCHA secret key (IMPORTANT: Replace with your actual secret key)
+$recaptcha_secret = '6LdG8kopAAAAALzagl-CRQTRlGeT_LBnRjqf3G5v';
 
 // Initialize session variables for tracking attempts
 if (!isset($_SESSION['attempts'])) {
@@ -57,14 +57,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
         // Verify reCAPTCHA
         $recaptcha_response = $_POST['g-recaptcha-response'] ?? '';
         
+        if (empty($recaptcha_response)) {
+            echo json_encode([
+                'success' => false, 
+                'error' => 'Please complete the reCAPTCHA', 
+                'show_recaptcha' => true
+            ]);
+            exit();
+        }
+        
         // Verify reCAPTCHA response
-        $verify_response = file_get_contents('https://www.google.com/recaptcha/api/siteverify?secret=' . $recaptcha_secret . '&response=' . $recaptcha_response);
+        $verify_url = 'https://www.google.com/recaptcha/api/siteverify';
+        $verify_data = [
+            'secret' => $recaptcha_secret,
+            'response' => $recaptcha_response
+        ];
+
+        $verify_options = [
+            'http' => [
+                'method' => 'POST',
+                'header' => 'Content-type: application/x-www-form-urlencoded',
+                'content' => http_build_query($verify_data)
+            ]
+        ];
+        
+        $verify_context = stream_context_create($verify_options);
+        $verify_response = file_get_contents($verify_url, false, $verify_context);
         $response_data = json_decode($verify_response);
         
         if (!$response_data->success) {
             echo json_encode([
                 'success' => false, 
-                'error' => 'Please complete the reCAPTCHA', 
+                'error' => 'reCAPTCHA verification failed', 
                 'show_recaptcha' => true
             ]);
             exit();
