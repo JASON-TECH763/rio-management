@@ -8,15 +8,10 @@ if (!isset($_SESSION['attempts'])) {
   $_SESSION['last_failed_attempt'] = time();
 }
 
+
 // Check if login button should be disabled
 if ($_SESSION['attempts'] >= 3 && (time() - $_SESSION['last_failed_attempt']) < 180) {
-  echo "<script>
-    Swal.fire({
-      icon: 'error',
-      title: 'Too Many Attempts',
-      text: 'You have reached the maximum login attempts. Please try again after 3 minutes.'
-    });
-  </script>";
+  $error = 'You have reached the maximum login attempts. Please try again after 3 minutes.';
 } else {
   if (isset($_POST['login'])) {
       $user = $_REQUEST['uname'];
