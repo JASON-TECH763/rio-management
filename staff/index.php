@@ -3,15 +3,30 @@
   include('config/connect.php');
   $error = "";
 
-  // Handle staff login
-  if (isset($_POST['login'])) {
-    $user = $_REQUEST['uname'];
-    $pass = $_REQUEST['pass'];
+  // Initialize login attempts session variable
+if (!isset($_SESSION['login_attempts'])) {
+  $_SESSION['login_attempts'] = 0;
+  $_SESSION['lockout_time'] = null;
+}
 
-    // Sanitize input
-    $user = mysqli_real_escape_string($conn, $user);
+// Check lockout status
+if (isset($_SESSION['lockout_time'])) {
+  $current_time = time();
+  if ($current_time - $_SESSION['lockout_time'] >= 180) { // 3 minutes
+      $_SESSION['login_attempts'] = 0; // Reset attempts after lockout period
+      $_SESSION['lockout_time'] = null;
+  }
+}
 
-    if (!empty($user) && !empty($pass)) {
+// Handle staff login
+if (isset($_POST['login']) && !isset($_SESSION['lockout_time'])) {
+  $user = $_REQUEST['uname'];
+  $pass = $_REQUEST['pass'];
+
+  // Sanitize input
+  $user = mysqli_real_escape_string($conn, $user);
+
+  if (!empty($user) && !empty($pass)) {
       // Prepare statement for login
       $query = "SELECT staff_email, staff_password FROM rpos_staff WHERE staff_email=?";
       $stmt = mysqli_prepare($conn, $query);
@@ -22,18 +37,24 @@
       $row = mysqli_fetch_array($result);
 
       if ($row && $pass === $row['staff_password']) {
-        // Login successful, store session information
-        $_SESSION['staff_email'] = $row['staff_email'];
-        header("Location: dashboard.php"); // Redirect to staff dashboard
-        exit(); // Always call exit after a header redirect
+          // Login successful, reset attempts
+          $_SESSION['login_attempts'] = 0;
+          $_SESSION['staff_email'] = $row['staff_email'];
+          header("Location: dashboard.php"); // Redirect to staff dashboard
+          exit();
       } else {
-        $error = '* Invalid Email or Password';
+          $_SESSION['login_attempts']++;
+          if ($_SESSION['login_attempts'] >= 3) {
+              $_SESSION['lockout_time'] = time(); // Start lockout timer
+              $error = 'Too many failed attempts. Please try again after 3 minutes.';
+          } else {
+              $error = '* Invalid Email or Password';
+          }
       }
-    } else {
+  } else {
       $error = '* Please fill all the fields!';
-    }
   }
-
+}
   // Handle staff account creation
   if (isset($_POST['create_account'])) {
     $staff_name = $_POST['name'];
@@ -158,8 +179,12 @@
             <input class="p-2" type="checkbox" onclick="myFunction()" style="margin-left: 10px; margin-top: 13px;"> <span style="margin-left: 5px;">Show password</span>
           </div>
           <div class="d-flex justify-content-between align-items-center">
-            <button type="submit" name="login" class="btn btn-warning btn-lg enter" style="background-color: #1572e8; color: white; padding-left: 2.5rem; padding-right: 2.5rem;">Login</button>
-        
+          <button type="submit" name="login" class="btn btn-warning btn-lg enter" 
+    style="background-color: #1572e8; color: white; padding-left: 2.5rem; padding-right: 2.5rem;" 
+    <?php echo isset($_SESSION['lockout_time']) ? 'disabled' : ''; ?>>
+    Login
+            </button>
+
           </div>
         </form>
       </div>
