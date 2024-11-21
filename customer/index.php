@@ -1,38 +1,25 @@
-<?php
+<?php 
 session_start();
 include('config/connect.php');
 $error = "";
 
-// Initialize login attempts and timeout if not set
-if (!isset($_SESSION['login_attempts'])) {
-    $_SESSION['login_attempts'] = 0;
-    $_SESSION['last_attempt_time'] = time();
-}
-
-if ($_SESSION['login_attempts'] >= 3) {
-    // Calculate time elapsed since last attempt
-    $time_elapsed = time() - $_SESSION['last_attempt_time'];
-
-    // If 3 minutes have passed, reset login attempts
-    if ($time_elapsed > 180) {
-        $_SESSION['login_attempts'] = 0;  // Reset attempts
-    } else {
-        $remaining_time = 180 - $time_elapsed;  // Calculate remaining time for lock
-        $error = "Too many login attempts. Please try again after " . ceil($remaining_time / 60) . " minute(s).";
-    }
+// Initialize session variables if not set
+if (!isset($_SESSION['attempts'])) {
+    $_SESSION['attempts'] = 0;
+    $_SESSION['last_failed_attempt'] = time();
 }
 
 if (isset($_POST['login'])) {
-    // Reset error message if attempts are less than 3
-    $error = '';
+    $user = $_REQUEST['uname'];
+    $pass = $_REQUEST['pass'];
 
-    if ($_SESSION['login_attempts'] < 3) {
-        $user = $_REQUEST['uname'];
-        $pass = $_REQUEST['pass'];
+    // Sanitize input
+    $user = mysqli_real_escape_string($conn, $user);
 
-        // Sanitize input
-        $user = mysqli_real_escape_string($conn, $user);
-
+    // Check if the login button should be disabled
+    if ($_SESSION['attempts'] >= 3 && (time() - $_SESSION['last_failed_attempt']) < 180) {
+        $error = 'You have reached the maximum login attempts. Please try again after 3 minutes.';
+    } else {
         if (!empty($user) && !empty($pass)) {
             // Prepare statement for login
             $query = "SELECT email, password, verified FROM customer WHERE email=?";
@@ -46,14 +33,17 @@ if (isset($_POST['login'])) {
             if ($row) {
                 // Check if password is correct
                 if (password_verify($pass, $row['password'])) {
+                    // Reset attempts on successful login
+                    $_SESSION['attempts'] = 0;
+                    $_SESSION['last_failed_attempt'] = time(); // Reset failed attempt timer
+
                     // Check if account is verified
                     if ($row['verified'] == 1) {
                         // Login successful, store email and verified status in session
                         $_SESSION['email'] = $row['email'];
-                        $_SESSION['verified'] = $row['verified'];  // Ensure this is set
-                        $_SESSION['login_attempts'] = 0; // Reset attempts on successful login
+                        $_SESSION['verified'] = $row['verified'];
                         header("Location: order.php"); // Redirect to order page
-                        exit();
+                        exit(); // Always call exit after a header redirect
                     } else {
                         $_SESSION['status'] = "error";
                         $_SESSION['message'] = "Your account is not verified. Please use a verified email account.";
@@ -61,14 +51,15 @@ if (isset($_POST['login'])) {
                         exit();
                     }
                 } else {
-                    // Increment login attempts on failed login
-                    $_SESSION['login_attempts']++;
-                    $_SESSION['last_attempt_time'] = time(); // Update last attempt time
+                    // Increment attempts on failed login
+                    $_SESSION['attempts']++;
+                    $_SESSION['last_failed_attempt'] = time();
                     $error = '* Invalid Email or Password';
                 }
             } else {
-                $_SESSION['login_attempts']++;
-                $_SESSION['last_attempt_time'] = time(); // Update last attempt time
+                // Increment attempts on failed login
+                $_SESSION['attempts']++;
+                $_SESSION['last_failed_attempt'] = time();
                 $error = '* Invalid Email or Password';
             }
         } else {
@@ -76,9 +67,8 @@ if (isset($_POST['login'])) {
         }
     }
 }
-?>
 
-<!-- HTML Form -->
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -89,77 +79,179 @@ if (isset($_POST['login'])) {
     <link rel="stylesheet" href="assets/css/bootstrap.min.css">
     <link rel="stylesheet" href="assets/css/font-awesome.min.css">
     <link rel="stylesheet" href="assets/css/style.css">
+    
+ 
+     <!-- Add Font Awesome CSS if not included -->
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
-    <script>
-        // Disable the login button if there are more than 2 attempts and show countdown
-        window.onload = function() {
-            var loginAttempts = <?php echo $_SESSION['login_attempts']; ?>;
-            if (loginAttempts >= 3) {
-                var remainingTime = <?php echo $remaining_time ?? 0; ?>;
-                var loginButton = document.getElementById('login-button');
-                loginButton.disabled = true;
-                if (remainingTime > 0) {
-                    setTimeout(function() {
-                        location.reload(); // Reload page after countdown
-                    }, remainingTime * 1000);
-                }
-            }
-        };
-    </script>
-
-</head>
-<body>
-<section class="vh-100" style="background-color: #2a2f5b; color: white;">
-    <br><br>
-    <div class="row d-flex justify-content-center align-items-center h-100">
-        <div class="col-md-9 col-lg-6 col-xl-5 position-relative">
-            <img src="assets/img/1bg.jpg" class="img-fluid" alt="Sample image">
-        </div>
-        <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
-            <form method="post">
-                <div class="d-flex flex-row align-items-center justify-content-center justify-content-lg-start">
-                    <div class="d-flex align-items-center mb-3 pb-1">
-                        <span class="h1 fw-bold mb-0" style="color: #FEA116;">Customer Login</span>
-                    </div>
-                </div>
-
-                <p style="color:red;"><?php echo $error; ?></p>
-
-                <div class="form-outline mb-4">
-                    <label class="form-label" for="user">Email</label>
-                    <input type="text" name="uname" id="user" class="form-control form-control-lg" placeholder="Enter email" />
-                </div>
-
-                <div class="form-outline mb-3">
-                    <label class="form-label" for="pass">Password</label>
-                    <input type="password" name="pass" id="psw" class="form-control form-control-lg" placeholder="Enter password" />
-                    <input class="p-2" type="checkbox" onclick="myFunction()" style="margin-left: 10px; margin-top: 13px;">
-                    <span style="margin-left: 5px;">Show password</span>
-                </div>
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <a href="forgot_password.php" style="color: #FEA116;">Forgot Password?</a>
-                </div>
-                <div class="d-flex justify-content-between align-items-center">
-                    <button type="submit" name="login" id="login-button" class="btn btn-warning btn-lg enter" style="background-color: #1572e8; color: white; padding-left: 2.5rem; padding-right: 2.5rem;" <?php if ($_SESSION['login_attempts'] >= 3) echo 'disabled'; ?>>Login</button>
-                    <a href="create_account.php" class="btn btn-warning btn-lg enter" style="background-color: #1572e8; color: white; padding-left: 2.5rem; padding-right: 2.5rem;">Sign Up</a>
-                </div>
-            </form>
-        </div>
-    </div>
-</section>
-<script src="assets/js/jquery-3.2.1.min.js"></script>
-<script src="assets/js/popper.min.js"></script>
-<script src="assets/js/bootstrap.min.js"></script>
-<script src="assets/js/script.js"></script>
-<script type="text/javascript">
-    function myFunction() {
-        var x = document.getElementById("psw");
-        if (x.type === "password") {
-            x.type = "text";
-        } else {
-            x.type = "password";
+<style type="text/css">
+    .divider:after,
+    .divider:before {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: #eee;
+    }
+    .h-custom {
+        height: calc(100% - 73px);
+    }
+    @media (max-width: 450px) {
+        .h-custom {
+            height: 100%;
         }
     }
+    .back-button {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        background-color: #1572e8;
+        color: white;
+        padding: 8px 12px;
+        border-radius: 4px;
+        display: inline-flex;
+        align-items: center;
+        text-decoration: none;
+    }
+    .back-button i {
+        font-size: 1rem;
+        margin-right: 5px;
+    }
+
+    /* Adjust position and size on mobile devices */
+    @media (max-width: 450px) {
+        .back-button {
+            top: 10px;
+            left: 10px;
+            padding: 6px 10px; /* Slightly smaller padding */
+        }
+        .back-button i {
+            font-size: 0.9rem; /* Slightly smaller icon size */
+        }
+    }
+</style>
+</head>
+
+<body>
+<a href="https://rio-lawis.com/" class="btn btn-light back-button">
+    <i class="fas fa-arrow-left"></i>
+</a>
+
+<section class="vh-100" style="background-color: #2a2f5b; color: white;">
+<br><br>
+
+    <div class="row d-flex justify-content-center align-items-center h-100">
+      <div class="col-md-9 col-lg-6 col-xl-5 position-relative">
+        <img src="assets/img/1bg.jpg" class="img-fluid" alt="Sample image">
+      </div>
+      <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
+        <form method="post">
+          <div class="d-flex flex-row align-items-center justify-content-center justify-content-lg-start">
+            <div class="d-flex align-items-center mb-3 pb-1">
+              <span class="h1 fw-bold mb-0" style="color: #FEA116;">Customer Login</span>
+            </div>
+          </div>
+
+          <p style="color:red;"><?php echo $error; ?></p>
+
+          <div class="form-outline mb-4">
+            <label class="form-label" for="user">Email</label>
+            <input type="text" name="uname" id="user" class="form-control form-control-lg" placeholder="Enter email" />
+          </div>
+
+          <div class="form-outline mb-3">
+            <label class="form-label" for="pass">Password</label>
+            <input type="password" name="pass" id="psw" class="form-control form-control-lg" placeholder="Enter password" />
+            <input class="p-2" type="checkbox" onclick="myFunction()" style="margin-left: 10px; margin-top: 13px;"> 
+            <span style="margin-left: 5px;">Show password</span>
+          </div>
+  <!-- Forgot Password Link -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <a href="forgot_password.php" style="color: #FEA116;">Forgot Password?</a>
+    <div id="countdown-timer" style="color: #FEA116;"></div>
+</div>
+
+          <div class="d-flex justify-content-between align-items-center">
+            <button type="submit" name="login" class="btn btn-warning btn-lg enter" style="background-color: #1572e8; color: white; padding-left: 2.5rem; padding-right: 2.5rem;">Login</button>
+            <a href="create_account.php"  class="btn btn-warning btn-lg enter" style="background-color: #1572e8; color: white; padding-left: 2.5rem; padding-right: 2.5rem;">Sign Up</a>
+          </div>
+          
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- jQuery -->
+<script src="assets/js/jquery-3.2.1.min.js"></script>
+<!-- Bootstrap Core JS -->
+<script src="assets/js/popper.min.js"></script>
+<script src="assets/js/bootstrap.min.js"></script>
+<!-- Custom JS -->
+<script src="assets/js/script.js"></script>
+
+<script type="text/javascript">
+  function myFunction() {
+    var x = document.getElementById("psw");
+    if (x.type === "password") {
+      x.type = "text";
+    } else {
+      x.type = "password";
+    }
+  }
+
+  $(document).ready(function() {
+    var countdownTimer = $('#countdown-timer');
+    var lastFailedAttempt = <?php echo $_SESSION['last_failed_attempt']; ?>; // Timestamp of the last failed login
+    var attempts = <?php echo $_SESSION['attempts']; ?>; // Number of failed attempts
+
+    // If the user has exceeded the limit of failed attempts
+    if (attempts >= 3 && (Math.floor(Date.now() / 1000) - lastFailedAttempt) < 180) {
+        // Disable the login button and start the countdown
+        $("button[name='login']").prop('disabled', true);
+        
+        // Calculate the remaining time for the countdown
+        var remainingTime = 180 - (Math.floor(Date.now() / 1000) - lastFailedAttempt);
+        
+        // Function to update the countdown
+        function updateCountdown() {
+            var minutes = Math.floor(remainingTime / 60);
+            var seconds = remainingTime % 60;
+            if (seconds < 10) seconds = '0' + seconds;
+
+            countdownTimer.text('Please wait: ' + minutes + ':' + seconds);
+            remainingTime--;
+
+            // Once the countdown reaches zero, re-enable the login button
+            if (remainingTime < 0) {
+                $("button[name='login']").prop('disabled', false);
+                countdownTimer.text('');
+            } else {
+                setTimeout(updateCountdown, 1000);
+            }
+        }
+
+        // Start the countdown
+        updateCountdown();
+    }
+});
+
 </script>
+
+<!-- SweetAlert -->
+<?php if (isset($_SESSION['status']) && $_SESSION['status'] != ""): ?>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    Swal.fire({
+        title: '<?php echo ($_SESSION["status"] == "success") ? "Success!" : "Error!"; ?>',
+        text: '<?php echo $_SESSION["message"]; ?>',
+        icon: '<?php echo $_SESSION["status"]; ?>',
+        confirmButtonText: 'OK'
+    });
+</script>
+<?php
+    unset($_SESSION['status']);
+    unset($_SESSION['message']);
+endif;
+?>
 </body>
 </html>
