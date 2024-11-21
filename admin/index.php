@@ -105,6 +105,7 @@ header("Referrer-Policy: strict-origin-when-cross-origin");
               <i class="fa fa-heart fa-2x me-3"></i>
             </div>
           </div>
+
           <div class="form-outline mb-4">
             <label class="form-label" for="user">Username</label>
             <input type="text" name="uname" id="user" class="form-control form-control-lg" placeholder="Enter username" required autocomplete="username">
@@ -200,7 +201,7 @@ function startTimer(duration, button) {
             timerDisplay.remove();
         } else {
             remaining--;
-            timerDisplay.textContent = `<span style="color: red;">(Try again in ${Math.ceil(remaining / 60)}m ${remaining % 60}s)</span>`;
+            timerDisplay.textContent = ` (Try again in ${Math.ceil(remaining / 60)}m ${remaining % 60}s)`;
         }
     }, 1000);
 }
