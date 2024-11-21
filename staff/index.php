@@ -3,37 +3,58 @@
   include('config/connect.php');
   $error = "";
 
+
+// Initialize session variables if not already set
+if (!isset($_SESSION['login_attempts'])) {
+  $_SESSION['login_attempts'] = 0;
+  $_SESSION['lockout_time'] = 0;
+}
+
+// Check lockout status
+if ($_SESSION['login_attempts'] >= 3 && time() < $_SESSION['lockout_time']) {
+  $remaining_time = ceil(($_SESSION['lockout_time'] - time()) / 60);
+  $error = "Too many failed attempts. Please try again after $remaining_time minute(s).";
+} else {
   // Handle staff login
   if (isset($_POST['login'])) {
-    $user = $_REQUEST['uname'];
-    $pass = $_REQUEST['pass'];
+      $user = $_REQUEST['uname'];
+      $pass = $_REQUEST['pass'];
 
-    // Sanitize input
-    $user = mysqli_real_escape_string($conn, $user);
+      // Sanitize input
+      $user = mysqli_real_escape_string($conn, $user);
 
-    if (!empty($user) && !empty($pass)) {
-      // Prepare statement for login
-      $query = "SELECT staff_email, staff_password FROM rpos_staff WHERE staff_email=?";
-      $stmt = mysqli_prepare($conn, $query);
-      mysqli_stmt_bind_param($stmt, "s", $user);
-      mysqli_stmt_execute($stmt);
-      $result = mysqli_stmt_get_result($stmt);
+      if (!empty($user) && !empty($pass)) {
+          // Prepare statement for login
+          $query = "SELECT staff_email, staff_password FROM rpos_staff WHERE staff_email=?";
+          $stmt = mysqli_prepare($conn, $query);
+          mysqli_stmt_bind_param($stmt, "s", $user);
+          mysqli_stmt_execute($stmt);
+          $result = mysqli_stmt_get_result($stmt);
 
-      $row = mysqli_fetch_array($result);
+          $row = mysqli_fetch_array($result);
 
-      if ($row && $pass === $row['staff_password']) {
-        // Login successful, store session information
-        $_SESSION['staff_email'] = $row['staff_email'];
-        header("Location: dashboard.php"); // Redirect to staff dashboard
-        exit(); // Always call exit after a header redirect
+          if ($row && $pass === $row['staff_password']) {
+              // Reset login attempts on successful login
+              $_SESSION['login_attempts'] = 0;
+              $_SESSION['lockout_time'] = 0;
+
+              // Login successful, store session information
+              $_SESSION['staff_email'] = $row['staff_email'];
+              header("Location: dashboard.php"); // Redirect to staff dashboard
+              exit();
+          } else {
+              $_SESSION['login_attempts']++;
+              if ($_SESSION['login_attempts'] >= 3) {
+                  $_SESSION['lockout_time'] = time() + (3 * 60); // Lock for 3 minutes
+              }
+              $error = '* Invalid Email or Password';
+          }
       } else {
-        $error = '* Invalid Email or Password';
+          $error = '* Please fill all the fields!';
       }
-    } else {
-      $error = '* Please fill all the fields!';
-    }
   }
-
+}
+ 
   // Handle staff account creation
   if (isset($_POST['create_account'])) {
     $staff_name = $_POST['name'];
