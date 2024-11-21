@@ -103,15 +103,15 @@ header("Referrer-Policy: strict-origin-when-cross-origin");
               <i class="fa fa-heart fa-2x me-3"></i>
             </div>
           </div>
-          <p style="color:red;"><?php echo $error; ?></p>
+          <p id="error-message" style="color:red;"></p>
           <div class="form-outline mb-4">
-            <label class="form-label" name="uname" for="user">Username</label>
-            <input type="text" name="uname" id="user" class="form-control form-control-lg" placeholder="Enter username" />
+            <label class="form-label" for="user">Username</label>
+            <input type="text" name="uname" id="user" class="form-control form-control-lg" placeholder="Enter username" required autocomplete="username">
           </div>
           <div class="form-outline mb-3">
             <label class="form-label" for="pass">Password</label>
-            <input type="password" name="pass" id="psw" class="form-control form-control-lg" placeholder="Enter password" />
-            <input class="p-2" type="checkbox" onclick="myFunction()" style="margin-left: 10px; margin-top: 13px;"> <span style="margin-left: 5px;">Show password</span>
+            <input type="password" name="pass" id="psw" class="form-control form-control-lg" placeholder="Enter password" required autocomplete="current-password">
+            <input class="p-2" type="checkbox" onclick="togglePassword()" style="margin-left: 10px; margin-top: 13px;"> <span style="margin-left: 5px;">Show password</span>
           </div>
           
           <!-- reCAPTCHA Container -->
