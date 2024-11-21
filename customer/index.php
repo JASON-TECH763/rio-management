@@ -166,18 +166,19 @@ if (isset($_POST['login'])) {
           <!-- Forgot Password Link -->
           <div class="d-flex justify-content-between align-items-center mb-4">
               <a href="forgot_password.php" style="color: #FEA116;">Forgot Password?</a>
-              <div id="countdown-timer" style="color: #FEA116; float: right;"></div>
           </div>
+
+          <!-- Countdown Timer (Above Sign Up Button) -->
+          <div id="countdown-timer" style="color: #FEA116; text-align: center; margin-bottom: 10px;"></div>
 
           <div class="d-flex justify-content-between align-items-center">
             <button type="submit" name="login" class="btn btn-warning btn-lg enter" style="background-color: #1572e8; color: white; padding-left: 2.5rem; padding-right: 2.5rem;">Login</button>
-            <a href="create_account.php"  class="btn btn-warning btn-lg enter" style="background-color: #1572e8; color: white; padding-left: 2.5rem; padding-right: 2.5rem;">Sign Up</a>
+            <a href="create_account.php" class="btn btn-warning btn-lg enter" style="background-color: #1572e8; color: white; padding-left: 2.5rem; padding-right: 2.5rem;">Sign Up</a>
           </div>
           
         </form>
       </div>
     </div>
-  </div>
 </section>
 
 <!-- jQuery -->
