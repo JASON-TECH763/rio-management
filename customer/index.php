@@ -160,7 +160,7 @@ if ($_SESSION['attempts'] >= 3 && (time() - $_SESSION['last_failed_attempt']) < 
                         <input class="p-2" type="checkbox" onclick="myFunction()" style="margin-left: 10px; margin-top: 13px;"> <span style="margin-left: 5px;">Show password</span>
                     </div>
                       <!-- Forgot Password Link -->
-          <div class="d-flex justify-content-between align-items-center">
+          <div class="d-flex justify-content-between align-items-center mb-4">
               <a href="forgot_password.php" style="color: #FEA116;">Forgot Password?</a>
               <span id="countdown-timer" style="margin-right: 20px; font-weight: bold; color: #ff0000;"></span> 
               
