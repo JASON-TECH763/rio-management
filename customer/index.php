@@ -208,8 +208,10 @@ if (isset($_POST['create_account'])) {
           </div>
 
           <div class="d-flex justify-content-between align-items-center mb-4">
-            <a href="forgot_password.php" style="color: #FEA116;">Forgot Password?</a>
-        </div>
+    <a href="forgot_password.php" style="color: #FEA116;">Forgot Password?</a>
+    <span id="countdown" style="color: #FEA116;"></span>
+</div>
+
 
           <div class="d-flex justify-content-between align-items-center">
             <button type="submit" name="login" class="btn btn-warning btn-lg enter" style="background-color: #1572e8; color: white; padding-left: 2.5rem; padding-right: 2.5rem;" <?php if ($_SESSION['attempts'] >= 3) echo 'disabled'; ?>>Login</button>
@@ -250,6 +252,26 @@ if (isset($_POST['create_account'])) {
         icon: '<?php echo $_SESSION["status"]; ?>',
         confirmButtonText: 'OK'
     });
+
+      // Check if there are remaining attempts and calculate time left
+      <?php if ($_SESSION['attempts'] >= 3): ?>
+        var lockoutTime = <?php echo 180 - (time() - $_SESSION['last_attempt_time']); ?>; // Time remaining in seconds
+        if (lockoutTime > 0) {
+            var countdownInterval = setInterval(function() {
+                var minutes = Math.floor(lockoutTime / 60);
+                var seconds = lockoutTime % 60;
+                document.getElementById("countdown").innerHTML = "Please wait " + minutes + "m " + seconds + "s";
+
+                lockoutTime--; // Decrement the countdown timer
+
+                // If the lockout time is over, reset the countdown
+                if (lockoutTime <= 0) {
+                    clearInterval(countdownInterval);
+                    document.getElementById("countdown").innerHTML = "";
+                }
+            }, 1000);
+        }
+    <?php endif; ?>
 </script>
 <?php
     unset($_SESSION['status']);
