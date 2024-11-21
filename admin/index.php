@@ -23,7 +23,9 @@ header("Referrer-Policy: strict-origin-when-cross-origin");
     <link rel="stylesheet" href="assets/css/bootstrap.min.css">
     <link rel="stylesheet" href="assets/css/font-awesome.min.css">
     <link rel="stylesheet" href="assets/css/style.css">
-   
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <!-- Add Font Awesome CSS if not included -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
@@ -161,7 +163,14 @@ header("Referrer-Policy: strict-origin-when-cross-origin");
         if (data.success) {
             window.location.href = data.redirect;
         } else {
-            document.getElementById('error-message').textContent = data.error;
+            // Show SweetAlert for error messages
+            Swal.fire({
+                icon: 'error',
+                title: 'Login Failed',
+                text: data.error,
+                confirmButtonText: 'Try Again',
+                timer: 5000
+            });
 
             // Show reCAPTCHA after 3 failed attempts
             if (data.show_recaptcha) {
