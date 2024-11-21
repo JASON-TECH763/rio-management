@@ -3,47 +3,73 @@ session_start();
 include('config/connect.php');
 $error = "";
 
+// Initialize session variables for attempts and lockout time
+if (!isset($_SESSION['attempts'])) {
+    $_SESSION['attempts'] = 0;
+    $_SESSION['last_attempt_time'] = time();
+}
+
+$lockout_duration = 180; // 3 minutes (in seconds)
+$current_time = time();
+
+// Check if the lockout period has expired
+if ($_SESSION['attempts'] >= 3 && $current_time - $_SESSION['last_attempt_time'] < $lockout_duration) {
+    // User is locked out, disable login button
+    $lockout_time_left = $lockout_duration - ($current_time - $_SESSION['last_attempt_time']);
+    $error = "Too many failed attempts. Please try again in " . ceil($lockout_time_left / 60) . " minutes.";
+} elseif ($_SESSION['attempts'] >= 3 && $current_time - $_SESSION['last_attempt_time'] >= $lockout_duration) {
+    // Lockout period expired, reset attempts
+    $_SESSION['attempts'] = 0;
+}
+
+// Handle login attempt
 if (isset($_POST['login'])) {
-    $user = $_REQUEST['uname'];
-    $pass = $_REQUEST['pass'];
+    if ($_SESSION['attempts'] < 3) { // Only allow login if attempts are less than 3
+        $user = $_REQUEST['uname'];
+        $pass = $_REQUEST['pass'];
 
-    // Sanitize input
-    $user = mysqli_real_escape_string($conn, $user);
+        // Sanitize input
+        $user = mysqli_real_escape_string($conn, $user);
 
-    if (!empty($user) && !empty($pass)) {
-        // Prepare statement for login
-        $query = "SELECT email, password, verified FROM customer WHERE email=?";
-        $stmt = mysqli_prepare($conn, $query);
-        mysqli_stmt_bind_param($stmt, "s", $user);
-        mysqli_stmt_execute($stmt);
-        $result = mysqli_stmt_get_result($stmt);
+        if (!empty($user) && !empty($pass)) {
+            // Prepare statement for login
+            $query = "SELECT email, password, verified FROM customer WHERE email=?";
+            $stmt = mysqli_prepare($conn, $query);
+            mysqli_stmt_bind_param($stmt, "s", $user);
+            mysqli_stmt_execute($stmt);
+            $result = mysqli_stmt_get_result($stmt);
 
-        $row = mysqli_fetch_array($result);
+            $row = mysqli_fetch_array($result);
 
-        if ($row) {
-            // Check if password is correct
-            if (password_verify($pass, $row['password'])) {
-                // Check if account is verified
-                if ($row['verified'] == 1) {
-                    // Login successful, store email and verified status in session
-                    $_SESSION['email'] = $row['email'];
-                    $_SESSION['verified'] = $row['verified'];  // Ensure this is set
-                    header("Location: order.php"); // Redirect to order page
-                    exit(); // Always call exit after a header redirect
+            if ($row) {
+                // Check if password is correct
+                if (password_verify($pass, $row['password'])) {
+                    // Check if account is verified
+                    if ($row['verified'] == 1) {
+                        // Login successful, store email and verified status in session
+                        $_SESSION['email'] = $row['email'];
+                        $_SESSION['verified'] = $row['verified'];  // Ensure this is set
+                        header("Location: order.php"); // Redirect to order page
+                        exit(); // Always call exit after a header redirect
+                    } else {
+                        $_SESSION['status'] = "error";
+                        $_SESSION['message'] = "Your account is not verified. Please use a verified email account.";
+                        header("Location: index.php");
+                        exit();
+                    }
                 } else {
-                    $_SESSION['status'] = "error";
-                    $_SESSION['message'] = "Your account is not verified. Please use a verified email account.";
-                    header("Location: index.php");
-                    exit();
+                    $error = '* Invalid Email or Password';
+                    $_SESSION['attempts'] += 1;
+                    $_SESSION['last_attempt_time'] = $current_time; // Update last attempt time
                 }
             } else {
                 $error = '* Invalid Email or Password';
+                $_SESSION['attempts'] += 1;
+                $_SESSION['last_attempt_time'] = $current_time; // Update last attempt time
             }
         } else {
-            $error = '* Invalid Email or Password';
+            $error = '* Please fill all the fields!';
         }
-    } else {
-        $error = '* Please fill all the fields!';
     }
 }
 
@@ -181,12 +207,16 @@ if (isset($_POST['create_account'])) {
             <input class="p-2" type="checkbox" onclick="myFunction()" style="margin-left: 10px; margin-top: 13px;"> 
             <span style="margin-left: 5px;">Show password</span>
           </div>
-  <!-- Forgot Password Link -->
-  <div class="d-flex justify-content-between align-items-center mb-4">
+  
+          <div class="d-flex justify-content-between align-items-center mb-4">
         <a href="forgot_password.php" style="color: #FEA116;">Forgot Password?</a>
     </div>
           <div class="d-flex justify-content-between align-items-center">
-            <button type="submit" name="login" class="btn btn-warning btn-lg enter" style="background-color: #1572e8; color: white; padding-left: 2.5rem; padding-right: 2.5rem;">Login</button>
+            <button type="submit" name="login" class="btn btn-warning btn-lg enter" 
+                    style="background-color: #1572e8; color: white; padding-left: 2.5rem; padding-right: 2.5rem;"
+                    <?php echo ($_SESSION['attempts'] >= 3) ? 'disabled' : ''; ?>>
+                    Login
+            </button>
             <a href="create_account.php"  class="btn btn-warning btn-lg enter" style="background-color: #1572e8; color: white; padding-left: 2.5rem; padding-right: 2.5rem;">Sign Up</a>
           </div>
           
