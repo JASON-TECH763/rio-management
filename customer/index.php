@@ -164,10 +164,10 @@ if (isset($_POST['login'])) {
             <input class="p-2" type="checkbox" onclick="myFunction()" style="margin-left: 10px; margin-top: 13px;"> 
             <span style="margin-left: 5px;">Show password</span>
           </div>
-  <!-- Forgot Password Link -->
+ <!-- Forgot Password Link -->
 <div class="d-flex justify-content-between align-items-center mb-4">
     <a href="forgot_password.php" style="color: #FEA116;">Forgot Password?</a>
-    <div id="countdown-timer" style="color: #FEA116;"></div>
+    <div id="countdown-timer" style="color: #FEA116; float: right;"></div>
 </div>
 
           <div class="d-flex justify-content-between align-items-center">
