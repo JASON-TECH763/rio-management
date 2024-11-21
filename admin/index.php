@@ -120,12 +120,8 @@ header("Referrer-Policy: strict-origin-when-cross-origin");
 <script src="assets/js/popper.min.js"></script>
 <script src="assets/js/bootstrap.min.js"></script>
 <script src="assets/js/script.js"></script>
-<script>
-function togglePassword() {
-    var x = document.getElementById("psw");
-    x.type = x.type === "password" ? "text" : "password";
-}
 
+<script>
 document.getElementById('loginForm').addEventListener('submit', function(e) {
     e.preventDefault();
     var formData = new FormData(this);
@@ -141,10 +137,16 @@ document.getElementById('loginForm').addEventListener('submit', function(e) {
     })
     .then(response => response.json())
     .then(data => {
+        const loginButton = document.querySelector('button[name="login"]');
         if (data.success) {
             window.location.href = data.redirect;
         } else {
             document.getElementById('error-message').textContent = data.error;
+
+            if (data.disable) {
+                loginButton.disabled = true;
+                startTimer(data.time_remaining, loginButton);
+            }
         }
     })
     .catch(error => {
@@ -152,18 +154,24 @@ document.getElementById('loginForm').addEventListener('submit', function(e) {
     });
 });
 
-// Modified security measures
-document.addEventListener('contextmenu', function(e) {
-    if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
-        e.preventDefault();
-    }
-});
+function startTimer(duration, button) {
+    const timerDisplay = document.createElement('span');
+    timerDisplay.style.marginLeft = '10px';
+    button.parentNode.appendChild(timerDisplay);
 
-document.onkeydown = function(e) {
-    if (e.ctrlKey && (e.keyCode === 85 || e.keyCode === 83)) {
-        return false;
-    }
-};
+    let remaining = duration;
+    const interval = setInterval(() => {
+        if (remaining <= 0) {
+            clearInterval(interval);
+            button.disabled = false;
+            timerDisplay.remove();
+        } else {
+            remaining--;
+            timerDisplay.textContent = ` (Try again in ${Math.ceil(remaining / 60)}m ${remaining % 60}s)`;
+        }
+    }, 1000);
+}
 </script>
+
 </body>
 </html>
