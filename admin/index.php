@@ -7,7 +7,7 @@ if (!isset($_SESSION['csrf_token'])) {
 }
 
 // Set security headers
-header("Content-Security-Policy: default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; style-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; img-src 'self' data:; font-src 'self' https://fonts.googleapis.com https://cdn.jsdelivr.net; frame-ancestors 'none'; form-action 'self'; base-uri 'self';");
+header("Content-Security-Policy: default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://www.google.com/recaptcha/ 'unsafe-inline'; style-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; img-src 'self' data:; font-src 'self' https://fonts.googleapis.com https://cdn.jsdelivr.net; frame-ancestors 'none'; form-action 'self'; base-uri 'self';");
 header("X-XSS-Protection: 1; mode=block");
 header("X-Frame-Options: DENY");
 header("X-Content-Type-Options: nosniff");
@@ -24,8 +24,11 @@ header("Referrer-Policy: strict-origin-when-cross-origin");
     <link rel="stylesheet" href="assets/css/font-awesome.min.css">
     <link rel="stylesheet" href="assets/css/style.css">
    
-     <!-- Add Font Awesome CSS if not included -->
-     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Add Font Awesome CSS if not included -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <!-- reCAPTCHA Script -->
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 
 <style type="text/css">
     .divider:after,
@@ -71,6 +74,10 @@ header("Referrer-Policy: strict-origin-when-cross-origin");
             font-size: 0.9rem; /* Slightly smaller icon size */
         }
     }
+    .recaptcha-container {
+        display: none;
+        margin-bottom: 15px;
+    }
 </style>
 </head>
 
@@ -106,6 +113,12 @@ header("Referrer-Policy: strict-origin-when-cross-origin");
             <input type="password" name="pass" id="psw" class="form-control form-control-lg" placeholder="Enter password" required autocomplete="current-password">
             <input class="p-2" type="checkbox" onclick="togglePassword()" style="margin-left: 10px; margin-top: 13px;"> <span style="margin-left: 5px;">Show password</span>
           </div>
+          
+          <!-- reCAPTCHA Container -->
+          <div id="recaptchaContainer" class="recaptcha-container mb-3">
+            <div class="g-recaptcha" data-sitekey="YOUR_RECAPTCHA_SITE_KEY"></div>
+          </div>
+
           <div class="d-flex justify-content-between align-items-center">
             <button type="submit" name="login" class="btn btn-warning btn-lg enter" style="background-color: #1572e8; color: white; padding-left: 2.5rem; padding-right: 2.5rem;">Login</button>
             <a href="forgot_password.php" class="">Forgot password?</a>
@@ -125,8 +138,9 @@ header("Referrer-Policy: strict-origin-when-cross-origin");
   function togglePassword() {
     var x = document.getElementById("psw");
     x.type = x.type === "password" ? "text" : "password";
-}
-document.getElementById('loginForm').addEventListener('submit', function(e) {
+  }
+
+  document.getElementById('loginForm').addEventListener('submit', function(e) {
     e.preventDefault();
     var formData = new FormData(this);
     formData.append('login', '1');
@@ -142,10 +156,17 @@ document.getElementById('loginForm').addEventListener('submit', function(e) {
     .then(response => response.json())
     .then(data => {
         const loginButton = document.querySelector('button[name="login"]');
+        const recaptchaContainer = document.getElementById('recaptchaContainer');
+
         if (data.success) {
             window.location.href = data.redirect;
         } else {
             document.getElementById('error-message').textContent = data.error;
+
+            // Show reCAPTCHA after 3 failed attempts
+            if (data.show_recaptcha) {
+                recaptchaContainer.style.display = 'block';
+            }
 
             if (data.disable) {
                 loginButton.disabled = true;
