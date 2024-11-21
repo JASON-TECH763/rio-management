@@ -3,80 +3,47 @@ session_start();
 include('config/connect.php');
 $error = "";
 
-// Initialize session variables for attempts and lockout time
-if (!isset($_SESSION['attempts'])) {
-  $_SESSION['attempts'] = 0;
-  $_SESSION['last_attempt_time'] = time();
-}
-
-$lockout_duration = 180; // 3 minutes (in seconds)
-$current_time = time();
-
-// Check if the lockout period has expired
-if ($_SESSION['attempts'] >= 3 && $current_time - $_SESSION['last_attempt_time'] < $lockout_duration) {
-  // User is locked out, disable login button
-  $lockout_time_left = $lockout_duration - ($current_time - $_SESSION['last_attempt_time']);
-  $error = "Too many failed attempts. Please try again in " . ceil($lockout_time_left / 60) . " minutes.";
-  $lockout = true;
-  $countdown = $lockout_time_left;
-} elseif ($_SESSION['attempts'] >= 3 && $current_time - $_SESSION['last_attempt_time'] >= $lockout_duration) {
-  // Lockout period expired, reset attempts
-  $_SESSION['attempts'] = 0;
-  $lockout = false;
-  $countdown = 0;
-} else {
-  $lockout = false;
-  $countdown = 0;
-}
-
-// Handle login attempt
 if (isset($_POST['login'])) {
-    if ($_SESSION['attempts'] < 3) { // Only allow login if attempts are less than 3
-        $user = $_REQUEST['uname'];
-        $pass = $_REQUEST['pass'];
+    $user = $_REQUEST['uname'];
+    $pass = $_REQUEST['pass'];
 
-        // Sanitize input
-        $user = mysqli_real_escape_string($conn, $user);
+    // Sanitize input
+    $user = mysqli_real_escape_string($conn, $user);
 
-        if (!empty($user) && !empty($pass)) {
-            // Prepare statement for login
-            $query = "SELECT email, password, verified FROM customer WHERE email=?";
-            $stmt = mysqli_prepare($conn, $query);
-            mysqli_stmt_bind_param($stmt, "s", $user);
-            mysqli_stmt_execute($stmt);
-            $result = mysqli_stmt_get_result($stmt);
+    if (!empty($user) && !empty($pass)) {
+        // Prepare statement for login
+        $query = "SELECT email, password, verified FROM customer WHERE email=?";
+        $stmt = mysqli_prepare($conn, $query);
+        mysqli_stmt_bind_param($stmt, "s", $user);
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
 
-            $row = mysqli_fetch_array($result);
+        $row = mysqli_fetch_array($result);
 
-            if ($row) {
-                // Check if password is correct
-                if (password_verify($pass, $row['password'])) {
-                    // Check if account is verified
-                    if ($row['verified'] == 1) {
-                        // Login successful, store email and verified status in session
-                        $_SESSION['email'] = $row['email'];
-                        $_SESSION['verified'] = $row['verified'];  // Ensure this is set
-                        header("Location: order.php"); // Redirect to order page
-                        exit(); // Always call exit after a header redirect
-                    } else {
-                        $_SESSION['status'] = "error";
-                        $_SESSION['message'] = "Your account is not verified. Please use a verified email account.";
-                        header("Location: index.php");
-                        exit();
-                    }
+        if ($row) {
+            // Check if password is correct
+            if (password_verify($pass, $row['password'])) {
+                // Check if account is verified
+                if ($row['verified'] == 1) {
+                    // Login successful, store email and verified status in session
+                    $_SESSION['email'] = $row['email'];
+                    $_SESSION['verified'] = $row['verified'];  // Ensure this is set
+                    header("Location: order.php"); // Redirect to order page
+                    exit(); // Always call exit after a header redirect
                 } else {
-                    $error = '* Invalid Email or Password';
-                    $_SESSION['attempts'] += 1;
-                    $_SESSION['last_attempt_time'] = $current_time; // Update last attempt time
+                    $_SESSION['status'] = "error";
+                    $_SESSION['message'] = "Your account is not verified. Please use a verified email account.";
+                    header("Location: index.php");
+                    exit();
                 }
             } else {
                 $error = '* Invalid Email or Password';
-                $_SESSION['attempts'] += 1;
-                $_SESSION['last_attempt_time'] = $current_time; // Update last attempt time
             }
         } else {
-            $error = '* Please fill all the fields!';
+            $error = '* Invalid Email or Password';
         }
+    } else {
+        $error = '* Please fill all the fields!';
     }
 }
 
@@ -187,52 +154,48 @@ if (isset($_POST['create_account'])) {
 </a>
 
 <section class="vh-100" style="background-color: #2a2f5b; color: white;">
+<br><br>
+
     <div class="row d-flex justify-content-center align-items-center h-100">
-        <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
-            <form method="post">
-                <div class="d-flex flex-row align-items-center justify-content-center justify-content-lg-start">
-                    <div class="d-flex align-items-center mb-3 pb-1">
-                        <span class="h1 fw-bold mb-0" style="color: #FEA116;">Customer Login</span>
-                    </div>
-                </div>
+      <div class="col-md-9 col-lg-6 col-xl-5 position-relative">
+        <img src="assets/img/1bg.jpg" class="img-fluid" alt="Sample image">
+      </div>
+      <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
+        <form method="post">
+          <div class="d-flex flex-row align-items-center justify-content-center justify-content-lg-start">
+            <div class="d-flex align-items-center mb-3 pb-1">
+              <span class="h1 fw-bold mb-0" style="color: #FEA116;">Customer Login</span>
+            </div>
+          </div>
 
-                <p style="color:red;"><?php echo $error; ?></p>
+          <p style="color:red;"><?php echo $error; ?></p>
 
-                <div class="form-outline mb-4">
-                    <label class="form-label" for="user">Email</label>
-                    <input type="text" name="uname" id="user" class="form-control form-control-lg" placeholder="Enter email" />
-                </div>
+          <div class="form-outline mb-4">
+            <label class="form-label" for="user">Email</label>
+            <input type="text" name="uname" id="user" class="form-control form-control-lg" placeholder="Enter email" />
+          </div>
 
-                <div class="form-outline mb-3">
-                    <label class="form-label" for="pass">Password</label>
-                    <input type="password" name="pass" id="psw" class="form-control form-control-lg" placeholder="Enter password" />
-                    <input class="p-2" type="checkbox" onclick="myFunction()" style="margin-left: 10px; margin-top: 13px;">
-                    <span style="margin-left: 5px;">Show password</span>
-                </div>
-
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <a href="forgot_password.php" style="color: #FEA116;">Forgot Password?</a>
-                </div>
-
-                <?php if ($lockout): ?>
-                    <div id="lockoutCountdown">
-                        <span>Too many failed attempts. Please try again in <span id="countdown"><?php echo ceil($countdown / 60); ?>:00</span> minutes.</span>
-                    </div>
-                <?php endif; ?>
-
-                <div class="d-flex justify-content-between align-items-center">
-                    <button type="submit" name="login" class="btn btn-warning btn-lg enter" 
-                            style="background-color: #1572e8; color: white; padding-left: 2.5rem; padding-right: 2.5rem;"
-                            <?php echo ($_SESSION['attempts'] >= 3) ? 'disabled' : ''; ?>>
-                        Login
-                    </button>
-                    <a href="create_account.php" class="btn btn-warning btn-lg enter" style="background-color: #1572e8; color: white; padding-left: 2.5rem; padding-right: 2.5rem;">Sign Up</a>
-                </div>
-
-            </form>
-        </div>
+          <div class="form-outline mb-3">
+            <label class="form-label" for="pass">Password</label>
+            <input type="password" name="pass" id="psw" class="form-control form-control-lg" placeholder="Enter password" />
+            <input class="p-2" type="checkbox" onclick="myFunction()" style="margin-left: 10px; margin-top: 13px;"> 
+            <span style="margin-left: 5px;">Show password</span>
+          </div>
+  <!-- Forgot Password Link -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+        <a href="forgot_password.php" style="color: #FEA116;">Forgot Password?</a>
     </div>
+          <div class="d-flex justify-content-between align-items-center">
+            <button type="submit" name="login" class="btn btn-warning btn-lg enter" style="background-color: #1572e8; color: white; padding-left: 2.5rem; padding-right: 2.5rem;">Login</button>
+            <a href="create_account.php"  class="btn btn-warning btn-lg enter" style="background-color: #1572e8; color: white; padding-left: 2.5rem; padding-right: 2.5rem;">Sign Up</a>
+          </div>
+          
+        </form>
+      </div>
+    </div>
+  </div>
 </section>
+
 <!-- jQuery -->
 <script src="assets/js/jquery-3.2.1.min.js"></script>
 <!-- Bootstrap Core JS -->
@@ -250,25 +213,6 @@ if (isset($_POST['create_account'])) {
       x.type = "password";
     }
   }
-
-  <?php if ($lockout): ?>
-        // Countdown logic for lockout
-        var countdownTime = <?php echo $countdown; ?>;
-        var countdownElement = document.getElementById('countdown');
-        
-        // Update countdown every second
-        var countdownInterval = setInterval(function() {
-            var minutes = Math.floor(countdownTime / 60);
-            var seconds = countdownTime % 60;
-            countdownElement.innerHTML = minutes + ":" + (seconds < 10 ? "0" + seconds : seconds);
-
-            if (countdownTime <= 0) {
-                clearInterval(countdownInterval);
-                countdownElement.innerHTML = "00:00";
-            }
-            countdownTime--;
-        }, 1000);
-    <?php endif; ?>
 </script>
 
 <!-- SweetAlert -->
