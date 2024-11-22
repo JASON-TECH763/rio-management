@@ -190,9 +190,8 @@ header("Referrer-Policy: strict-origin-when-cross-origin");
 
 function startTimer(duration, button) {
     const timerDisplay = document.createElement('span');
-    timerDisplay.style.marginLeft = '10px';
+    timerDisplay.style.marginLeft = '5px';
     timerDisplay.style.color = 'red'; // Set color to red
-    timerDisplay.style.fontWeight = 'bold'; // Optional: Make it bold
     button.parentNode.appendChild(timerDisplay);
 
     let remaining = duration;
