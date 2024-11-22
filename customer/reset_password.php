@@ -125,6 +125,7 @@ if (isset($_POST['reset_password'])) {
         <p class="success"><?php echo $success; ?></p>
 
         <?php if (!$success): ?>
+            <form method="post">
             <div class="form-group">
     <label for="new_password">New Password:</label>
     <input type="password" name="new_password" id="new_password" class="form-control" 
