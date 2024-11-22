@@ -165,17 +165,29 @@ if (isset($_POST['submit'])) {
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 
     <script>
-        // SweetAlert Success Message
-        <?php if (isset($_SESSION['success'])) { ?>
-            Swal.fire({
-                icon: 'success',
-                title: 'Password reset link sent!',
-                text: 'Check your email to reset your password.',
-                confirmButtonText: 'OK'
-            });
-            <?php unset($_SESSION['success']); ?>
-        <?php } ?>
-    </script>
+    // SweetAlert Success Message
+    <?php if (isset($_SESSION['success'])) { ?>
+        Swal.fire({
+            icon: 'success',
+            title: 'Password reset link sent!',
+            text: 'Check your email to reset your password.',
+            confirmButtonText: 'OK'
+        });
+        <?php unset($_SESSION['success']); ?>
+    <?php } ?>
+
+    // SweetAlert Error Message
+    <?php if (isset($_SESSION['error'])) { ?>
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: '<?php echo $_SESSION['error']; ?>',
+            confirmButtonText: 'OK'
+        });
+        <?php unset($_SESSION['error']); ?>
+    <?php } ?>
+</script>
+
 
 </body>
 
