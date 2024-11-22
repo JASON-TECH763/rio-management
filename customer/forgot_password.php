@@ -44,21 +44,10 @@ if (isset($_POST['forgot_password'])) {
             $error = "Failed to send OTP. Please try again.";
         }
     } else {
-        // Trigger SweetAlert error message
-        echo "<script>
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Invalid Email or Unverified Account',
-                    text: 'The email you entered does not exist or is unverified.',
-                    confirmButtonText: 'Try Again'
-                }).then(() => {
-                    window.location.href = 'forgot_password.php'; // Redirect to the same page
-                });
-              </script>";
+        $error = "Invalid email or unverified account.";
     }
 }
 ?>
-
 <!DOCTYPE html> 
 <html lang="en">
 <head>
