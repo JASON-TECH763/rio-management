@@ -143,6 +143,7 @@ if (isset($_POST['reset_password'])) {
            required>
 </div>
 
+</form>
         <?php endif; ?>
     </div>
 
