@@ -162,7 +162,7 @@ if (isset($_GET['token'])) {
 
         <?php if (isset($user) && !$success): ?>
             <form method="post">
-                <div class="form-group">
+                <div class="form-group"><br>
                     <label for="new_password">New Password:</label>
                     <input type="password" name="new_password" id="new_password" class="form-control" required>
                     <span class="password-toggle" onclick="togglePasswordVisibility('new_password', 'toggleNewPassword')">
