@@ -1,73 +1,86 @@
 <?php 
 session_start();
 include('config/connect.php');
-$error = "";
 
 // Initialize session variables if not set
 if (!isset($_SESSION['attempts'])) {
-  $_SESSION['attempts'] = 0;
-  $_SESSION['last_failed_attempt'] = time();
+    $_SESSION['attempts'] = 0;
+    $_SESSION['last_failed_attempt'] = time();
 }
+
+// SweetAlert error variable
+$sweetalert_error = "";
 
 // Check if login button should be disabled
 if ($_SESSION['attempts'] >= 3 && (time() - $_SESSION['last_failed_attempt']) < 180) {
-  $error = 'You have reached the maximum login attempts. Please try again after 3 minutes.';
+    $sweetalert_error = 'You have reached the maximum login attempts. Please try again after 3 minutes.';
 } else {
-  if (isset($_POST['login'])) {
-      $user = $_REQUEST['uname'];
-      $pass = $_REQUEST['pass'];
+    if (isset($_POST['login'])) {
+        $user = $_REQUEST['uname'];
+        $pass = $_REQUEST['pass'];
 
-      // Sanitize input
-      $user = mysqli_real_escape_string($conn, $user);
+        // Sanitize input
+        $user = mysqli_real_escape_string($conn, $user);
 
-      if (!empty($user) && !empty($pass)) {
-          // Prepare statement for login
-          $query = "SELECT email, password, verified FROM customer WHERE email=?";
-          $stmt = mysqli_prepare($conn, $query);
-          mysqli_stmt_bind_param($stmt, "s", $user);
-          mysqli_stmt_execute($stmt);
-          $result = mysqli_stmt_get_result($stmt);
+        if (!empty($user) && !empty($pass)) {
+            // Prepare statement for login
+            $query = "SELECT email, password, verified FROM customer WHERE email=?";
+            $stmt = mysqli_prepare($conn, $query);
+            mysqli_stmt_bind_param($stmt, "s", $user);
+            mysqli_stmt_execute($stmt);
+            $result = mysqli_stmt_get_result($stmt);
 
-          $row = mysqli_fetch_array($result);
+            $row = mysqli_fetch_array($result);
 
-          if ($row) {
-              // Check if password is correct
-              if (password_verify($pass, $row['password'])) {
-                  // Reset attempts on successful login
-                  $_SESSION['attempts'] = 0;
-                  $_SESSION['last_failed_attempt'] = time(); // Reset failed attempt timer
+            if ($row) {
+                // Check if password is correct
+                if (password_verify($pass, $row['password'])) {
+                    // Reset attempts on successful login
+                    $_SESSION['attempts'] = 0;
+                    $_SESSION['last_failed_attempt'] = time();
 
-                  // Check if account is verified
-                  if ($row['verified'] == 1) {
-                      // Login successful, store email and verified status in session
-                      $_SESSION['email'] = $row['email'];
-                      $_SESSION['verified'] = $row['verified'];
-                      header("Location: order.php"); // Redirect to order page
-                      exit(); // Always call exit after a header redirect
-                  } else {
-                      $_SESSION['status'] = "error";
-                      $_SESSION['message'] = "Your account is not verified. Please use a verified email account.";
-                      header("Location: index.php");
-                      exit();
-                  }
-              } else {
-                  // Increment attempts on failed login
-                  $_SESSION['attempts']++;
-                  $_SESSION['last_failed_attempt'] = time();
-                  $error = '* Invalid Email or Password';
-              }
-          } else {
-              // Increment attempts on failed login
-              $_SESSION['attempts']++;
-              $_SESSION['last_failed_attempt'] = time();
-              $error = '* Invalid Email or Password';
-          }
-      } else {
-          $error = '* Please fill all the fields!';
-      }
-  }
+                    // Check if account is verified
+                    if ($row['verified'] == 1) {
+                        $_SESSION['email'] = $row['email'];
+                        $_SESSION['verified'] = $row['verified'];
+                        header("Location: order.php");
+                        exit();
+                    } else {
+                        $_SESSION['status'] = "error";
+                        $_SESSION['message'] = "Your account is not verified. Please use a verified email account.";
+                        header("Location: index.php");
+                        exit();
+                    }
+                } else {
+                    $_SESSION['attempts']++;
+                    $_SESSION['last_failed_attempt'] = time();
+                    $sweetalert_error = '* Invalid Email or Password';
+                }
+            } else {
+                $_SESSION['attempts']++;
+                $_SESSION['last_failed_attempt'] = time();
+                $sweetalert_error = '* Invalid Email or Password';
+            }
+        } else {
+            $sweetalert_error = '* Please fill all the fields!';
+        }
+    }
 }
 ?>
+
+<!-- Include SweetAlert -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+<?php if (!empty($sweetalert_error)): ?>
+    Swal.fire({
+        icon: 'error',
+        title: 'Login Failed',
+        text: '<?php echo $sweetalert_error; ?>',
+    });
+<?php endif; ?>
+</script>
+
 
 <!DOCTYPE html>
 <html lang="en">
