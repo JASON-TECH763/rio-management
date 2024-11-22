@@ -157,12 +157,31 @@ header("Referrer-Policy: strict-origin-when-cross-origin");
     })
     .then(response => response.json())
     .then(data => {
-        const loginButton = document.querySelector('button[name="login"]');
-        const recaptchaContainer = document.getElementById('recaptchaContainer');
+    const loginButton = document.querySelector('button[name="login"]');
+    const recaptchaContainer = document.getElementById('recaptchaContainer');
 
-        if (data.success) {
-            window.location.href = data.redirect;
-        } else {
+    // Reference to the username field
+    const usernameField = document.querySelector('.form-outline:first-child');
+
+    // Remove any existing error message
+    const existingError = document.getElementById('loginError');
+    if (existingError) {
+        existingError.remove();
+    }
+
+    if (data.success) {
+        window.location.href = data.redirect;
+    } else {
+        // Create and show error message above username field
+        const errorMessage = document.createElement('div');
+        errorMessage.id = 'loginError';
+        errorMessage.textContent = data.error || 'An error occurred. Please try again.';
+        errorMessage.style.color = 'red';
+        errorMessage.style.marginBottom = '10px';
+        errorMessage.style.fontWeight = 'bold';
+        usernameField.parentNode.insertBefore(errorMessage, usernameField);
+
+      } else {
             // Show SweetAlert for error messages
             Swal.fire({
                 icon: 'error',
