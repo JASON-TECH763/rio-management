@@ -129,7 +129,7 @@ if (isset($_POST['reset_password'])) {
             <div class="form-group">
     <label for="new_password">New Password:</label>
     <input type="password" name="new_password" id="new_password" class="form-control" 
-           placeholder="Enter your new password" minlength="8" 
+           placeholder="" minlength="8" 
            pattern="(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}" 
            title="Password must contain at least one uppercase letter, one number, and one special character" 
            required>
@@ -137,7 +137,7 @@ if (isset($_POST['reset_password'])) {
 <div class="form-group">
     <label for="confirm_password">Confirm Password:</label>
     <input type="password" name="confirm_password" id="confirm_password" class="form-control" 
-           placeholder="Confirm your new password" minlength="8" 
+           placeholder="" minlength="8" 
            pattern="(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}" 
            title="Password must contain at least one uppercase letter, one number, and one special character" 
            required>
