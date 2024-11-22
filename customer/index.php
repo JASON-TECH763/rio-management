@@ -162,7 +162,7 @@ if ($_SESSION['attempts'] >= 3 && (time() - $_SESSION['last_failed_attempt']) < 
                             <span class="h1 fw-bold mb-0" style="color: #FEA116;">Customer Login</span>
                         </div>
                     </div>
-                    <p style="color:red;"><?php echo $error; ?></p>
+                 
                     <div class="form-outline mb-4">
                         <label class="form-label" for="user">Email</label>
                         <input type="text" name="uname" id="user" class="form-control form-control-lg" placeholder="Enter email" />
