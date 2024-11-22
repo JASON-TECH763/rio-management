@@ -1,13 +1,13 @@
 <?php 
 session_start();
 include('config/connect.php');
+$error = "";
 
 // Initialize session variables if not set
 if (!isset($_SESSION['attempts'])) {
   $_SESSION['attempts'] = 0;
   $_SESSION['last_failed_attempt'] = time();
 }
-
 
 // Check if login button should be disabled
 if ($_SESSION['attempts'] >= 3 && (time() - $_SESSION['last_failed_attempt']) < 180) {
@@ -39,52 +39,31 @@ if ($_SESSION['attempts'] >= 3 && (time() - $_SESSION['last_failed_attempt']) < 
 
                   // Check if account is verified
                   if ($row['verified'] == 1) {
-                      // Login successful
+                      // Login successful, store email and verified status in session
                       $_SESSION['email'] = $row['email'];
                       $_SESSION['verified'] = $row['verified'];
-                      header("Location: order.php");
-                      exit();
+                      header("Location: order.php"); // Redirect to order page
+                      exit(); // Always call exit after a header redirect
                   } else {
-                      echo "<script>
-                        Swal.fire({
-                          icon: 'error',
-                          title: 'Account Not Verified',
-                          text: 'Your account is not verified. Please use a verified email account.'
-                        });
-                      </script>";
+                      $_SESSION['status'] = "error";
+                      $_SESSION['message'] = "Your account is not verified. Please use a verified email account.";
+                      header("Location: index.php");
+                      exit();
                   }
               } else {
                   // Increment attempts on failed login
                   $_SESSION['attempts']++;
                   $_SESSION['last_failed_attempt'] = time();
-                  echo "<script>
-                    Swal.fire({
-                      icon: 'error',
-                      title: 'Invalid Credentials',
-                      text: 'Invalid Email or Password.'
-                    });
-                  </script>";
+                  $error = '* Invalid Email or Password';
               }
           } else {
               // Increment attempts on failed login
               $_SESSION['attempts']++;
               $_SESSION['last_failed_attempt'] = time();
-              echo "<script>
-                Swal.fire({
-                  icon: 'error',
-                  title: 'Invalid Credentials',
-                  text: 'Invalid Email or Password.'
-                });
-              </script>";
+              $error = '* Invalid Email or Password';
           }
       } else {
-          echo "<script>
-            Swal.fire({
-              icon: 'warning',
-              title: 'Incomplete Fields',
-              text: 'Please fill all the fields!'
-            });
-          </script>";
+          $error = '* Please fill all the fields!';
       }
   }
 }
@@ -170,7 +149,7 @@ if ($_SESSION['attempts'] >= 3 && (time() - $_SESSION['last_failed_attempt']) < 
                             <span class="h1 fw-bold mb-0" style="color: #FEA116;">Customer Login</span>
                         </div>
                     </div>
-              
+                    <p style="color:red;"><?php echo $error; ?></p>
                     <div class="form-outline mb-4">
                         <label class="form-label" for="user">Email</label>
                         <input type="text" name="uname" id="user" class="form-control form-control-lg" placeholder="Enter email" />
