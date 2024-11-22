@@ -4,7 +4,7 @@ include("config/connect.php");
 
 // Ensure the user is logged in by checking the session
 if (!isset($_SESSION['email'])) {
-    header("Location: login.php");
+    header("Location: index.php");
     exit;
 }
 
@@ -55,29 +55,38 @@ if ($result_customer->num_rows === 1) {
 
     // Handle placing the order
     if (isset($_POST['place_order'])) {
-        // Debug: Log the customer ID before inserting
-        // echo "Placing order for customer ID: " . $customer_id; // Debug line
-
-        // Insert into orders table with customer_id
-        $sql_order = "INSERT INTO orders (order_date, status, customer_id) VALUES (NOW(), 'Pending', ?)";
-        $stmt_order = $conn->prepare($sql_order);
-        $stmt_order->bind_param('i', $customer_id); // Correct binding as integer
-
-        // Check if the order was placed successfully
-        if ($stmt_order->execute()) {
-            $order_id = $conn->insert_id;
-
-            // Insert into order_details table
-            foreach ($_SESSION['orders'] as $order) {
-                $sql_order_details = "INSERT INTO order_details (order_id, prod_id, prod_name, prod_price, quantity) VALUES (?, ?, ?, ?, ?)";
-                $stmt_order_details = $conn->prepare($sql_order_details);
-                $stmt_order_details->bind_param('issss', $order_id, $order['prod_id'], $order['prod_name'], $order['prod_price'], $order['quantity']);
-                
-                if (!$stmt_order_details->execute()) {
-                    // Log any errors in order details insertion
-                    // echo "Error: " . $stmt_order_details->error; // Debug line
+        // Check if there are any items in the order
+        if (empty($_SESSION['orders'])) {
+            echo '<script>window.onload = function() { Swal.fire({ title: "Error!", text: "Please add products to your order before placing it.", icon: "error" }); };</script>';
+        } else {
+            // Proceed with placing the order if there are items in the order
+            $sql_order = "INSERT INTO orders (order_date, status, customer_id) VALUES (NOW(), 'Pending', ?)";
+            $stmt_order = $conn->prepare($sql_order);
+            $stmt_order->bind_param('i', $customer_id); // Correct binding as integer
+    
+            if ($stmt_order->execute()) {
+                $order_id = $conn->insert_id;
+    
+                foreach ($_SESSION['orders'] as $order) {
+                    $sql_order_details = "INSERT INTO order_details (order_id, prod_id, prod_name, prod_price, quantity) VALUES (?, ?, ?, ?, ?)";
+                    $stmt_order_details = $conn->prepare($sql_order_details);
+                    
+                    // Ensure correct binding for order details
+                    $stmt_order_details->bind_param(
+                        'issss',
+                        $order_id,
+                        $order['prod_id'],
+                        $order['prod_name'],
+                        $order['prod_price'],
+                        $order['quantity']
+                    );
+    
+                    if (!$stmt_order_details->execute()) {
+                        // Log any errors in order details insertion
+                        // echo "Error: " . $stmt_order_details->error; // Debug line
+                    }
                 }
-            }
+    
 
             // Clear the session orders
             unset($_SESSION['orders']);
@@ -85,14 +94,14 @@ if ($result_customer->num_rows === 1) {
             // Redirect to order summary with order_id
             header("Location: order_summary.php?order_id=" . $order_id);
             exit;
-        } else {
+        }  else {
             // Log the error if order placement fails
             echo '<script>window.onload = function() { Swal.fire({ title: "Error!", text: "Failed to place the order. ' . $stmt_order->error . '", icon: "error" }); };</script>';
         }
+        
+       
     }
-} else {
-    // Log an error if customer ID cannot be fetched
-    echo '<script>window.onload = function() { Swal.fire({ title: "Error!", text: "Customer not found.", icon: "error" }); };</script>';
+  } 
 }
 ?>
 
@@ -143,7 +152,7 @@ if ($result_customer->num_rows === 1) {
                             <div class="d-flex align-items-center">
                                 
                                <form method="post" action="">
-                                <button type="submit" name="place_order" class="btn btn-primary"> <i class="fas fa-cart-plus" ></i> Place Order</button>
+                                <button type="submit" name="place_order" class="btn btn-primary"> <i class="fas fa-cart-plus" ></i> Reserve Order</button>
 
                             </form>
                             </div>
