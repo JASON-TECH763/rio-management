@@ -125,20 +125,23 @@ if (isset($_POST['reset_password'])) {
         <p class="success"><?php echo $success; ?></p>
 
         <?php if (!$success): ?>
-            <form method="post">
-                <div class="form-group">
-                    <label for="new_password">New Password:</label>
-                    <input type="password" name="new_password" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label for="confirm_password">Confirm Password:</label>
-                    <input type="password" name="confirm_password" class="form-control" required>
-                </div>
-                <!-- CSRF Token -->
-                <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
-                
-                <button type="submit" name="reset_password" class="btn btn-primary">Reset Password</button>
-            </form>
+            <div class="form-group">
+    <label for="new_password">New Password:</label>
+    <input type="password" name="new_password" id="new_password" class="form-control" 
+           placeholder="Enter your new password" minlength="8" 
+           pattern="(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}" 
+           title="Password must contain at least one uppercase letter, one number, and one special character" 
+           required>
+</div>
+<div class="form-group">
+    <label for="confirm_password">Confirm Password:</label>
+    <input type="password" name="confirm_password" id="confirm_password" class="form-control" 
+           placeholder="Confirm your new password" minlength="8" 
+           pattern="(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}" 
+           title="Password must contain at least one uppercase letter, one number, and one special character" 
+           required>
+</div>
+
         <?php endif; ?>
     </div>
 

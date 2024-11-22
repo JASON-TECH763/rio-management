@@ -155,10 +155,16 @@ if ($_SESSION['attempts'] >= 3 && (time() - $_SESSION['last_failed_attempt']) < 
                         <input type="text" name="uname" id="user" class="form-control form-control-lg" placeholder="Enter email" />
                     </div>
                     <div class="form-outline mb-3">
-                        <label class="form-label" for="pass">Password</label>
-                        <input type="password" name="pass" id="psw" class="form-control form-control-lg" placeholder="Enter password" />
-                        <input class="p-2" type="checkbox" onclick="myFunction()" style="margin-left: 10px; margin-top: 13px;"> <span style="margin-left: 5px;">Show password</span>
-                    </div>
+    <label class="form-label" for="pass">Password</label>
+    <input type="password" name="pass" id="psw" class="form-control form-control-lg" placeholder="Enter password"
+           minlength="8" 
+           pattern="(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}" 
+           title="Password must contain at least one uppercase letter, one number, and one special character" 
+           required />
+    <input class="p-2" type="checkbox" onclick="myFunction()" style="margin-left: 10px; margin-top: 13px;"> 
+    <span style="margin-left: 5px;">Show password</span>
+                  </div>
+
                       <!-- Forgot Password Link -->
           <div class="d-flex justify-content-between align-items-center mb-4">
               <a href="forgot_password.php" style="color: #FEA116;">Forgot Password?</a>
