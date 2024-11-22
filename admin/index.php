@@ -191,6 +191,8 @@ header("Referrer-Policy: strict-origin-when-cross-origin");
 function startTimer(duration, button) {
     const timerDisplay = document.createElement('span');
     timerDisplay.style.marginLeft = '10px';
+    timerDisplay.style.color = 'red'; // Set color to red
+    timerDisplay.style.fontWeight = 'bold'; // Optional: Make it bold
     button.parentNode.appendChild(timerDisplay);
 
     let remaining = duration;
@@ -201,10 +203,13 @@ function startTimer(duration, button) {
             timerDisplay.remove();
         } else {
             remaining--;
-            timerDisplay.textContent = ` (Try again in ${Math.ceil(remaining / 60)}m ${remaining % 60}s)`;
+            const minutes = Math.floor(remaining / 60);
+            const seconds = remaining % 60 < 10 ? `0${remaining % 60}` : remaining % 60;
+            timerDisplay.textContent = ` (Try again in ${minutes}:${seconds} mins)`;
         }
     }, 1000);
 }
+
 </script>
 
 </body>
