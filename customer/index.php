@@ -68,19 +68,6 @@ if ($_SESSION['attempts'] >= 3 && (time() - $_SESSION['last_failed_attempt']) < 
 }
 ?>
 
-<!-- Include SweetAlert -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-<script>
-<?php if (!empty($sweetalert_error)): ?>
-    Swal.fire({
-        icon: 'error',
-        title: 'Login Failed',
-        text: '<?php echo $sweetalert_error; ?>',
-    });
-<?php endif; ?>
-</script>
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -186,7 +173,20 @@ if ($_SESSION['attempts'] >= 3 && (time() - $_SESSION['last_failed_attempt']) < 
             </div>
         </div>
     </div>
+
 </section>
+<!-- Include SweetAlert -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+<?php if (!empty($sweetalert_error)): ?>
+    Swal.fire({
+        icon: 'error',
+        title: 'Login Failed',
+        text: '<?php echo $sweetalert_error; ?>',
+    });
+<?php endif; ?>
+</script>
 
 <!-- jQuery -->
 <script src="assets/js/jquery-3.2.1.min.js"></script>
