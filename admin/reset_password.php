@@ -69,6 +69,9 @@ if (isset($_GET['token'])) {
 
     <!-- SweetAlert CSS and JS -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <!-- Font Awesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
 
     <!-- CSS Styles -->
     <style>
@@ -93,12 +96,13 @@ if (isset($_GET['token'])) {
         }
 
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
+            position: relative;
         }
 
         .form-control {
             width: 100%;
-            padding: 10px;
+            padding: 12px 40px 12px 10px;  /* Extra space on the right for the icon */
             font-size: 16px;
             border-radius: 5px;
             border: 1px solid #ced4da;
@@ -108,6 +112,15 @@ if (isset($_GET['token'])) {
         .form-control:focus {
             border-color: #80bdff;
             outline: none;
+        }
+
+        .password-toggle {
+            cursor: pointer;
+            position: absolute;
+            right: 15px;  /* Space for the icon */
+            top: 68%;
+            transform: translateY(-50%);
+            font-size: 20px;  /* Adjust size of the icon */
         }
 
         .btn {
@@ -139,7 +152,11 @@ if (isset($_GET['token'])) {
 </head>
 <body>
     <div class="container">
-        <h2>Reset Password</h2>
+        <div style="position: relative; text-align: center;">
+            <img src="assets/img/a.jpg" alt="navbar brand" class="navbar-brand" height="70" style="position: absolute; left: 0; top: 50%; transform: translateY(-50%);">
+            <h2>Reset Password</h2>
+        </div>
+
         <p class="error"><?php echo $error; ?></p>
         <p class="success"><?php echo $success; ?></p>
 
@@ -147,19 +164,41 @@ if (isset($_GET['token'])) {
             <form method="post">
                 <div class="form-group">
                     <label for="new_password">New Password:</label>
-                    <input type="password" name="new_password" class="form-control" required>
+                    <input type="password" name="new_password" id="new_password" class="form-control" required>
+                    <span class="password-toggle" onclick="togglePasswordVisibility('new_password', 'toggleNewPassword')">
+                        <i class="fas fa-eye-slash" id="toggleNewPassword"></i>
+                    </span>
                 </div>
                 <div class="form-group">
                     <label for="confirm_password">Confirm Password:</label>
-                    <input type="password" name="confirm_password" class="form-control" required>
+                    <input type="password" name="confirm_password" id="confirm_password" class="form-control" required>
+                    <span class="password-toggle" onclick="togglePasswordVisibility('confirm_password', 'toggleConfirmPassword')">
+                        <i class="fas fa-eye-slash" id="toggleConfirmPassword"></i>
+                    </span>
                 </div>
                 <!-- CSRF Token -->
                 <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
-                
                 <button type="submit" name="reset" class="btn btn-primary">Reset Password</button>
             </form>
         <?php endif; ?>
     </div>
+
+    <script>
+        function togglePasswordVisibility(inputId, iconId) {
+            const passwordInput = document.getElementById(inputId);
+            const toggleIcon = document.getElementById(iconId);
+
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+                toggleIcon.classList.remove("fa-eye-slash");
+                toggleIcon.classList.add("fa-eye");
+            } else {
+                passwordInput.type = "password";
+                toggleIcon.classList.remove("fa-eye");
+                toggleIcon.classList.add("fa-eye-slash");
+            }
+        }
+    </script>
 
     <script>
         // SweetAlert Success Message
@@ -186,6 +225,5 @@ if (isset($_GET['token'])) {
             });
         <?php } ?>
     </script>
-
 </body>
 </html>
