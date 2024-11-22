@@ -135,6 +135,7 @@ if (isset($_POST['submit'])) {
     <form method="post">
         <div class="form-group">             
             <label for="email">Enter your registered email:</label>
+            <br><br>
             <input type="email" name="email" class="form-control" required>
         </div>
         <button type="submit" name="submit" class="btn btn-primary">Send Reset Link</button>
