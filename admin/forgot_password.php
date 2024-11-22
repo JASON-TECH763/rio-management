@@ -9,9 +9,6 @@ require 'phpmailer/vendor/autoload.php'; // Include PHPMailer
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-$error = "";
-$success = "";
-
 if (isset($_POST['submit'])) {
     $email = mysqli_real_escape_string($conn, $_POST['email']);
 
@@ -22,46 +19,45 @@ if (isset($_POST['submit'])) {
 
         // Set token expiration (1 hour)
         $update_query = "UPDATE admin SET reset_token='$token', token_expire=DATE_ADD(NOW(), INTERVAL 1 HOUR) WHERE email='$email'";
-        mysqli_query($conn, $update_query);
+        if (mysqli_query($conn, $update_query)) {
+            // Initialize PHPMailer and configure settings
+            $mail = new PHPMailer(true);
+            try {
+                // SMTP Server configuration
+                $mail->isSMTP();
+                $mail->Host       = 'smtp.gmail.com';           // Set the SMTP server
+                $mail->SMTPAuth   = true;
+                $mail->Username   = 'riomanagement123@gmail.com';  // Your SMTP username
+                $mail->Password   = 'vilenbrazfimbkbl';         // Your SMTP password
+                $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS; // Enable SSL encryption
+                $mail->Port       = 465;                        // TCP port
 
-        // Initialize PHPMailer and configure settings
-        $mail = new PHPMailer(true);
-        try {
-            // SMTP Server configuration
-            $mail->isSMTP();
-            $mail->Host       = 'smtp.gmail.com';           // Set the SMTP server
-            $mail->SMTPAuth   = true;
-            $mail->Username   = 'riomanagement123@gmail.com';  // Your SMTP username
-            $mail->Password   = 'vilenbrazfimbkbl';         // Your SMTP password
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS; // Enable SSL encryption
-            $mail->Port       = 465;                        // TCP port
+                // Sender and recipient settings
+                $mail->setFrom('riomanagement123@gmail.com', 'Rio Management System');
+                $mail->addAddress($email, 'Admin'); // Add recipient email
 
-            // Sender and recipient settings
-            $mail->setFrom('riomanagement123@gmail.com', 'Rio Management System');
-            $mail->addAddress($email, 'Admin'); // Add recipient email
+                // Email content
+                $mail->isHTML(true);
+                $mail->Subject = 'Password Reset Request';
+                $mail->Body    = "
+                    <p>Hi Admin,</p>
+                    <p>You have requested to reset your password. Click the link below to reset your password:</p>
+                    <a href='http://rio-lawis.com/admin/reset_password.php?token=$token'>Reset Password</a>
+                    <p>This link will expire in 1 hour.</p>
+                ";
 
-            // Email content
-            $mail->isHTML(true);
-            $mail->Subject = 'Password Reset Request';
-            $mail->Body    = "
-                <p>Hi Admin,</p>
-                <p>You have requested to reset your password. Click the link below to reset your password:</p>
-                <a href='http://rio-lawis.com/admin/reset_password.php?token=$token'>Reset Password</a>
-                <p>This link will expire in 1 hour.</p>
-            ";
-
-            // Send the email
-            if ($mail->send()) {
-                $_SESSION['success'] = true;
-            } else {
-                $_SESSION['error'] = "Failed to send the email. Please try again.";
+                // Send the email
+                $mail->send();
+                $_SESSION['success'] = 'Password reset link sent! Check your email to reset your password.';
+            } catch (Exception $e) {
+                $_SESSION['error'] = 'Mailer Error: ' . $mail->ErrorInfo;
             }
-        } catch (Exception $e) {
-            $_SESSION['error'] = "Mailer Error: " . $mail->ErrorInfo;
+        } else {
+            $_SESSION['error'] = 'Failed to update the reset token in the database.';
         }
     } else {
         // If email is not riomanagement123@gmail.com
-        $_SESSION['error'] = "* Invalid email. Only the admin can reset the password.";
+        $_SESSION['error'] = 'Invalid email. Only the admin can reset the password.';
     }
 
     // Redirect to avoid form resubmission
@@ -101,7 +97,7 @@ if (isset($_POST['submit'])) {
             margin-bottom: 20px;
         }
 
-        .form-group, .form-floating {
+        .form-group {
             margin-bottom: 15px;
         }
 
@@ -112,11 +108,6 @@ if (isset($_POST['submit'])) {
             border-radius: 5px;
             border: 1px solid #ced4da;
             box-sizing: border-box;
-        }
-
-        .form-control:focus {
-            border-color: #80bdff;
-            outline: none;
         }
 
         .btn {
@@ -132,51 +123,45 @@ if (isset($_POST['submit'])) {
             background-color: #007bff;
             color: white;
         }
-
-        .btn-primary:hover {
-            background-color: #0056b3;
-        }
-
-        .error {
-            color: red;
-        }
     </style>
 </head>
 <body>
 
-    <!-- Back Button with Left Arrow Icon -->
-    <div class="container">
-        <a href="index.php" class="btn btn-light back-button" style="background-color: #1572e8; color: white;">
-            <i class="fas fa-arrow-left"></i>Back
-        </a>
-        
-        <h2>Forgot Password ?</h2>
-        <p class="error"><?php echo isset($_SESSION['error']) ? $_SESSION['error'] : ''; unset($_SESSION['error']); ?></p>
-        <form method="post">
-            <div class="form-group">             
-                <label for="email">Enter your registered email:</label><br><br>
-                <input type="email" name="email" class="form-control" required>
-            </div>
-            <button type="submit" name="submit" class="btn btn-primary">Send Reset Link</button>
-        </form>
-    </div>
+<div class="container">
+    <a href="index.php" class="btn btn-light back-button" style="background-color: #1572e8; color: white;">
+        <i class="fas fa-arrow-left"></i> Back
+    </a>
+    <h2>Forgot Password ?</h2>
+    <form method="post">
+        <div class="form-group">             
+            <label for="email">Enter your registered email:</label><br><br>
+            <input type="email" name="email" class="form-control" required>
+        </div>
+        <button type="submit" name="submit" class="btn btn-primary">Send Reset Link</button>
+    </form>
+</div>
 
-    <!-- Font Awesome Script for Icons -->
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+<script>
+    <?php if (isset($_SESSION['success'])) { ?>
+        Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: '<?php echo $_SESSION['success']; ?>',
+            confirmButtonText: 'OK'
+        });
+        <?php unset($_SESSION['success']); ?>
+    <?php } ?>
 
-    <script>
-        // SweetAlert Success Message
-        <?php if (isset($_SESSION['success'])) { ?>
-            Swal.fire({
-                icon: 'success',
-                title: 'Password reset link sent!',
-                text: 'Check your email to reset your password.',
-                confirmButtonText: 'OK'
-            });
-            <?php unset($_SESSION['success']); ?>
-        <?php } ?>
-    </script>
+    <?php if (isset($_SESSION['error'])) { ?>
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: '<?php echo $_SESSION['error']; ?>',
+            confirmButtonText: 'OK'
+        });
+        <?php unset($_SESSION['error']); ?>
+    <?php } ?>
+</script>
 
 </body>
-
 </html>
