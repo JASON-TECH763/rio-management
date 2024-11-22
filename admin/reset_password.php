@@ -162,24 +162,35 @@ if (isset($_GET['token'])) {
 
         <?php if (isset($user) && !$success): ?>
             <form method="post">
-                <div class="form-group"><br>
-                    <label for="new_password">New Password:</label>
-                    <input type="password" name="new_password" id="new_password" class="form-control" required>
-                    <span class="password-toggle" onclick="togglePasswordVisibility('new_password', 'toggleNewPassword')">
-                        <i class="fas fa-eye-slash" id="toggleNewPassword"></i>
-                    </span>
-                </div>
-                <div class="form-group">
-                    <label for="confirm_password">Confirm Password:</label>
-                    <input type="password" name="confirm_password" id="confirm_password" class="form-control" required>
-                    <span class="password-toggle" onclick="togglePasswordVisibility('confirm_password', 'toggleConfirmPassword')">
-                        <i class="fas fa-eye-slash" id="toggleConfirmPassword"></i>
-                    </span>
-                </div>
-                <!-- CSRF Token -->
-                <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
-                <button type="submit" name="reset" class="btn btn-primary">Reset Password</button>
-            </form>
+    <div class="form-group"><br>
+        <label for="new_password">New Password:</label>
+        <input type="password" name="new_password" id="new_password" class="form-control" 
+               placeholder="Enter your password" 
+               minlength="8" 
+               pattern="(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}" 
+               title="Password must contain at least one uppercase letter, one number, and one special character" 
+               required>
+        <span class="password-toggle" onclick="togglePasswordVisibility('new_password', 'toggleNewPassword')">
+            <i class="fas fa-eye-slash" id="toggleNewPassword"></i>
+        </span>
+    </div>
+    <div class="form-group">
+        <label for="confirm_password">Confirm Password:</label>
+        <input type="password" name="confirm_password" id="confirm_password" class="form-control" 
+               placeholder="Confirm your password" 
+               minlength="8" 
+               pattern="(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}" 
+               title="Password must contain at least one uppercase letter, one number, and one special character" 
+               required>
+        <span class="password-toggle" onclick="togglePasswordVisibility('confirm_password', 'toggleConfirmPassword')">
+            <i class="fas fa-eye-slash" id="toggleConfirmPassword"></i>
+        </span>
+    </div>
+    <!-- CSRF Token -->
+    <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+    <button type="submit" name="reset" class="btn btn-primary">Reset Password</button>
+</form>
+
         <?php endif; ?>
     </div>
 
