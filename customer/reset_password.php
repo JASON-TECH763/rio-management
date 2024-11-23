@@ -50,131 +50,144 @@ if (isset($_POST['reset_password'])) {
 
     <!-- SweetAlert CSS and JS -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Font Awesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
 
     <!-- CSS Styles -->
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f8f9fa;
-            padding: 20px;
-        }
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f8f9fa;
+        padding: 20px;
+    }
 
-        .container {
-            max-width: 600px;
-            margin: auto;
-            background: #fff;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
-        }
+    .container {
+        max-width: 400px;
+        margin: auto;
+        background: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
 
-        h2 {
-            text-align: center;
-            margin-bottom: 20px;
-        }
+    .form-group {
+        margin-bottom: 20px;
+        position: relative;
+    }
 
-        .form-group {
-            margin-bottom: 15px;
-        }
+    .form-control {
+        width: 100%;
+        padding: 12px 40px 12px 10px; /* Extra space on the right for the icon */
+        font-size: 16px;
+        border: 1px solid #ced4da;
+        border-radius: 5px;
+        box-sizing: border-box; /* Ensures padding and border are within the width */
+    }
 
-        .form-control {
-            width: 100%;
-            padding: 10px;
-            font-size: 16px;
-            border-radius: 5px;
-            border: 1px solid #ced4da;
-            box-sizing: border-box;
-        }
+    .password-toggle {
+        cursor: pointer;
+        position: absolute;
+        right: 15px; /* Space for the icon */
+        top: 65%;
+        transform: translateY(-50%);
+        font-size: 20px; /* Adjust size of the icon */
+    }
 
-        .form-control:focus {
-            border-color: #80bdff;
-            outline: none;
-        }
+    .btn {
+        padding: 10px;
+        width: 100%;
+        font-size: 16px;
+        border: none;
+        border-radius: 5px;
+        background-color: #007bff;
+        color: white;
+        cursor: pointer;
+    }
 
-        .btn {
-            padding: 10px;
-            width: 100%;
-            font-size: 16px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
+    .btn:hover {
+        background-color: #0056b3;
+    }
 
-        .btn-primary {
-            background-color: #007bff;
-            color: white;
-        }
+    .error {
+        color: red;
+    }
 
-        .btn-primary:hover {
-            background-color: #0056b3;
-        }
+    .success {
+        color: green;
+    }
+</style>
 
-        .error {
-            color: red;
-        }
-
-        .success {
-            color: green;
-        }
-    </style>
 </head>
 <body>
-    <div class="container">
-        <h2>Reset Password</h2>
-        <p class="error"><?php echo $error; ?></p>
-        <p class="success"><?php echo $success; ?></p>
+<div class="container">
+    <h2>Reset Password</h2>
 
-        <?php if (!$success): ?>
-            <form method="post">
+    <p class="error"><?php echo $error; ?></p>
+    <p class="success"><?php echo $success; ?></p>
+
+    <?php if (!$success): ?>
+        <form method="post">
             <div class="form-group">
-    <label for="new_password">New Password:</label>
-    <input type="password" name="new_password" id="new_password" class="form-control" 
-           placeholder="" minlength="8" 
-           pattern="(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}" 
-           title="Password must contain at least one uppercase letter, one number, and one special character" 
-           required>
+                <label for="new_password">New Password:</label>
+                <input type="password" name="new_password" id="new_password" class="form-control" 
+                       placeholder="" minlength="8" required>
+                <span class="password-toggle" onclick="togglePasswordVisibility('new_password', 'toggleNewPassword')">
+                    <i class="fas fa-eye-slash" id="toggleNewPassword"></i>
+                </span>
+            </div>
+            <div class="form-group">
+                <label for="confirm_password">Confirm Password:</label>
+                <input type="password" name="confirm_password" id="confirm_password" class="form-control" 
+                       placeholder="" minlength="8" required>
+                <span class="password-toggle" onclick="togglePasswordVisibility('confirm_password', 'toggleConfirmPassword')">
+                    <i class="fas fa-eye-slash" id="toggleConfirmPassword"></i>
+                </span>
+            </div>
+            <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+            <button type="submit" name="reset_password" class="btn">Reset Password</button>
+        </form>
+    <?php endif; ?>
 </div>
-<div class="form-group">
-    <label for="confirm_password">Confirm Password:</label>
-    <input type="password" name="confirm_password" id="confirm_password" class="form-control" 
-           placeholder="" minlength="8" 
-           pattern="(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}" 
-           title="Password must contain at least one uppercase letter, one number, and one special character" 
-           required>
-</div>
 
-                <!-- CSRF Token -->
-                <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
-                
-                <button type="submit" name="reset_password" class="btn btn-primary">Reset Password</button>
-            </form>
-        <?php endif; ?>
-    </div>
+<script>
+    function togglePasswordVisibility(inputId, iconId) {
+        const passwordInput = document.getElementById(inputId);
+        const toggleIcon = document.getElementById(iconId);
 
-    <script>
-        // SweetAlert Success Message
-        <?php if (!empty($success)) { ?>
-            Swal.fire({
-                icon: 'success',
-                title: 'Success',
-                text: '<?php echo $success; ?>',
-                confirmButtonText: 'OK'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location = 'index.php';
-                }
-            });
-        <?php } ?>
+        if (passwordInput.type === "password") {
+            passwordInput.type = "text";
+            toggleIcon.classList.remove("fa-eye-slash");
+            toggleIcon.classList.add("fa-eye");
+        } else {
+            passwordInput.type = "password";
+            toggleIcon.classList.remove("fa-eye");
+            toggleIcon.classList.add("fa-eye-slash");
+        }
+    }
+</script>
 
-        // SweetAlert Error Message
-        <?php if (!empty($error)) { ?>
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: '<?php echo $error; ?>',
-                confirmButtonText: 'OK'
-            });
-        <?php } ?>
-    </script>
+<script>
+    // SweetAlert Success Message
+    <?php if (!empty($success)) { ?>
+    Swal.fire({
+        icon: 'success',
+        title: 'Success',
+        text: '<?php echo $success; ?>',
+        confirmButtonText: 'OK'
+    }).then(() => {
+        window.location = 'index.php';
+    });
+    <?php } ?>
+
+    // SweetAlert Error Message
+    <?php if (!empty($error)) { ?>
+    Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: '<?php echo $error; ?>',
+        confirmButtonText: 'OK'
+    });
+    <?php } ?>
+</script>
 </body>
 </html>
