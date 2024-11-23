@@ -122,7 +122,7 @@ if (isset($_POST['reset_password'])) {
 <div class="container">
     <h2>Reset Password</h2>
 
-    <p class="error"><?php echo $error; ?></p>
+    
     <p class="success"><?php echo $success; ?></p>
 
     <?php if (!$success): ?>
