@@ -66,16 +66,16 @@
        <ul class="dropdown-menu dropdown-user animated fadeIn" id="loginDropdown">
          <div class="dropdown-user-scroll scrollbar-outer">
            <div class="dropdown-divider"></div>
+           <a class="dropdown-item" href="admin">
+             <i class="fas fa-user-shield"></i> Admin
+           </a>
+           <div class="dropdown-divider"></div>
            <a class="dropdown-item" href="staff">
              <i class="fas fa-user-tie"></i> Staff
-           </a>
+           </a> 
            <div class="dropdown-divider"></div>
            <a class="dropdown-item" href="customer">
              <i class="fas fa-users"></i> Customer
-           </a>
-           <div class="dropdown-divider"></div>
-           <a class="dropdown-item" href="admin">
-             <i class="fas fa-user-shield"></i> Admin
            </a>
          </div>
        </ul>

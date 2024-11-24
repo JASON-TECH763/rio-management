@@ -110,6 +110,15 @@ if (isset($_POST['login']) && $_SESSION['attempt_count'] < 3) {
      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
 <style type="text/css">
+   /* Apply the fullscreen background color */
+   body {
+        background-color: #2a2f5b;
+        color: white;
+        margin: 0; /* Remove default margin */
+        padding: 0; /* Remove default padding */
+        height: 100%; /* Ensure the body covers the full screen */
+    }
+
     .divider:after,
     .divider:before {
         content: "";
