@@ -137,20 +137,22 @@ if ($result_customer->num_rows === 1) {
     <div class="main-panel">
         <?php include("include/header.php"); ?>
         <div class="container">
-            <div class="page-inner">
-                <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row pt-2 pb-4">
-                    <div>
-                        <h3 class="fw-bold mb-3">Order List</h3>
-                        <h6 class="op-7 mb-2">Information</h6>
-                    </div>
-                    <div class="text-right">
-        <label for="reserve_date" class="fw-bold">Reserve Date:</label>
-        <input type="date" id="reserve_date" name="reserve_date" class="form-control mb-2" style="max-width: 200px;" />
-        
-        <label for="reserve_time" class="fw-bold">Reserve Time:</label>
-        <input type="time" id="reserve_time" name="reserve_time" class="form-control" style="max-width: 200px;" />
-          </div>
-           </div>
+        <div class="page-inner">
+    <div class="d-flex align-items-center justify-content-between pt-2 pb-4">
+        <!-- Order List Section -->
+        <h3 class="fw-bold mb-0 me-4">Order List</h3>
+        <h6 class="op-7 mb-2">Information</h6>
+        <!-- Reserve Date and Time Section -->
+        <div class="d-flex align-items-center">
+            <label for="reserve_date" class="fw-bold me-2">Reserve Date:</label>
+            <input type="date" id="reserve_date" name="reserve_date" class="form-control me-4" style="max-width: 200px;" />
+            
+            <label for="reserve_time" class="fw-bold me-2">Reserve Time:</label>
+            <input type="time" id="reserve_time" name="reserve_time" class="form-control" style="max-width: 200px;" />
+        </div>
+    </div>
+</div>
+
             <div class="row">
                 <div class="col-md-12">
                     <div class="card">
