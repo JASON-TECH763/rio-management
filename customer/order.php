@@ -139,9 +139,11 @@ if ($result_customer->num_rows === 1) {
         <div class="container">
         <div class="page-inner">
     <div class="d-flex align-items-center justify-content-between pt-2 pb-4">
-        <!-- Order List Section -->
-        <h3 class="fw-bold mb-0 me-4">Order List</h3>
-        <h6 class="op-7 mb-2">Information</h6>
+        <!-- Order List and Information Section -->
+        <div>
+            <h3 class="fw-bold mb-1">Order List</h3>
+            <h6 class="op-7">Information</h6>
+        </div>
         <!-- Reserve Date and Time Section -->
         <div class="d-flex align-items-center">
             <label for="reserve_date" class="fw-bold me-2">Reserve Date:</label>
