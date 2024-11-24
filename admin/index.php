@@ -32,7 +32,24 @@ header("Referrer-Policy: strict-origin-when-cross-origin");
     <!-- reCAPTCHA Script -->
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 
-<style type="text/css">
+    <style type="text/css">
+    /* Apply the fullscreen background color */
+    body {
+        background-color: #2a2f5b;
+        color: white;
+        margin: 0; /* Remove default margin */
+        padding: 0; /* Remove default padding */
+        height: 100%; /* Ensure the body covers the full screen */
+    }
+
+    html {
+        height: 100%; /* Ensure the html element covers the full screen */
+    }
+
+    .vh-100 {
+        height: 100vh; /* Full viewport height */
+    }
+
     .divider:after,
     .divider:before {
         content: "";
@@ -40,14 +57,17 @@ header("Referrer-Policy: strict-origin-when-cross-origin");
         height: 1px;
         background: #eee;
     }
+
     .h-custom {
         height: calc(100% - 73px);
     }
+
     @media (max-width: 450px) {
         .h-custom {
             height: 100%;
         }
     }
+
     .back-button {
         position: absolute;
         top: 20px;
@@ -60,6 +80,7 @@ header("Referrer-Policy: strict-origin-when-cross-origin");
         align-items: center;
         text-decoration: none;
     }
+
     .back-button i {
         font-size: 1rem;
         margin-right: 5px;
@@ -70,17 +91,20 @@ header("Referrer-Policy: strict-origin-when-cross-origin");
         .back-button {
             top: 10px;
             left: 10px;
-            padding: 6px 10px; /* Slightly smaller padding */
+            padding: 6px 10px;
         }
+
         .back-button i {
-            font-size: 0.9rem; /* Slightly smaller icon size */
+            font-size: 0.9rem;
         }
     }
+
     .recaptcha-container {
         display: none;
         margin-bottom: 15px;
     }
 </style>
+
 </head>
 
 <body>
