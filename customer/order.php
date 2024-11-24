@@ -137,6 +137,7 @@ if ($result_customer->num_rows === 1) {
     <div class="main-panel">
         <?php include("include/header.php"); ?>
         <div class="container">
+  
         <div class="page-inner">
     <div class="d-flex align-items-center justify-content-between pt-2 pb-4">
         <!-- Order List and Information Section -->
@@ -148,12 +149,26 @@ if ($result_customer->num_rows === 1) {
         <div class="d-flex align-items-center">
             <label for="reserve_date" class="fw-bold me-2">Reserve Date:</label>
             <input type="date" id="reserve_date" name="reserve_date" class="form-control me-4" style="max-width: 200px;" />
-            
+
             <label for="reserve_time" class="fw-bold me-2">Reserve Time:</label>
             <input type="time" id="reserve_time" name="reserve_time" class="form-control" style="max-width: 200px;" />
         </div>
     </div>
 </div>
+
+<script>
+    // Set today's date in YYYY-MM-DD format
+    const today = new Date().toISOString().split('T')[0];
+
+    // Get the reserve_date input field
+    const reserveDate = document.getElementById('reserve_date');
+
+    // Set the min attribute to disable past dates
+    reserveDate.setAttribute('min', today);
+
+    // Set the default value to today's date
+    reserveDate.value = today;
+</script>
 
             <div class="row">
                 <div class="col-md-12">
