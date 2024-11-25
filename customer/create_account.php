@@ -22,10 +22,20 @@ if (isset($_POST['create_account'])) {
     $password = mysqli_real_escape_string($conn, $password);
     $phone = mysqli_real_escape_string($conn, $phone);
 
+    // Validate name format
+    if (!preg_match("/^([A-Z][a-zÀ-ž'-]+\s?)+$/", $name)) {
+        $error = "Invalid name format. Please use proper capitalization.";
+    }
+    
+    // Validate terms agreement
+    if (!isset($_POST['terms_agreement'])) {
+        $error = "You must agree to the Terms and Conditions.";
+    }
+
     // Hash the password (recommended for security)
     $hashed_password = password_hash($password, PASSWORD_BCRYPT);
 
-    if (!empty($name) && !empty($email) && !empty($password) && !empty($phone)) {
+    if (empty($error) && !empty($name) && !empty($email) && !empty($password) && !empty($phone)) {
         // Check if the email already exists
         $query = "SELECT * FROM customer WHERE email='$email'";
         $result = mysqli_query($conn, $query);
@@ -51,7 +61,6 @@ if (isset($_POST['create_account'])) {
                 'password' => $hashed_password,
                 'phone' => $phone,
             ];
-        
 
             // Send OTP email
             $mail = new PHPMailer(true);
@@ -104,42 +113,9 @@ if (isset($_POST['create_account'])) {
                 exit();
             }
         }
-    } else {
-        $error = "Please fill all the fields.";
     }
 }
 ?>
-
-<style type="text/css">
-     /* Apply the fullscreen background color */
-     body {
-        background-color: #2a2f5b;
-        color: white;
-        margin: 0; /* Remove default margin */
-        padding: 0; /* Remove default padding */
-        height: 100%; /* Ensure the body covers the full screen */
-    }
-    .divider:after,
-    .divider:before {
-        content: "";
-        flex: 1;
-        height: 1px;
-        background: #eee;
-    }
-    .h-custom {
-        height: calc(100% - 73px);
-    }
-    @media (max-width: 450px) {
-        .h-custom {
-            height: 100%;
-        }
-    }
-    .back-button {
-        position: absolute;
-        top: 20px;
-        left: 10px;
-    }
-</style>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -152,15 +128,19 @@ if (isset($_POST['create_account'])) {
     <link rel="stylesheet" href="assets/css/font-awesome.min.css">
     <link rel="stylesheet" href="assets/css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <!-- Include Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
     <style>
-
+        body {
+            background-color: #2a2f5b;
+            color: white;
+            margin: 0;
+            padding: 0;
+            height: 100%;
+        }
         .form-control {
             width: 100%;
             padding: 10px;
-            padding-right: 40px; /* Space for the icon */
+            padding-right: 40px;
             box-sizing: border-box;
         }
         .password-toggle {
@@ -171,6 +151,10 @@ if (isset($_POST['create_account'])) {
             transform: translateY(-50%);
             color: #999;
         }
+        .form-check-label a {
+            color: #1572e8;
+            text-decoration: underline;
+        }
     </style>
 </head>
 
@@ -179,101 +163,58 @@ if (isset($_POST['create_account'])) {
         <div class="container-fluid h-custom">
             <div class="row d-flex justify-content-center align-items-center h-100">
                 <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
-                    <!-- Box container around the form -->
                     <div class="form-box text-center position-relative" style="background-color: #3b4272; padding: 30px; border-radius: 10px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);">
-                        
-                        <!-- Icon button for back -->
-                        <a href="https://rio-lawis.com/customer/" class="btn btn-light position-absolute" style="top: 10px; left: 10px; background-color: transparent; color:  #1572e8;">
+                        <a href="https://rio-lawis.com/customer/" class="btn btn-light position-absolute" style="top: 10px; left: 10px; background-color: transparent; color: #1572e8;">
                             <i class="fas fa-arrow-left"></i>
                         </a>
                         
-                        <!-- Logo image at the top -->
                         <img src="assets/img/1bg.jpg" alt="Logo" class="img-fluid mb-4" style="max-width: 100px; border-radius: 50%;">
                         
                         <form method="post">
                             <div class="d-flex flex-row align-items-center justify-content-center justify-content-lg-start">
                                 <span class="h1 fw-bold mb-0" style="color: #FEA116; text-align: center;">Create Customer Account</span>
                             </div>
-                            <p style="color:red;"><?php echo $error; ?></p>
+                            
+                            <?php if (!empty($error)): ?>
+                                <p style="color:red;"><?php echo htmlspecialchars($error); ?></p>
+                            <?php endif; ?>
+                            
                             <div class="form-outline mb-4">
-                            <div class="form-group">
-    <label for="name"></label>
-    <input type="text" name="name" id="name" class="form-control" placeholder="Enter your name" required 
-    pattern="[A-Za-zÀ-ž' -]+" title="Name can contain only letters, hyphens, apostrophes, and spaces." oninput="validateName()">
-</div>
-
-<script>
-    function validateName() {
-        var nameField = document.getElementById('name');
-        var value = nameField.value;
-
-        // Regular expression to allow multiple capitalized words with letters, hyphens, apostrophes, and spaces
-        var regex = /^([A-Z][a-zÀ-ž'-]+\s?)+$/;
-
-        if (!regex.test(value)) {
-            nameField.setCustomValidity("");
-        } else {
-            nameField.setCustomValidity(""); // Clear the message if valid
-        }
-    }
-</script>
-
-<?php
-// Check if the form was submitted
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $name = $_POST['name'];
-
-    // Sanitize input to remove any HTML or script tags
-    $name_sanitized = htmlspecialchars($name, ENT_QUOTES, 'UTF-8');
-
-    // Validate the input format with multiple capitalized words
-    if (!preg_match("/^([A-Z][a-zÀ-ž'-]+\s?)+$/", $name)) {
-        echo '<div class="alert alert-danger">Invalid input: Please enter a valid name</div>';
-    } else if ($name !== $name_sanitized) {
-        echo '<div class="alert alert-danger">Invalid input: HTML or script tags are not allowed.</div>';
-    } 
-}
-?>
-
+                                <div class="form-group">
+                                    <label for="name"></label>
+                                    <input type="text" name="name" id="name" class="form-control" placeholder="Enter your name" required 
+                                    pattern="[A-Za-zÀ-ž' -]+" title="Name can contain only letters, hyphens, apostrophes, and spaces." oninput="validateName()">
+                                </div>
 
                                 <br>
                                 <div class="form-group">
                                     <label for="email"></label>
                                     <input type="email" name="email" id="email" class="form-control" placeholder="Enter your email" required>
                                 </div>
+                                
                                 <br>
                                 <div class="form-group position-relative">
-    <label for="password"></label>
-    <input type="password" name="password" id="password" class="form-control" placeholder="Enter your password" minlength="8" pattern="(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}" title="Password must contain at least one uppercase letter, one number, and one special character" required>
-    <span class="password-toggle" style="cursor: pointer; position: absolute; right: 10px; top: 50%; transform: translateY(-50%);">
-        <i class="fas fa-eye" id="togglePassword" onclick="togglePasswordVisibility()"></i>
-    </span>
-</div>
-
-<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-<script>
-    function togglePasswordVisibility() {
-        const passwordInput = document.getElementById("password");
-        const toggleIcon = document.getElementById("togglePassword");
-        
-        if (passwordInput.type === "password") {
-            passwordInput.type = "text";
-            toggleIcon.classList.remove("fa-eye-slash");
-            toggleIcon.classList.add("fa-eye");
-        } else {
-            passwordInput.type = "password";
-            toggleIcon.classList.remove("fa-eye");
-            toggleIcon.classList.add("fa-eye-slash");
-        }
-    }
-</script>
+                                    <label for="password"></label>
+                                    <input type="password" name="password" id="password" class="form-control" placeholder="Enter your password" minlength="8" pattern="(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}" title="Password must contain at least one uppercase letter, one number, and one special character" required>
+                                    <span class="password-toggle">
+                                        <i class="fas fa-eye" id="togglePassword" onclick="togglePasswordVisibility()"></i>
+                                    </span>
+                                </div>
 
                                 <br>
                                 <div class="form-group">
                                     <label for="phone"></label>
                                     <input type="text" name="phone" id="phone" class="form-control" placeholder="Enter your phone number" pattern="09\d{9}" maxlength="11" title="Phone number must start with '09' and be exactly 11 digits" required>
                                 </div>
+
                                 <br>
+                                <div class="form-check mb-3">
+                                    <input type="checkbox" class="form-check-input" id="termsCheckbox" name="terms_agreement" required>
+                                    <label class="form-check-label" for="termsCheckbox">
+                                        I agree to the <a href="#" data-toggle="modal" data-target="#termsModal">Terms and Conditions</a>
+                                    </label>
+                                </div>
+
                                 <button type="submit" name="create_account" class="btn btn-warning btn-lg" style="background-color: #1572e8; color: white;">Send verification code</button>
                             </div>
                         </form>
@@ -283,8 +224,100 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
     </section>
 
+    <!-- Terms and Conditions Modal -->
+    <div class="modal fade" id="termsModal" tabindex="-1" role="dialog" aria-labelledby="termsModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="termsModalLabel">Terms and Conditions</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <h6>Room Reservation and Restaurant Management System Terms of Service</h6>
+                    <ol>
+                        <li><strong>Account Usage</strong>
+                            <ul>
+                                <li>You must provide accurate and current information during registration.</li>
+                                <li>You are responsible for maintaining the confidentiality of your account credentials.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Reservation Policies</strong>
+                            <ul>
+                                <li>Reservations are subject to availability and confirmation.</li>
+                                <li>Cancellations must be made at least 24 hours in advance.</li>
+                                <li>Late cancellations may incur a cancellation fee.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Privacy and Data Protection</strong>
+                            <ul>
+                                <li>Personal information will be handled in accordance with our privacy policy.</li>
+                                <li>We do not share personal data with third parties without consent.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Restaurant Dining Terms</strong>
+                            <ul>
+                                <li>Menu items and prices are subject to change without notice.</li>
+                                <li>Special dietary requirements must be communicated in advance.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Liability Disclaimer</strong>
+                            <ul>
+                                <li>We are not liable for any inconvenience caused by circumstances beyond our control.</li>
+                                <li>Customers are responsible for their personal belongings.</li>
+                            </ul>
+                        </li>
+                    </ol>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="assets/js/jquery-3.2.1.min.js"></script>
     <script src="assets/js/bootstrap.min.js"></script>
+    <script>
+        function validateName() {
+            var nameField = document.getElementById('name');
+            var value = nameField.value;
+            var regex = /^([A-Z][a-zÀ-ž'-]+\s?)+$/;
+            nameField.setCustomValidity(regex.test(value) ? "" : "Invalid name format");
+        }
+
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById("password");
+            const toggleIcon = document.getElementById("togglePassword");
+            
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+                toggleIcon.classList.remove("fa-eye-slash");
+                toggleIcon.classList.add("fa-eye");
+            } else {
+                passwordInput.type = "password";
+                toggleIcon.classList.remove("fa-eye");
+                toggleIcon.classList.add("fa-eye-slash");
+            }
+        }
+
+        $(document).ready(function() {
+            // Prevent form submission if terms are not checked
+            $('form').on('submit', function(e) {
+                if (!$('#termsCheckbox').is(':checked')) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Terms and Conditions',
+                        text: 'Please agree to the Terms and Conditions before proceeding.',
+                        confirmButtonColor: '#3085d6',
+                        confirmButtonText: 'OK'
+                    });
+                    e.preventDefault(); // Prevent form submission
+                }
+            });
+        });
+    </script>
 
     <?php if (isset($_SESSION['status']) && $_SESSION['status'] != ""): ?>
     <script>
@@ -303,5 +336,4 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     endif;
     ?>
 </body>
-
 </html>
