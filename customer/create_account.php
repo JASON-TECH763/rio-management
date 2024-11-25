@@ -32,15 +32,29 @@ if (isset($_POST['create_account'])) {
         $num_rows = mysqli_num_rows($result);
 
         if ($num_rows > 0) {
-            $error = "An account with this email already exists.";
+            echo "<script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'An account with this email already exists.',
+                        confirmButtonColor: '#3085d6',
+                        confirmButtonText: 'OK'
+                    });
+                });
+            </script>";
         } else {
-            // Store user data temporarily in the session
+            // Continue with the OTP email sending process
             $_SESSION['temp_account'] = [
                 'name' => $name,
                 'email' => $email,
                 'password' => $hashed_password,
                 'phone' => $phone,
             ];
+        
+            // Send OTP email (existing code here)
+        }
+        
 
             // Send OTP email
             $mail = new PHPMailer(true);
