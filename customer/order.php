@@ -157,22 +157,19 @@ if ($result_customer->num_rows === 1) {
 </div>
 
 <script>
-    // Set today's date in YYYY-MM-DD format
+    // Get today's date and format it as YYYY-MM-DD
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // Reset time to midnight for accurate comparison
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+    const day = String(today.getDate()).padStart(2, '0');
+    const formattedToday = `${year}-${month}-${day}`;
 
-    // Get today's date in YYYY-MM-DD format
-    const formattedToday = today.toISOString().split('T')[0];
-
-    // Get the reserve_date input field
+    // Set the min attribute of the date picker
     const reserveDate = document.getElementById('reserve_date');
-
-    // Set the min attribute to disable past dates
-    reserveDate.setAttribute('min', formattedToday);
-
-    // Set the default value to today's date
-    reserveDate.value = formattedToday;
+    reserveDate.setAttribute('min', formattedToday); // Disable all past dates
+    reserveDate.value = formattedToday; // Set default value to today
 </script>
+
 
 
             <div class="row">
