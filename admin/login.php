@@ -4,9 +4,6 @@ include('config/connect.php');
 
 // Content Security Policy (CSP) and security headers
 
-header("X-XSS-Protection: 1; mode=block");
-header("X-Frame-Options: DENY");
-header("X-Content-Type-Options: nosniff");
 
 $error = "";
 $max_attempts = 3;       // Maximum number of login attempts
