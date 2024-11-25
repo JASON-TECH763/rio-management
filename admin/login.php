@@ -13,7 +13,7 @@ $max_attempts = 3;       // Maximum number of login attempts
 $lockout_time = 180;     // Lockout time in seconds (3 minutes)
 
 // reCAPTCHA secret key (IMPORTANT: Replace with your actual secret key)
-$recaptcha_secret = '6LdG8kopAAAAALzagl-CRQTRlGeT_LBnRjqf3G5v';
+$recaptcha_secret = '6LdO2IUqAAAAAFrvkoQY1xdLiEFKd94qf9JH4ivC';
 
 // Initialize session variables for tracking attempts
 if (!isset($_SESSION['attempts'])) {
