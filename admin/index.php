@@ -125,7 +125,7 @@ header("Referrer-Policy: strict-origin-when-cross-origin");
           <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
           <div class="d-flex flex-row align-items-center justify-content-center justify-content-lg-start">
             <div class="d-flex align-items-center mb-3 pb-1">
-              <span class="h1 fw-bold mb-0" style="color: #FEA116;">RMS Login</span>
+              <span class="h1 fw-bold mb-0" style="color: #FEA116;">RMS Logn</span>
               <i class="fa fa-heart fa-2x me-3"></i>
             </div>
           </div>
