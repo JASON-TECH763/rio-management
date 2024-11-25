@@ -3,7 +3,7 @@ session_start();
 include('config/connect.php');
 
 // Content Security Policy (CSP) and security headers
-header("Content-Security-Policy: default-src 'self'; script-src 'self' https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/ 'unsafe-inline'; style-src 'self' https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/ 'unsafe-inline'; img-src 'self' data:; frame-src https://www.google.com/recaptcha/; font-src 'self'; frame-ancestors 'none'; form-action 'self'; base-uri 'self';");
+
 header("X-XSS-Protection: 1; mode=block");
 header("X-Frame-Options: DENY");
 header("X-Content-Type-Options: nosniff");

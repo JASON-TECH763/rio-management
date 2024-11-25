@@ -130,7 +130,7 @@ header("Referrer-Policy: strict-origin-when-cross-origin");
           </div>
           <div class="form-outline mb-3">
             <label class="form-label" for="pass">Password</label>
-            <input 
+            <input  
                 type="password" 
                 name="pass" 
                 id="psw" 
