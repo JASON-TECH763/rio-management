@@ -144,7 +144,7 @@ if (!isset($_SESSION['csrf_token'])) {
 
           <!-- Modified: Remove id from container since we don't need to toggle visibility -->
           <div class="recaptcha-container mb-3">
-            <div class="g-recaptcha" data-sitekey="6Lf2jYkqAAAAAHm5pJwgRgrzyfp5DrOF95rRrw1k"></div>
+            <div class="g-recaptcha" data-sitekey="6LcGl4kqAAAAAB6yVfa6va0KJEnZ5nBZjW9G9was"></div>
           </div>
 
           <div class="d-flex justify-content-between align-items-center">
