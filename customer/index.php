@@ -202,15 +202,16 @@ if ($_SESSION['attempts'] >= 3 && (time() - $_SESSION['last_failed_attempt']) < 
                         <span style="margin-left: 5px;">Show password</span>
                     </div>
 
-                    <!-- reCAPTCHA -->
-                    <div class="recaptcha-container">
-                        <div class="g-recaptcha" data-sitekey="6LcGl4kqAAAAAB6yVfa6va0KJEnZ5nBZjW9G9was"></div>
-                    </div>
 
                     <!-- Forgot Password Link -->
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <a href="forgot_password.php" style="color: #FEA116;">Forgot Password?</a>
                         <span id="countdown-timer" style="margin-right: 20px; font-weight: bold; color: #ff0000;"></span>
+                    </div>
+
+                     <!-- reCAPTCHA -->
+                     <div class="recaptcha-container">
+                        <div class="g-recaptcha" data-sitekey="6LcGl4kqAAAAAB6yVfa6va0KJEnZ5nBZjW9G9was"></div>
                     </div>
 
                     <div class="d-flex justify-content-between align-items-center">
