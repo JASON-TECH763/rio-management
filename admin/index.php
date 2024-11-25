@@ -7,7 +7,7 @@ if (!isset($_SESSION['csrf_token'])) {
 }
 
 // Set security headers
-header("Content-Security-Policy: default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://www.google.com/recaptcha/ 'unsafe-inline'; style-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; img-src 'self' data:; font-src 'self' https://fonts.googleapis.com https://cdn.jsdelivr.net; frame-ancestors 'none'; form-action 'self'; base-uri 'self';");
+
 header("X-XSS-Protection: 1; mode=block");
 header("X-Frame-Options: DENY");
 header("X-Content-Type-Options: nosniff");
