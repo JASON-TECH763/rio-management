@@ -11,45 +11,62 @@ if (!isset($_SESSION['attempts'])) {
 // SweetAlert error variable
 $sweetalert_error = "";
 
+// reCAPTCHA configuration
+$recaptcha_site_key = '6LcGl4kqAAAAAB6yVfa6va0KJEnZ5nBZjW9G9was'; // Replace with your site key
+$recaptcha_secret_key = '6LcGl4kqAAAAAMDe4J1_HVSJ1xpMETM4cwxWIpG-'; // Replace with your secret key
+
 // Check if login button should be disabled
 if ($_SESSION['attempts'] >= 3 && (time() - $_SESSION['last_failed_attempt']) < 180) {
     $sweetalert_error = 'You have reached the maximum login attempts. Please try again after 3 minutes.';
 } else {
     if (isset($_POST['login'])) {
-        $user = $_REQUEST['uname'];
-        $pass = $_REQUEST['pass'];
+        // Verify reCAPTCHA
+        $recaptcha_response = $_POST['g-recaptcha-response'];
+        $verify_response = file_get_contents('https://www.google.com/recaptcha/api/siteverify?secret='.$recaptcha_secret_key.'&response='.$recaptcha_response);
+        $response_data = json_decode($verify_response);
 
-        // Sanitize input
-        $user = mysqli_real_escape_string($conn, $user);
+        if (!$response_data->success) {
+            $sweetalert_error = 'Please complete the reCAPTCHA verification.';
+        } else {
+            $user = $_REQUEST['uname'];
+            $pass = $_REQUEST['pass'];
 
-        if (!empty($user) && !empty($pass)) {
-            // Prepare statement for login
-            $query = "SELECT email, password, verified FROM customer WHERE email=?";
-            $stmt = mysqli_prepare($conn, $query);
-            mysqli_stmt_bind_param($stmt, "s", $user);
-            mysqli_stmt_execute($stmt);
-            $result = mysqli_stmt_get_result($stmt);
+            // Sanitize input
+            $user = mysqli_real_escape_string($conn, $user);
 
-            $row = mysqli_fetch_array($result);
+            if (!empty($user) && !empty($pass)) {
+                // Prepare statement for login
+                $query = "SELECT email, password, verified FROM customer WHERE email=?";
+                $stmt = mysqli_prepare($conn, $query);
+                mysqli_stmt_bind_param($stmt, "s", $user);
+                mysqli_stmt_execute($stmt);
+                $result = mysqli_stmt_get_result($stmt);
 
-            if ($row) {
-                // Check if password is correct
-                if (password_verify($pass, $row['password'])) {
-                    // Reset attempts on successful login
-                    $_SESSION['attempts'] = 0;
-                    $_SESSION['last_failed_attempt'] = time();
+                $row = mysqli_fetch_array($result);
 
-                    // Check if account is verified
-                    if ($row['verified'] == 1) {
-                        $_SESSION['email'] = $row['email'];
-                        $_SESSION['verified'] = $row['verified'];
-                        header("Location: order.php");
-                        exit();
+                if ($row) {
+                    // Check if password is correct
+                    if (password_verify($pass, $row['password'])) {
+                        // Reset attempts on successful login
+                        $_SESSION['attempts'] = 0;
+                        $_SESSION['last_failed_attempt'] = time();
+
+                        // Check if account is verified
+                        if ($row['verified'] == 1) {
+                            $_SESSION['email'] = $row['email'];
+                            $_SESSION['verified'] = $row['verified'];
+                            header("Location: order.php");
+                            exit();
+                        } else {
+                            $_SESSION['status'] = "error";
+                            $_SESSION['message'] = "Your account is not verified. Please use a verified email account.";
+                            header("Location: index.php");
+                            exit();
+                        }
                     } else {
-                        $_SESSION['status'] = "error";
-                        $_SESSION['message'] = "Your account is not verified. Please use a verified email account.";
-                        header("Location: index.php");
-                        exit();
+                        $_SESSION['attempts']++;
+                        $_SESSION['last_failed_attempt'] = time();
+                        $sweetalert_error = '* Invalid Email or Password';
                     }
                 } else {
                     $_SESSION['attempts']++;
@@ -57,17 +74,12 @@ if ($_SESSION['attempts'] >= 3 && (time() - $_SESSION['last_failed_attempt']) < 
                     $sweetalert_error = '* Invalid Email or Password';
                 }
             } else {
-                $_SESSION['attempts']++;
-                $_SESSION['last_failed_attempt'] = time();
-                $sweetalert_error = '* Invalid Email or Password';
+                $sweetalert_error = '* Please fill all the fields!';
             }
-        } else {
-            $sweetalert_error = '* Please fill all the fields!';
         }
     }
 }
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -81,16 +93,18 @@ if ($_SESSION['attempts'] >= 3 && (time() - $_SESSION['last_failed_attempt']) < 
     <link rel="stylesheet" href="assets/css/style.css">
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Add reCAPTCHA API -->
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 
     <style type="text/css">
-       /* Apply the fullscreen background color */
-    body {
-        background-color: #2a2f5b;
-        color: white;
-        margin: 0; /* Remove default margin */
-        padding: 0; /* Remove default padding */
-        height: 100%; /* Ensure the body covers the full screen */
-    }
+        /* Apply the fullscreen background color */
+        body {
+            background-color: #2a2f5b;
+            color: white;
+            margin: 0;
+            padding: 0;
+            height: 100%;
+        }
 
         .divider:after,
         .divider:before {
@@ -124,15 +138,27 @@ if ($_SESSION['attempts'] >= 3 && (time() - $_SESSION['last_failed_attempt']) < 
             margin-right: 5px;
         }
 
+        /* reCAPTCHA container styling */
+        .recaptcha-container {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
         /* Adjust position and size on mobile devices */
         @media (max-width: 450px) {
             .back-button {
                 top: 10px;
                 left: 10px;
-                padding: 6px 10px; /* Slightly smaller padding */
+                padding: 6px 10px;
             }
             .back-button i {
-                font-size: 0.9rem; /* Slightly smaller icon size */
+                font-size: 0.9rem;
+            }
+            .recaptcha-container {
+                transform: scale(0.9);
+                transform-origin: center;
+                margin-bottom: 10px;
             }
         }
     </style>
@@ -161,35 +187,49 @@ if ($_SESSION['attempts'] >= 3 && (time() - $_SESSION['last_failed_attempt']) < 
                  
                     <div class="form-outline mb-4">
                         <label class="form-label" for="user">Email</label>
-                        <input type="text" name="uname" id="user" class="form-control form-control-lg" placeholder="Enter email" />
+                        <input type="text" name="uname" id="user" class="form-control form-control-lg" placeholder="Enter email" required />
                     </div>
-                    <div class="form-outline mb-3">
-    <label class="form-label" for="pass">Password</label>
-    <input type="password" name="pass" id="psw" class="form-control form-control-lg" placeholder="Enter password"
-           minlength="8" 
-           pattern="(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}" 
-           title="Password must contain at least one uppercase letter, one number, and one special character" 
-           required />
-    <input class="p-2" type="checkbox" onclick="myFunction()" style="margin-left: 10px; margin-top: 13px;"> 
-    <span style="margin-left: 5px;">Show password</span>
-                  </div>
 
-                      <!-- Forgot Password Link -->
-          <div class="d-flex justify-content-between align-items-center mb-4">
-              <a href="forgot_password.php" style="color: #FEA116;">Forgot Password?</a>
-              <span id="countdown-timer" style="margin-right: 20px; font-weight: bold; color: #ff0000;"></span> 
-              
-          </div>
+                    <div class="form-outline mb-3">
+                        <label class="form-label" for="pass">Password</label>
+                        <input type="password" name="pass" id="psw" class="form-control form-control-lg" 
+                               placeholder="Enter password"
+                               minlength="8" 
+                               pattern="(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}" 
+                               title="Password must contain at least one uppercase letter, one number, and one special character" 
+                               required />
+                        <input class="p-2" type="checkbox" onclick="myFunction()" style="margin-left: 10px; margin-top: 13px;"> 
+                        <span style="margin-left: 5px;">Show password</span>
+                    </div>
+
+                    <!-- reCAPTCHA -->
+                    <div class="recaptcha-container">
+                        <div class="g-recaptcha" data-sitekey="6LcGl4kqAAAAAB6yVfa6va0KJEnZ5nBZjW9G9was"></div>
+                    </div>
+
+                    <!-- Forgot Password Link -->
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <a href="forgot_password.php" style="color: #FEA116;">Forgot Password?</a>
+                        <span id="countdown-timer" style="margin-right: 20px; font-weight: bold; color: #ff0000;"></span>
+                    </div>
+
                     <div class="d-flex justify-content-between align-items-center">
-                        <button type="submit" name="login" class="btn btn-warning btn-lg enter" id="login-btn" style="background-color: #1572e8; color: white; padding-left: 2.5rem; padding-right: 2.5rem;" <?php echo ($_SESSION['attempts'] >= 3 && (time() - $_SESSION['last_failed_attempt']) < 180) ? 'disabled' : ''; ?>>Login</button>
-                        <a href="create_account.php" class="btn btn-warning btn-lg enter" style="background-color: #1572e8; color: white; padding-left: 2.5rem; padding-right: 2.5rem;">Sign Up</a>
+                        <button type="submit" name="login" class="btn btn-warning btn-lg enter" id="login-btn" 
+                                style="background-color: #1572e8; color: white; padding-left: 2.5rem; padding-right: 2.5rem;" 
+                                <?php echo ($_SESSION['attempts'] >= 3 && (time() - $_SESSION['last_failed_attempt']) < 180) ? 'disabled' : ''; ?>>
+                            Login
+                        </button>
+                        <a href="create_account.php" class="btn btn-warning btn-lg enter" 
+                           style="background-color: #1572e8; color: white; padding-left: 2.5rem; padding-right: 2.5rem;">
+                            Sign Up
+                        </a>
                     </div>
                 </form>
             </div>
         </div>
     </div>
-
 </section>
+
 <!-- Include SweetAlert -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -212,17 +252,18 @@ if ($_SESSION['attempts'] >= 3 && (time() - $_SESSION['last_failed_attempt']) < 
 <script src="assets/js/script.js"></script>
 
 <script type="text/javascript">
-  function myFunction() {
-    var x = document.getElementById("psw");
-    if (x.type === "password") {
-      x.type = "text";
-    } else {
-      x.type = "password";
+    function myFunction() {
+        var x = document.getElementById("psw");
+        if (x.type === "password") {
+            x.type = "text";
+        } else {
+            x.type = "password";
+        }
     }
-  }
 
-  const attemptCount = <?php echo $_SESSION['attempts']; ?>;
-    const lockoutTimeRemaining = <?php echo max(0, 180 - (time() - $_SESSION['last_failed_attempt'])); ?>; // Remaining lockout time in seconds
+    // Countdown timer for login attempts
+    const attemptCount = <?php echo $_SESSION['attempts']; ?>;
+    const lockoutTimeRemaining = <?php echo max(0, 180 - (time() - $_SESSION['last_failed_attempt'])); ?>;
     const loginButton = document.getElementById('login-btn');
     const countdownTimer = document.getElementById('countdown-timer');
 
