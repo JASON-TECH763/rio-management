@@ -25,29 +25,24 @@ header("Referrer-Policy: strict-origin-when-cross-origin");
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-    <!-- Add Font Awesome CSS if not included -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
-    <!-- reCAPTCHA Script -->
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 
     <style type="text/css">
-    /* Apply the fullscreen background color */
     body {
         background-color: #2a2f5b;
         color: white;
-        margin: 0; /* Remove default margin */
-        padding: 0; /* Remove default padding */
-        height: 100%; /* Ensure the body covers the full screen */
+        margin: 0;
+        padding: 0;
+        height: 100%;
     }
 
     html {
-        height: 100%; /* Ensure the html element covers the full screen */
+        height: 100%;
     }
 
     .vh-100 {
-        height: 100vh; /* Full viewport height */
+        height: 100vh;
     }
 
     .divider:after,
@@ -86,7 +81,6 @@ header("Referrer-Policy: strict-origin-when-cross-origin");
         margin-right: 5px;
     }
 
-    /* Adjust position and size on mobile devices */
     @media (max-width: 450px) {
         .back-button {
             top: 10px;
@@ -99,8 +93,8 @@ header("Referrer-Policy: strict-origin-when-cross-origin");
         }
     }
 
+    /* Modified: Remove display: none from recaptcha-container */
     .recaptcha-container {
-        display: none;
         margin-bottom: 15px;
     }
 </style>
@@ -125,7 +119,7 @@ header("Referrer-Policy: strict-origin-when-cross-origin");
           <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
           <div class="d-flex flex-row align-items-center justify-content-center justify-content-lg-start">
             <div class="d-flex align-items-center mb-3 pb-1">
-              <span class="h1 fw-bold mb-0" style="color: #FEA116;">RMS Logn</span>
+              <span class="h1 fw-bold mb-0" style="color: #FEA116;">RMS Login</span>
               <i class="fa fa-heart fa-2x me-3"></i>
             </div>
           </div>
@@ -135,26 +129,25 @@ header("Referrer-Policy: strict-origin-when-cross-origin");
             <input type="text" name="uname" id="user" class="form-control form-control-lg" placeholder="Enter username" required autocomplete="username">
           </div>
           <div class="form-outline mb-3">
-    <label class="form-label" for="pass">Password</label>
-    <input 
-        type="password" 
-        name="pass" 
-        id="psw" 
-        class="form-control form-control-lg" 
-        placeholder="Enter password" 
-        minlength="8" 
-        pattern="(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}" 
-        title="Password must contain at least one uppercase letter, one number, and one special character" 
-        required 
-        autocomplete="current-password"
-    >
-    <input class="p-2" type="checkbox" onclick="togglePassword()" style="margin-left: 10px; margin-top: 13px;">
-    <span style="margin-left: 5px;">Show password</span>
-</div>
+            <label class="form-label" for="pass">Password</label>
+            <input 
+                type="password" 
+                name="pass" 
+                id="psw" 
+                class="form-control form-control-lg" 
+                placeholder="Enter password" 
+                minlength="8" 
+                pattern="(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}" 
+                title="Password must contain at least one uppercase letter, one number, and one special character" 
+                required 
+                autocomplete="current-password"
+            >
+            <input class="p-2" type="checkbox" onclick="togglePassword()" style="margin-left: 10px; margin-top: 13px;">
+            <span style="margin-left: 5px;">Show password</span>
+          </div>
 
-          
-          <!-- reCAPTCHA Container -->
-          <div id="recaptchaContainer" class="recaptcha-container mb-3">
+          <!-- Modified: Remove id from container since we don't need to toggle visibility -->
+          <div class="recaptcha-container mb-3">
             <div class="g-recaptcha" data-sitekey="6Lf2jYkqAAAAAHm5pJwgRgrzyfp5DrOF95rRrw1k"></div>
           </div>
 
@@ -168,18 +161,19 @@ header("Referrer-Policy: strict-origin-when-cross-origin");
     </div>
   </div>
 </section>
+
 <script src="assets/js/jquery-3.2.1.min.js"></script>
 <script src="assets/js/popper.min.js"></script>
 <script src="assets/js/bootstrap.min.js"></script>
 <script src="assets/js/script.js"></script>
 
 <script>
-  function togglePassword() {
+function togglePassword() {
     var x = document.getElementById("psw");
     x.type = x.type === "password" ? "text" : "password";
-  }
+}
 
-  document.getElementById('loginForm').addEventListener('submit', function(e) {
+document.getElementById('loginForm').addEventListener('submit', function(e) {
     e.preventDefault();
     var formData = new FormData(this);
     formData.append('login', '1');
@@ -195,12 +189,10 @@ header("Referrer-Policy: strict-origin-when-cross-origin");
     .then(response => response.json())
     .then(data => {
         const loginButton = document.querySelector('button[name="login"]');
-        const recaptchaContainer = document.getElementById('recaptchaContainer');
 
         if (data.success) {
             window.location.href = data.redirect;
         } else {
-            // Show SweetAlert for error messages
             Swal.fire({
                 icon: 'error',
                 title: 'Login Failed',
@@ -208,11 +200,6 @@ header("Referrer-Policy: strict-origin-when-cross-origin");
                 confirmButtonText: 'Try Again',
                 timer: 5000
             });
-
-            // Show reCAPTCHA after 3 failed attempts
-            if (data.show_recaptcha) {
-                recaptchaContainer.style.display = 'block';
-            }
 
             if (data.disable) {
                 loginButton.disabled = true;
@@ -228,7 +215,7 @@ header("Referrer-Policy: strict-origin-when-cross-origin");
 function startTimer(duration, button) {
     const timerDisplay = document.createElement('span');
     timerDisplay.style.marginLeft = '5px';
-    timerDisplay.style.color = 'red'; // Set color to red
+    timerDisplay.style.color = 'red';
     button.parentNode.appendChild(timerDisplay);
 
     let remaining = duration;
@@ -245,7 +232,6 @@ function startTimer(duration, button) {
         }
     }, 1000);
 }
-
 </script>
 
 </body>
