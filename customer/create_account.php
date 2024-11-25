@@ -52,9 +52,6 @@ if (isset($_POST['create_account'])) {
                 'phone' => $phone,
             ];
         
-            // Send OTP email (existing code here)
-        }
-        
 
             // Send OTP email
             $mail = new PHPMailer(true);
