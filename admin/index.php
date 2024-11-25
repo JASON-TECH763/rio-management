@@ -155,7 +155,7 @@ header("Referrer-Policy: strict-origin-when-cross-origin");
           
           <!-- reCAPTCHA Container -->
           <div id="recaptchaContainer" class="recaptcha-container mb-3">
-            <div class="g-recaptcha" data-sitekey="6LdO2IUqAAAAAI_flMld0C2tf7C9zVwIfk63QUfO"></div>
+            <div class="g-recaptcha" data-sitekey="6Lf2jYkqAAAAAHm5pJwgRgrzyfp5DrOF95rRrw1k"></div>
           </div>
 
           <div class="d-flex justify-content-between align-items-center">
