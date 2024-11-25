@@ -194,7 +194,6 @@ if (isset($_POST['create_account'])) {
                             <div class="d-flex flex-row align-items-center justify-content-center justify-content-lg-start">
                                 <span class="h1 fw-bold mb-0" style="color: #FEA116; text-align: center;">Create Customer Account</span>
                             </div>
-                            <p style="color:red;"><?php echo $error; ?></p>
                             <div class="form-outline mb-4">
                             <div class="form-group">
     <label for="name"></label>
