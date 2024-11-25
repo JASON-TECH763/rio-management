@@ -234,17 +234,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } 
 }
 ?>
- <script>
-        // Function to hide alert after 5 seconds
-        function hideAlert() {
-            setTimeout(function() {
-                const alert = document.getElementById('alert');
-                if (alert) {
-                    alert.style.display = 'none';
-                }
-            }, 5000);
-        }
-    </script>
+
 
                                 <br>
                                 <div class="form-group">
