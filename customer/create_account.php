@@ -100,6 +100,14 @@ if (isset($_POST['create_account'])) {
 ?>
 
 <style type="text/css">
+     /* Apply the fullscreen background color */
+     body {
+        background-color: #2a2f5b;
+        color: white;
+        margin: 0; /* Remove default margin */
+        padding: 0; /* Remove default padding */
+        height: 100%; /* Ensure the body covers the full screen */
+    }
     .divider:after,
     .divider:before {
         content: "";
