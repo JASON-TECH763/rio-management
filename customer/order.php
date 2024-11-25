@@ -157,9 +157,12 @@ if ($result_customer->num_rows === 1) {
 </div>
 
 <script>
-    // Create a Date object for today's date
+    // Set today's date in YYYY-MM-DD format
     const today = new Date();
-    const formattedToday = today.toISOString().split('T')[0]; // Format date as YYYY-MM-DD
+    today.setHours(0, 0, 0, 0); // Reset time to midnight for accurate comparison
+
+    // Get today's date in YYYY-MM-DD format
+    const formattedToday = today.toISOString().split('T')[0];
 
     // Get the reserve_date input field
     const reserveDate = document.getElementById('reserve_date');
