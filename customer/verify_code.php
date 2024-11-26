@@ -67,16 +67,14 @@ if (isset($_POST['verify_otp'])) {
     <div class="container mt-5">
         <center>
             <!-- Box container around the form -->
-            <div class="form-box" style="background-color: #3b4272; padding: 30px; border-radius: 10px; width: 400px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);">
-                <div style="position: relative; width: 100px; margin: 0 auto;">
-                    <!-- Back button positioned above the logo -->
-                    <a href="index.php" class="btn btn-link" style="position: absolute; left: 0; top: -30px; color: white;">
-                        <i class="fas fa-arrow-left"></i>
-                    </a>
-                    
-                    <!-- Logo image -->
-                    <img src="assets/img/1bg.jpg" alt="Logo" class="img-fluid mb-4" style="width: 100px; border-radius: 50%;">
-                </div>
+            <div class="form-box" style="background-color: #3b4272; padding: 30px; border-radius: 10px; width: 400px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); position: relative;">
+                <!-- Back button positioned at top-left of form -->
+                <a href="index.php" class="btn btn-link" style="position: absolute; left: 20px; top: 20px; color: white;">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+                
+                <!-- Logo image -->
+                <img src="assets/img/1bg.jpg" alt="Logo" class="img-fluid mb-4" style="width: 100px; border-radius: 50%;">
                 
                 <form method="post">
                     <div class="d-flex flex-row align-items-center justify-content-center" style="color:#FEA116; font-size: 1.7rem;">
