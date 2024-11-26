@@ -241,10 +241,8 @@ if (isset($_POST['create_account'])) {
                     <form method="post" id="createAccountForm">
                         <div class="form-group">
                             <input type="text" name="name" class="form-control" placeholder="Full Name" 
-                                   pattern="[A-Za-zÀ-ž' -]+" 
-                                   title="Name can contain only letters, hyphens, apostrophes, and spaces" 
-                                   required>
-                        </div>
+                            pattern="[A-Za-zÀ-ž' -]+" title="Name can contain only letters, hyphens, apostrophes, and spaces." oninput="validateName()">
+                            </div>
 
                         <div class="form-group">
                             <input type="email" name="email" class="form-control" placeholder="Email Address" required>
