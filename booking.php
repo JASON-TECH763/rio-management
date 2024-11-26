@@ -448,16 +448,16 @@ if (isset($_GET['room_id'])) {
                         </div>
                     </div>
 
-                <!-- Terms and Conditions Modal -->
+             <!-- Terms and Conditions Modal -->
 <div class="modal fade" id="termsModal" tabindex="-1" aria-labelledby="termsModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="termsModalLabel">Terms and Conditions</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-content" style="background-color: #2a2f5b; color: white;">
+            <div class="modal-header" style="border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+                <h5 class="modal-title" id="termsModalLabel" style="color: white;">Terms and Conditions</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="color: white;"></button>
             </div>
-            <div class="modal-body">
-                <h6>Room Reservation and Restaurant Management System Terms of Service</h6>
+            <div class="modal-body" style="color: white;">
+                <h6 style="color: white;">Room Reservation and Restaurant Management System Terms of Service</h6>
                 <ol>
                     <li><strong>Account Usage</strong>
                         <ul>
@@ -492,12 +492,13 @@ if (isset($_GET['room_id'])) {
                     </li>
                 </ol>
             </div>
-            <div class="modal-footer">
+            <div class="modal-footer" style="border-top: 1px solid rgba(255, 255, 255, 0.1);">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
 </div>
+
              
                 </div>
             </div>
