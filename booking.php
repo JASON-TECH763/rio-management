@@ -104,40 +104,9 @@ if ($conn->query($sql) === TRUE) {
 
     <!-- Template Stylesheet -->
     <link href="css/style.css" rel="stylesheet">
- <!-- Custom CSS -->
- <style>
-        body {
-            background-color: #2a2f5b;
-            color: white;
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .form-container {
-            background-color: #3b4272;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            width: 100%;
-            max-width: 500px;
-        }
-        .form-control {
-            background-color: rgba(255,255,255,0.1);
-            color: white;
-            border: 1px solid rgba(255,255,255,0.3);
-        }
-        .form-control:focus {
-            background-color: rgba(255,255,255,0.2);
-            color: white;
-            border-color: #1572e8;
-            box-shadow: none;
-        }
-        .btn-primary {
-            background-color: #1572e8;
-            border-color: #1572e8;
-        }
-        .terms-link {
+
+    <style>
+         .terms-link {
             color: #1572e8;
             text-decoration: underline;
             cursor: pointer;
@@ -165,34 +134,6 @@ if ($conn->query($sql) === TRUE) {
     right: 1rem;
     padding: 1rem;
     margin: -1rem -1rem -1rem auto;
-}
-.form-control::placeholder {
-    color: rgba(255, 255, 255, 0.7) !important;  /* Makes placeholder text white with some transparency */
-}
-
-.form-control {
-    color: white !important;  /* Makes input text white */
-}
-
-.form-control:-webkit-autofill,
-.form-control:-webkit-autofill:hover,
-.form-control:-webkit-autofill:focus,
-.form-control:-webkit-autofill:active {
-    -webkit-text-fill-color: white !important;
-    -webkit-box-shadow: 0 0 0 30px #3b4272 inset !important;  /* Matches your form background */
-    transition: background-color 5000s ease-in-out 0s;
-}
-
-.custom-control-label {
-    color: white;  /* Makes checkbox label text white */
-}
-
-.terms-link {
-    color: #1572e8;  /* Keeps the Terms and Conditions link blue */
-}
-
-.password-toggle-icon i {
-    color: white;  /* Makes the password toggle icon white */
 }
     </style>
  
