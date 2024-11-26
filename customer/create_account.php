@@ -165,6 +165,32 @@ if (isset($_POST['create_account'])) {
             text-decoration: underline;
             cursor: pointer;
         }
+        .modal-content {
+    background-color: #2a2f5b;
+    color: white;
+}
+
+.modal-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal-footer {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal-header .close {
+    color: white;
+}
+
+.btn-secondary {
+    background-color: #3b4272;
+    border-color: #3b4272;
+}
+
+.btn-secondary:hover {
+    background-color: #4b5282;
+    border-color: #4b5282;
+}
     </style>
 
     <!-- Font Awesome -->
