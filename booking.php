@@ -135,10 +135,6 @@ if ($conn->query($sql) === TRUE) {
     padding: 1rem;
     margin: -1rem -1rem -1rem auto;
 }
-.terms-link {
-    color: #1572e8;  /* Keeps the Terms and Conditions link blue */
-}
-
     </style>
  
     <script>
