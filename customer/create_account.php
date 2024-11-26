@@ -348,58 +348,41 @@ if (isset($_POST['create_account'])) {
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
     <script>
-function togglePasswordVisibility() {
-    const passwordInput = document.getElementById('password');
-    const toggleIcon = document.getElementById('passwordToggle');
-    
-    if (passwordInput.type === 'password') {
-        passwordInput.type = 'text';
-        toggleIcon.classList.remove('fa-eye');
-        toggleIcon.classList.add('fa-eye-slash');
-    } else {
-        passwordInput.type = 'password';
-        toggleIcon.classList.remove('fa-eye-slash');
-        toggleIcon.classList.add('fa-eye');
-    }
-}
-
-// Prevent form submission if terms are not checked
-$(document).ready(function() {
-    $('#createAccountForm').on('submit', function(e) {
-        const termsCheckbox = $('#termsCheckbox');
-        
-        if (!termsCheckbox.is(':checked')) {
-            e.preventDefault();
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById('password');
+            const toggleIcon = document.getElementById('passwordToggle');
             
-            // Clear any existing error message
-            $('.terms-error').remove();
-            
-            // Add error message below the checkbox
-            termsCheckbox.closest('.form-group')
-                .append('<div class="text-danger terms-error mt-2">Please agree to the Terms and Conditions before proceeding.</div>');
-            
-            // Optional: Also show SweetAlert for additional emphasis
-            Swal.fire({
-                icon: 'error',
-                title: 'Terms and Conditions',
-                text: 'Please agree to the Terms and Conditions before proceeding.',
-                confirmButtonColor: '#3085d6',
-                confirmButtonText: 'OK'
-            });
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
         }
-    });
 
-    // Make terms link in modal clickable to check checkbox
-    $('.terms-link').on('click', function() {
-        $('#termsCheckbox').prop('checked', true);
-        $('.terms-error').remove(); // Remove error message if present
-    });
+        // Prevent form submission if terms are not checked
+        $(document).ready(function() {
+            $('#createAccountForm').on('submit', function(e) {
+                if (!$('#termsCheckbox').is(':checked')) {
+                    e.preventDefault();
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Terms and Conditions',
+                        text: 'Please agree to the Terms and Conditions before proceeding.',
+                        confirmButtonColor: '#3085d6',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            });
 
-    // Remove error message if checkbox is checked
-    $('#termsCheckbox').on('change', function() {
-        $('.terms-error').remove();
-    });
-});
-</script>
+            // Make terms link in modal clickable to check checkbox
+            $('.terms-link').on('click', function() {
+                $('#termsCheckbox').prop('checked', true);
+            });
+        });
+    </script>
 </body>
 </html>
