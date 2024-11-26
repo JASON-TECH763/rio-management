@@ -2,23 +2,17 @@
 session_start();
 include('config/connect.php');
 
-// Security Configuration
 $error = "";
 $max_attempts = 3;       // Maximum number of login attempts
 $lockout_time = 180;     // Lockout time in seconds (3 minutes)
 
 // reCAPTCHA secret key
-$recaptcha_secret = 'YOUR_RECAPTCHA_SECRET_KEY';
+$recaptcha_secret = '6LcGl4kqAAAAAMDe4J1_HVSJ1xpMETM4cwxWIpG-';
 
 // Initialize session variables for tracking attempts
 if (!isset($_SESSION['attempts'])) {
     $_SESSION['attempts'] = 0;
     $_SESSION['last_attempt_time'] = time();
-}
-
-// Prevent direct script access
-if (!isset($_SERVER['HTTP_X_REQUESTED_WITH']) || strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) != 'xmlhttprequest') {
-    die('Access denied');
 }
 
 // Check if the user is locked out
@@ -40,10 +34,8 @@ if ($_SESSION['attempts'] >= $max_attempts) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
     // Validate CSRF token
     if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
-        echo json_encode([
-            'success' => false, 
-            'error' => 'Invalid CSRF token. Please refresh the page and try again.'
-        ]);
+        $error = "Invalid CSRF token!";
+        echo json_encode(['success' => false, 'error' => $error]);
         exit();
     }
 
@@ -74,16 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
     ];
     
     $verify_context = stream_context_create($verify_options);
-    $verify_response = @file_get_contents($verify_url, false, $verify_context);
-    
-    if ($verify_response === false) {
-        echo json_encode([
-            'success' => false, 
-            'error' => 'Unable to verify reCAPTCHA. Please try again.'
-        ]);
-        exit();
-    }
-    
+    $verify_response = file_get_contents($verify_url, false, $verify_context);
     $response_data = json_decode($verify_response);
     
     if (!$response_data->success) {
@@ -94,25 +77,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
         exit();
     }
 
-    // Sanitize and validate input
-    $user = filter_var(trim($_POST['uname']), FILTER_SANITIZE_STRING);
+    // If reCAPTCHA passed, proceed with login
+    $user = trim($_POST['uname']);
     $pass = trim($_POST['pass']);
 
-    // Validate input
-    if (empty($user) || empty($pass)) {
-        echo json_encode([
-            'success' => false, 
-            'error' => 'Please provide both username and password'
-        ]);
-        exit();
-    }
+    if (!empty($user) && !empty($pass)) {
+        // Sanitize input
+        $user = filter_var($user, FILTER_SANITIZE_STRING);
 
-    // Prevent brute-force by adding a small delay
-    usleep(250000); // 250 milliseconds
-
-    try {
-        // Prepare statement to prevent SQL injection
-        $stmt = $conn->prepare("SELECT id, uname, password FROM admin WHERE uname = ?");
+        // Query the database for the provided username
+        $stmt = $conn->prepare("SELECT uname, password FROM admin WHERE uname = ?");
         $stmt->bind_param("s", $user);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -122,51 +96,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
 
             // Verify the password
             if (password_verify($pass, $row['password'])) {
-                // Regenerate session ID to prevent session fixation
-                session_regenerate_id(true);
-                
-                // Set session variables
-                $_SESSION['user_id'] = $row['id'];
-                $_SESSION['uname'] = $row['uname'];
-                $_SESSION['last_login'] = time();
-                
-                // Reset login attempts
-                $_SESSION['attempts'] = 0;
-
-                // Log successful login (recommended)
-                error_log("Successful login for user: {$row['uname']} at " . date('Y-m-d H:i:s'));
-
-                echo json_encode([
-                    'success' => true, 
-                    'redirect' => 'dashboard.php'
-                ]);
+                session_regenerate_id(true); // Regenerate session ID
+                $_SESSION['uname'] = $user;
+                $_SESSION['attempts'] = 0; // Reset attempts on successful login
+                echo json_encode(['success' => true, 'redirect' => 'dashboard.php']);
                 exit();
             } else {
-                $error = 'Invalid Username or Password';
+                $error = '* Invalid Username or Password';
             }
         } else {
-            $error = 'Invalid Username or Password';
+            $error = '* Invalid Username or Password';
         }
 
         // Increment attempts and update last attempt time
         $_SESSION['attempts']++;
         $_SESSION['last_attempt_time'] = time();
-
-        echo json_encode([
-            'success' => false, 
-            'error' => $error,
-            'disable' => $_SESSION['attempts'] >= $max_attempts,
-            'time_remaining' => $_SESSION['attempts'] >= $max_attempts ? $lockout_time : null
-        ]);
-    } catch (Exception $e) {
-        // Log the error securely
-        error_log("Login error: " . $e->getMessage());
-        
-        echo json_encode([
-            'success' => false, 
-            'error' => 'An unexpected error occurred. Please try again.'
-        ]);
+    } else {
+        $error = "* Please Fill all the Fields!";
     }
-    exit();
+
+    // Return error as JSON response
+    echo json_encode([
+        'success' => false, 
+        'error' => $error,
+        'disable' => $_SESSION['attempts'] >= $max_attempts,
+        'time_remaining' => $_SESSION['attempts'] >= $max_attempts ? $lockout_time : null
+    ]);
 }
 ?>
