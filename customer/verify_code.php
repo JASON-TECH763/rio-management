@@ -39,6 +39,7 @@ if (isset($_POST['verify_otp'])) {
 <head>
     <title>Rio Management System</title>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <script>
         window.onload = function() {
             <?php if ($otp_success): ?>
@@ -66,14 +67,15 @@ if (isset($_POST['verify_otp'])) {
     <div class="container mt-5">
         <center>
             <!-- Box container around the form -->
-            <div class="form-box" style="background-color: #3b4272; padding: 30px; border-radius: 10px; width: 400px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);">
-            <a href="create_account.php" class="btn btn-link position-absolute" style="top: 10px; left: 10px; color: white;">
-                        <i class="fas fa-arrow-left"></i>
-                    </a>
+            <div class="form-box" style="background-color: #3b4272; padding: 30px; border-radius: 10px; width: 400px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); position: relative;">
+                <!-- Back button -->
+                <a href="index.php" class="btn btn-link position-absolute" style="top: 10px; left: 10px; color: white;">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
                         
-                        <!-- Logo image at the top -->
-                        <img src="assets/img/1bg.jpg" alt="Logo" class="img-fluid mb-4" style="max-width: 100px; border-radius: 50%;">
-            <form method="post">
+                <!-- Logo image at the top -->
+                <img src="assets/img/1bg.jpg" alt="Logo" class="img-fluid mb-4" style="max-width: 100px; border-radius: 50%;">
+                <form method="post">
                     <div class="d-flex flex-row align-items-center justify-content-center" style="color:#FEA116; font-size: 1.7rem;">
                         <h1 class="mb-5">Verify OTP</h1>
                     </div>
@@ -116,5 +118,4 @@ if (isset($_POST['verify_otp'])) {
         }
     </style>
 </body>
-
 </html>
