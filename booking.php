@@ -102,6 +102,9 @@ if ($conn->query($sql) === TRUE) {
     <!-- Customized Bootstrap Stylesheet -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
 
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
     <!-- Template Stylesheet -->
     <link href="css/style.css" rel="stylesheet">
 
@@ -431,14 +434,15 @@ if (isset($_GET['room_id'])) {
                                         </div>
                                     </div>
 
-                                    <div class="form-group">
-                            <div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input" id="termsCheckbox" name="terms_agreement" required>
-                                <label class="custom-control-label" for="termsCheckbox">
-                                    I agree to the <span class="terms-link" data-toggle="modal" data-target="#termsModal">Terms and Conditions</span>
-                                </label>
-                            </div>
-                        </div>
+                                   <!-- Terms Checkbox and Link -->
+<div class="form-group">
+    <div class="custom-control custom-checkbox">
+        <input type="checkbox" class="custom-control-input" id="termsCheckbox" name="terms_agreement" required>
+        <label class="custom-control-label" for="termsCheckbox">
+            I agree to the <span class="terms-link" data-bs-toggle="modal" data-bs-target="#termsModal">Terms and Conditions</span>
+        </label>
+    </div>
+</div>
                                     <div class="col-12">
                                         <button class="btn btn-primary w-100 py-3" name="submit" type="submit">Book Now</button>
                                     </div>
@@ -447,61 +451,56 @@ if (isset($_GET['room_id'])) {
                         </div>
                     </div>
 
-             <!-- Terms and Conditions Modal -->
-    <div class="modal fade" id="termsModal" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-scrollable" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Terms and Conditions</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <h6>Room Reservation and Restaurant Management System Terms of Service</h6>
-                    <ol>
-                        <li><strong>Account Usage</strong>
-                            <ul>
-                                <li>You must provide accurate and current information during registration.</li>
-                                <li>You are responsible for maintaining the confidentiality of your account credentials.</li>
-                            </ul>
-                        </li>
-                        <li><strong>Reservation Policies</strong>
-                            <ul>
-                                <li>Reservations are subject to availability and confirmation.</li>
-                                <li>Cancellations must be made at least 24 hours in advance.</li>
-                                <li>Late cancellations may incur a cancellation fee.</li>
-                            </ul>
-                        </li>
-                        <li><strong>Privacy and Data Protection</strong>
-                            <ul>
-                                <li>Personal information will be handled in accordance with our privacy policy.</li>
-                                <li>We do not share personal data with third parties without consent.</li>
-                            </ul>
-                        </li>
-                        <li><strong>Restaurant Dining Terms</strong>
-                            <ul>
-                                <li>Menu items and prices are subject to change without notice.</li>
-                                <li>Special dietary requirements must be communicated in advance.</li>
-                            </ul>
-                        </li>
-                        <li><strong>Liability Disclaimer</strong>
-                            <ul>
-                                <li>We are not liable for any inconvenience caused by circumstances beyond our control.</li>
-                                <li>Customers are responsible for their personal belongings.</li>
-                            </ul>
-                        </li>
-                    </ol>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                </div>
+                <!-- Terms and Conditions Modal -->
+<div class="modal fade" id="termsModal" tabindex="-1" aria-labelledby="termsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="termsModalLabel">Terms and Conditions</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h6>Room Reservation and Restaurant Management System Terms of Service</h6>
+                <ol>
+                    <li><strong>Account Usage</strong>
+                        <ul>
+                            <li>You must provide accurate and current information during registration.</li>
+                            <li>You are responsible for maintaining the confidentiality of your account credentials.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Reservation Policies</strong>
+                        <ul>
+                            <li>Reservations are subject to availability and confirmation.</li>
+                            <li>Cancellations must be made at least 24 hours in advance.</li>
+                            <li>Late cancellations may incur a cancellation fee.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Privacy and Data Protection</strong>
+                        <ul>
+                            <li>Personal information will be handled in accordance with our privacy policy.</li>
+                            <li>We do not share personal data with third parties without consent.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Restaurant Dining Terms</strong>
+                        <ul>
+                            <li>Menu items and prices are subject to change without notice.</li>
+                            <li>Special dietary requirements must be communicated in advance.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Liability Disclaimer</strong>
+                        <ul>
+                            <li>We are not liable for any inconvenience caused by circumstances beyond our control.</li>
+                            <li>Customers are responsible for their personal belongings.</li>
+                        </ul>
+                    </li>
+                </ol>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
-                    
-                    
-              
+</div>
              
                 </div>
             </div>
@@ -534,6 +533,8 @@ if (isset($_GET['room_id'])) {
     <script src="lib/tempusdominus/js/moment.min.js"></script>
     <script src="lib/tempusdominus/js/moment-timezone.min.js"></script>
     <script src="lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <!-- Template Javascript -->
     <script src="js/main.js"></script>
@@ -569,26 +570,27 @@ function calculateAmount(price, guestCount) {
     <script src="js/sweetalert.js"></script>
 
     <script>
-        // Prevent form submission if terms are not checked
-        $(document).ready(function() {
-            $('#createAccountForm').on('submit', function(e) {
-                if (!$('#termsCheckbox').is(':checked')) {
-                    e.preventDefault();
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Terms and Conditions',
-                        text: 'Please agree to the Terms and Conditions before proceeding.',
-                        confirmButtonColor: '#3085d6',
-                        confirmButtonText: 'OK'
-                    });
-                }
-            });
+       document.addEventListener('DOMContentLoaded', () => {
+    // Automatically check the checkbox when terms modal is triggered
+    document.querySelector('.terms-link').addEventListener('click', () => {
+        document.querySelector('#termsCheckbox').checked = true;
+    });
 
-            // Make terms link in modal clickable to check checkbox
-            $('.terms-link').on('click', function() {
-                $('#termsCheckbox').prop('checked', true);
+    // Validation on form submission
+    document.querySelector('form').addEventListener('submit', (event) => {
+        if (!document.querySelector('#termsCheckbox').checked) {
+            event.preventDefault(); // Prevent form submission
+            Swal.fire({
+                icon: 'error',
+                title: 'Terms and Conditions',
+                text: 'Please agree to the Terms and Conditions before proceeding.',
+                confirmButtonColor: '#3085d6',
+                confirmButtonText: 'OK'
             });
-        });
+        }
+    });
+});
+
     </script>
 </body>
 
