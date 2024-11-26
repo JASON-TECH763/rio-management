@@ -239,10 +239,26 @@ if (isset($_POST['create_account'])) {
                     <h2 class="mb-4" style="color: #FEA116;">Create Customer Account</h2>
 
                     <form method="post" id="createAccountForm">
-                        <div class="form-group">
-                            <input type="text" name="name" class="form-control" placeholder="Full Name" 
-                            pattern="[A-Za-zÀ-ž' -]+" title="Name can contain only letters, hyphens, apostrophes, and spaces." oninput="validateName()">
-                            </div>
+                    <div class="form-group">
+    <input 
+        type="text" 
+        name="name" 
+        class="form-control" 
+        placeholder="Full Name" 
+        pattern="[A-Za-zÀ-ž' -]+" 
+        title="Name can contain only letters, hyphens, apostrophes, and spaces." 
+        oninput="formatName(this)">
+</div>
+
+<script>
+function formatName(input) {
+    // Automatically capitalize the first letter of each word
+    input.value = input.value
+        .toLowerCase() // Convert all to lowercase
+        .replace(/\b\w/g, char => char.toUpperCase()); // Capitalize first letter of each word
+}
+</script>
+
 
                         <div class="form-group">
                             <input type="email" name="email" class="form-control" placeholder="Email Address" required>
