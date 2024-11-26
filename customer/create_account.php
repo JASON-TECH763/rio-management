@@ -172,24 +172,22 @@ if (isset($_POST['create_account'])) {
 
 .modal-header {
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    justify-content: center;  /* This centers the title */
+    text-align: center;
 }
 
-.modal-footer {
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+.modal-title {
+    text-align: center;
+    width: 100%;  /* This ensures the title takes full width */
 }
 
+/* Adjust the close button position */
 .modal-header .close {
     color: white;
-}
-
-.btn-secondary {
-    background-color: #3b4272;
-    border-color: #3b4272;
-}
-
-.btn-secondary:hover {
-    background-color: #4b5282;
-    border-color: #4b5282;
+    position: absolute;
+    right: 1rem;
+    padding: 1rem;
+    margin: -1rem -1rem -1rem auto;
 }
     </style>
 
