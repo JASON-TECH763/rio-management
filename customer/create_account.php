@@ -122,114 +122,127 @@ if (isset($_POST['create_account'])) {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
-    <title>Rio Management System</title>
-    <link rel="shortcut icon" type="image/x-icon" href="assets/img/a.jpg">
-    <link rel="stylesheet" href="assets/css/bootstrap.min.css">
-    <link rel="stylesheet" href="assets/css/font-awesome.min.css">
-    <link rel="stylesheet" href="assets/css/style.css">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>Rio Management System - Create Account</title>
+    
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    
+    <!-- Custom CSS -->
     <style>
         body {
             background-color: #2a2f5b;
             color: white;
-            margin: 0;
-            padding: 0;
-            height: 100%;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .form-container {
+            background-color: #3b4272;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 500px;
         }
         .form-control {
-            width: 100%;
-            padding: 10px;
-            padding-right: 40px;
-            box-sizing: border-box;
+            background-color: rgba(255,255,255,0.1);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
         }
-        .password-toggle {
-            cursor: pointer;
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #999;
+        .form-control:focus {
+            background-color: rgba(255,255,255,0.2);
+            color: white;
+            border-color: #1572e8;
+            box-shadow: none;
         }
-        .form-check-label a {
+        .btn-primary {
+            background-color: #1572e8;
+            border-color: #1572e8;
+        }
+        .terms-link {
             color: #1572e8;
             text-decoration: underline;
+            cursor: pointer;
         }
     </style>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
-
 <body>
-    <section class="vh-100" style="background-color: #2a2f5b; color: white;">
-        <div class="container-fluid h-custom">
-            <div class="row d-flex justify-content-center align-items-center h-100">
-                <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
-                    <div class="form-box text-center position-relative" style="background-color: #3b4272; padding: 30px; border-radius: 10px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);">
-                        <a href="https://rio-lawis.com/customer/" class="btn btn-light position-absolute" style="top: 10px; left: 10px; background-color: transparent; color: #1572e8;">
-                            <i class="fas fa-arrow-left"></i>
-                        </a>
-                        
-                        <img src="assets/img/1bg.jpg" alt="Logo" class="img-fluid mb-4" style="max-width: 100px; border-radius: 50%;">
-                        
-                        <form method="post">
-                            <div class="d-flex flex-row align-items-center justify-content-center justify-content-lg-start">
-                                <span class="h1 fw-bold mb-0" style="color: #FEA116; text-align: center;">Create Customer Account</span>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="form-container text-center">
+                    <a href="index.php" class="btn btn-link position-absolute" style="top: 10px; left: 10px; color: white;">
+                        <i class="fas fa-arrow-left"></i>
+                    </a>
+
+                    <img src="assets/img/1bg.jpg" alt="Logo" class="img-fluid mb-4 rounded-circle" style="max-width: 100px;">
+                    
+                    <h2 class="mb-4" style="color: #FEA116;">Create Customer Account</h2>
+
+                    <form method="post" id="createAccountForm">
+                        <div class="form-group">
+                            <input type="text" name="name" class="form-control" placeholder="Full Name" 
+                                   pattern="[A-Za-zÀ-ž' -]+" 
+                                   title="Name can contain only letters, hyphens, apostrophes, and spaces" 
+                                   required>
+                        </div>
+
+                        <div class="form-group">
+                            <input type="email" name="email" class="form-control" placeholder="Email Address" required>
+                        </div>
+
+                        <div class="form-group position-relative">
+                            <input type="password" name="password" id="password" class="form-control" 
+                                   placeholder="Password" 
+                                   minlength="8" 
+                                   pattern="(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}" 
+                                   title="Password must contain at least one uppercase letter, one number, and one special character" 
+                                   required>
+                            <span class="password-toggle-icon" onclick="togglePasswordVisibility()">
+                                <i class="fas fa-eye" id="passwordToggle" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer;"></i>
+                            </span>
+                        </div>
+
+                        <div class="form-group">
+                            <input type="tel" name="phone" class="form-control" 
+                                   placeholder="Phone Number" 
+                                   pattern="09\d{9}" 
+                                   maxlength="11" 
+                                   title="Phone number must start with '09' and be exactly 11 digits" 
+                                   required>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="termsCheckbox" name="terms_agreement" required>
+                                <label class="custom-control-label" for="termsCheckbox">
+                                    I agree to the <span class="terms-link" data-toggle="modal" data-target="#termsModal">Terms and Conditions</span>
+                                </label>
                             </div>
-                            
-                            <?php if (!empty($error)): ?>
-                                <p style="color:red;"><?php echo htmlspecialchars($error); ?></p>
-                            <?php endif; ?>
-                            
-                            <div class="form-outline mb-4">
-                                <div class="form-group">
-                                    <label for="name"></label>
-                                    <input type="text" name="name" id="name" class="form-control" placeholder="Enter your name" required 
-                                    pattern="[A-Za-zÀ-ž' -]+" title="Name can contain only letters, hyphens, apostrophes, and spaces." oninput="validateName()">
-                                </div>
+                        </div>
 
-                                <br>
-                                <div class="form-group">
-                                    <label for="email"></label>
-                                    <input type="email" name="email" id="email" class="form-control" placeholder="Enter your email" required>
-                                </div>
-                                
-                                <br>
-                                <div class="form-group position-relative">
-                                    <label for="password"></label>
-                                    <input type="password" name="password" id="password" class="form-control" placeholder="Enter your password" minlength="8" pattern="(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}" title="Password must contain at least one uppercase letter, one number, and one special character" required>
-                                    <span class="password-toggle">
-                                        <i class="fas fa-eye" id="togglePassword" onclick="togglePasswordVisibility()"></i>
-                                    </span>
-                                </div>
-
-                                <br>
-                                <div class="form-group">
-                                    <label for="phone"></label>
-                                    <input type="text" name="phone" id="phone" class="form-control" placeholder="Enter your phone number" pattern="09\d{9}" maxlength="11" title="Phone number must start with '09' and be exactly 11 digits" required>
-                                </div>
-
-                                <br>
-                                <div class="form-check mb-3">
-                                    <input type="checkbox" class="form-check-input" id="termsCheckbox" name="terms_agreement" required>
-                                    <label class="form-check-label" for="termsCheckbox">
-                                        I agree to the <a href="#" data-toggle="modal" data-target="#termsModal">Terms and Conditions</a>
-                                    </label>
-                                </div>
-
-                                <button type="submit" name="create_account" class="btn btn-warning btn-lg" style="background-color: #1572e8; color: white;">Send verification code</button>
-                            </div>
-                        </form>
-                    </div>
+                        <button type="submit" name="create_account" class="btn btn-primary btn-block">
+                            Create Account
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
 
     <!-- Terms and Conditions Modal -->
-    <div class="modal fade" id="termsModal" tabindex="-1" role="dialog" aria-labelledby="termsModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
+    <div class="modal fade" id="termsModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="termsModalLabel">Terms and Conditions</h5>
+                    <h5 class="modal-title">Terms and Conditions</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -277,35 +290,32 @@ if (isset($_POST['create_account'])) {
         </div>
     </div>
 
-    <script src="assets/js/jquery-3.2.1.min.js"></script>
-    <script src="assets/js/bootstrap.min.js"></script>
-    <script>
-        function validateName() {
-            var nameField = document.getElementById('name');
-            var value = nameField.value;
-            var regex = /^([A-Z][a-zÀ-ž'-]+\s?)+$/;
-            nameField.setCustomValidity(regex.test(value) ? "" : "Invalid name format");
-        }
+    <!-- jQuery, Popper.js, and Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
+    <script>
         function togglePasswordVisibility() {
-            const passwordInput = document.getElementById("password");
-            const toggleIcon = document.getElementById("togglePassword");
+            const passwordInput = document.getElementById('password');
+            const toggleIcon = document.getElementById('passwordToggle');
             
-            if (passwordInput.type === "password") {
-                passwordInput.type = "text";
-                toggleIcon.classList.remove("fa-eye-slash");
-                toggleIcon.classList.add("fa-eye");
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
             } else {
-                passwordInput.type = "password";
-                toggleIcon.classList.remove("fa-eye");
-                toggleIcon.classList.add("fa-eye-slash");
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
             }
         }
 
+        // Prevent form submission if terms are not checked
         $(document).ready(function() {
-            // Prevent form submission if terms are not checked
-            $('form').on('submit', function(e) {
+            $('#createAccountForm').on('submit', function(e) {
                 if (!$('#termsCheckbox').is(':checked')) {
+                    e.preventDefault();
                     Swal.fire({
                         icon: 'error',
                         title: 'Terms and Conditions',
@@ -313,27 +323,14 @@ if (isset($_POST['create_account'])) {
                         confirmButtonColor: '#3085d6',
                         confirmButtonText: 'OK'
                     });
-                    e.preventDefault(); // Prevent form submission
                 }
+            });
+
+            // Make terms link in modal clickable to check checkbox
+            $('.terms-link').on('click', function() {
+                $('#termsCheckbox').prop('checked', true);
             });
         });
     </script>
-
-    <?php if (isset($_SESSION['status']) && $_SESSION['status'] != ""): ?>
-    <script>
-        Swal.fire({
-            title: '<?php echo ($_SESSION["status"] == "success") ? "Account Created!" : "Error!"; ?>',
-            text: '<?php echo $_SESSION["message"]; ?>',
-            icon: '<?php echo $_SESSION["status"]; ?>',
-            confirmButtonText: 'OK'
-        }).then(function() {
-            window.location = 'verify_code.php';
-        });
-    </script>
-    <?php
-        unset($_SESSION['status']);
-        unset($_SESSION['message']);
-    endif;
-    ?>
 </body>
 </html>
