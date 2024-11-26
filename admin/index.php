@@ -5,6 +5,9 @@ session_start();
 if (!isset($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
+
+// Set security headers
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -38,6 +41,24 @@ if (!isset($_SESSION['csrf_token'])) {
         height: 100vh;
     }
 
+    .divider:after,
+    .divider:before {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: #eee;
+    }
+
+    .h-custom {
+        height: calc(100% - 73px);
+    }
+
+    @media (max-width: 450px) {
+        .h-custom {
+            height: 100%;
+        }
+    }
+
     .back-button {
         position: absolute;
         top: 20px;
@@ -56,11 +77,26 @@ if (!isset($_SESSION['csrf_token'])) {
         margin-right: 5px;
     }
 
+    @media (max-width: 450px) {
+        .back-button {
+            top: 10px;
+            left: 10px;
+            padding: 6px 10px;
+        }
+
+        .back-button i {
+            font-size: 0.9rem;
+        }
+    }
+
+    /* Modified: Remove display: none from recaptcha-container */
     .recaptcha-container {
         margin-bottom: 15px;
     }
-    </style>
+</style>
+
 </head>
+
 <body>
 <a href="https://rio-lawis.com/" class="btn btn-light back-button">
     <i class="fas fa-arrow-left"></i>
@@ -86,10 +122,7 @@ if (!isset($_SESSION['csrf_token'])) {
 
           <div class="form-outline mb-4">
             <label class="form-label" for="user">Username</label>
-            <input type="text" name="uname" id="user" class="form-control form-control-lg" 
-                   placeholder="Enter username" required autocomplete="username"
-                   pattern="[A-Za-z0-9_]{3,20}" 
-                   title="Username must be 3-20 characters long, using only letters, numbers, and underscores">
+            <input type="text" name="uname" id="user" class="form-control form-control-lg" placeholder="Enter username" required autocomplete="username">
           </div>
           <div class="form-outline mb-3">
             <label class="form-label" for="pass">Password</label>
@@ -99,9 +132,9 @@ if (!isset($_SESSION['csrf_token'])) {
                 id="psw" 
                 class="form-control form-control-lg" 
                 placeholder="Enter password" 
-                minlength="12" 
-                pattern="(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':\"\\|,.<>\/?]).{12,}" 
-                title="Password must be at least 12 characters long, containing uppercase, lowercase, number, and special character" 
+                minlength="8" 
+                pattern="(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}" 
+                title="Password must contain at least one uppercase letter, one number, and one special character" 
                 required 
                 autocomplete="current-password"
             >
@@ -109,6 +142,7 @@ if (!isset($_SESSION['csrf_token'])) {
             <span style="margin-left: 5px;">Show password</span>
           </div>
 
+          <!-- Modified: Remove id from container since we don't need to toggle visibility -->
           <div class="recaptcha-container mb-3">
             <div class="g-recaptcha" data-sitekey="6LcGl4kqAAAAAB6yVfa6va0KJEnZ5nBZjW9G9was"></div>
           </div>
@@ -123,6 +157,7 @@ if (!isset($_SESSION['csrf_token'])) {
     </div>
   </div>
 </section>
+
 
 <script src="assets/js/popper.min.js"></script>
 <script src="assets/js/bootstrap.min.js"></script>

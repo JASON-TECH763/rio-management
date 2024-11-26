@@ -82,9 +82,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
     $pass = trim($_POST['pass']);
 
     if (!empty($user) && !empty($pass)) {
-        // Sanitize input
-        $user = filter_var($user, FILTER_SANITIZE_STRING);
-
         // Query the database for the provided username
         $stmt = $conn->prepare("SELECT uname, password FROM admin WHERE uname = ?");
         $stmt->bind_param("s", $user);
