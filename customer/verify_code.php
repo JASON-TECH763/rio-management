@@ -69,7 +69,7 @@ if (isset($_POST['verify_otp'])) {
             <!-- Box container around the form -->
             <div class="form-box" style="background-color: #3b4272; padding: 30px; border-radius: 10px; width: 400px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); position: relative;">
                 <!-- Back button positioned at top-left of form -->
-                <a href="index.php" class="btn btn-link" style="position: absolute; left: 20px; top: 20px; color: white;">
+                <a href="create_account.php" class="btn btn-link" style="position: absolute; left: 20px; top: 20px; color: white;">
                     <i class="fas fa-arrow-left"></i>
                 </a>
                 
