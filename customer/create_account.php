@@ -189,6 +189,34 @@ if (isset($_POST['create_account'])) {
     padding: 1rem;
     margin: -1rem -1rem -1rem auto;
 }
+.form-control::placeholder {
+    color: rgba(255, 255, 255, 0.7) !important;  /* Makes placeholder text white with some transparency */
+}
+
+.form-control {
+    color: white !important;  /* Makes input text white */
+}
+
+.form-control:-webkit-autofill,
+.form-control:-webkit-autofill:hover,
+.form-control:-webkit-autofill:focus,
+.form-control:-webkit-autofill:active {
+    -webkit-text-fill-color: white !important;
+    -webkit-box-shadow: 0 0 0 30px #3b4272 inset !important;  /* Matches your form background */
+    transition: background-color 5000s ease-in-out 0s;
+}
+
+.custom-control-label {
+    color: white;  /* Makes checkbox label text white */
+}
+
+.terms-link {
+    color: #1572e8;  /* Keeps the Terms and Conditions link blue */
+}
+
+.password-toggle-icon i {
+    color: white;  /* Makes the password toggle icon white */
+}
     </style>
 
     <!-- Font Awesome -->
