@@ -22,7 +22,8 @@ if (!isset($_SESSION['csrf_token'])) {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-   
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
     <style type="text/css">
     body {
         background-color: #2a2f5b;
@@ -143,9 +144,9 @@ if (!isset($_SESSION['csrf_token'])) {
 
           <!-- Modified: Remove id from container since we don't need to toggle visibility -->
           <div class="recaptcha-container mb-3">
-    <div id="g-recaptcha" class="g-recaptcha" 
-         data-sitekey="6LcGl4kqAAAAAB6yVfa6va0KJEnZ5nBZjW9G9was"></div>
-</div>
+            <div class="g-recaptcha" data-sitekey="6LcGl4kqAAAAAB6yVfa6va0KJEnZ5nBZjW9G9was"></div>
+          </div>
+
           <div class="d-flex justify-content-between align-items-center">
             <button type="submit" name="login" class="btn btn-warning btn-lg enter" style="background-color: #1572e8; color: white; padding-left: 2.5rem; padding-right: 2.5rem;">Login</button>
             <a href="forgot_password.php" class="">Forgot password?</a>
@@ -161,86 +162,7 @@ if (!isset($_SESSION['csrf_token'])) {
 <script src="assets/js/popper.min.js"></script>
 <script src="assets/js/bootstrap.min.js"></script>
 <script src="assets/js/script.js"></script>
-<script src="https://www.google.com/recaptcha/api.js?render=explicit" async defer></script>
-<script>
-let recaptchaWidgetId = null;
 
-function renderRecaptcha() {
-    if (document.getElementById('g-recaptcha')) {
-        recaptchaWidgetId = grecaptcha.render('g-recaptcha', {
-            'sitekey': '6LcGl4kqAAAAAB6yVfa6va0KJEnZ5nBZjW9G9was',
-            'theme': 'light'
-        });
-    }
-}
-
-document.getElementById('loginForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    // Check if reCAPTCHA is verified
-    var recaptchaResponse = grecaptcha.getResponse(recaptchaWidgetId);
-    if (recaptchaResponse.length === 0) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Verification Failed',
-            text: 'Please complete the reCAPTCHA verification',
-            confirmButtonText: 'OK'
-        });
-        return;
-    }
-
-    var formData = new FormData(this);
-    formData.append('login', '1');
-
-    fetch('login.php', {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-        },
-        credentials: 'same-origin'
-    })
-    .then(response => response.json())
-    .then(data => {
-        const loginButton = document.querySelector('button[name="login"]');
-
-        if (data.success) {
-            window.location.href = data.redirect;
-        } else {
-            Swal.fire({
-                icon: 'error',
-                title: 'Login Failed',
-                text: data.error,
-                confirmButtonText: 'Try Again',
-                timer: 5000
-            });
-
-            // Reset reCAPTCHA on failure
-            if (recaptchaWidgetId !== null) {
-                grecaptcha.reset(recaptchaWidgetId);
-            }
-
-            if (data.disable) {
-                loginButton.disabled = true;
-                startTimer(data.time_remaining, loginButton);
-            }
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        // Reset reCAPTCHA on error
-        if (recaptchaWidgetId !== null) {
-            grecaptcha.reset(recaptchaWidgetId);
-        }
-    });
-});
-
-// Ensure reCAPTCHA is rendered
-window.onload = function() {
-    // Delay rendering to ensure DOM is fully loaded
-    setTimeout(renderRecaptcha, 100);
-};
-</script>
 <script>
 function togglePassword() {
     var x = document.getElementById("psw");
