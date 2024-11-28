@@ -1,10 +1,4 @@
 <?php
-$request = $_SERVER['REQUEST_URI'];
-if (substr($request, -4) == '.php') {
-    $new_url = substr($request, 0, -4);
-    header("Location: $new_url", true, 301);
-    exit();
-}
 // Anti-HTTP Secure Headers
 header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;");
 header("Strict-Transport-Security: max-age=31536000; includeSubDomains");
