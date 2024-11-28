@@ -94,7 +94,7 @@ if ($_SESSION['attempts'] >= 3 && (time() - $_SESSION['last_failed_attempt']) < 
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <!-- Add reCAPTCHA API -->
-    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <script src="https://www.google.com/recaptcha/api.js?render=explicit" async defer></script>
 
     <style type="text/css">
         /* Apply the fullscreen background color */
@@ -211,8 +211,17 @@ if ($_SESSION['attempts'] >= 3 && (time() - $_SESSION['last_failed_attempt']) < 
 
                      <!-- reCAPTCHA -->
                      <div class="recaptcha-container">
-                        <div class="g-recaptcha" data-sitekey="6LcGl4kqAAAAAB6yVfa6va0KJEnZ5nBZjW9G9was"></div>
-                    </div>
+    <div id="recaptcha-container" class="g-recaptcha"></div>
+</div>
+
+<script>
+    // Add this script to explicitly render reCAPTCHA
+    document.addEventListener('DOMContentLoaded', function() {
+        grecaptcha.render('recaptcha-container', {
+            'sitekey': '6LcGl4kqAAAAAB6yVfa6va0KJEnZ5nBZjW9G9was'
+        });
+    });
+</script>
 
                     <div class="d-flex justify-content-between align-items-center">
                         <button type="submit" name="login" class="btn btn-warning btn-lg enter" id="login-btn" 
