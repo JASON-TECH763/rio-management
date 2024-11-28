@@ -316,17 +316,17 @@ function formatName(input) {
                 <div class="modal-body">
     <h6>Food and Drinks Reservation Terms of Service</h6>
     <ol>
-        <li><strong>Reservation Policies</strong>
+    <li><strong>Reservation Policies</strong>
             <ul>
                 <li>Reservations for food and drinks are subject to availability and confirmation.</li>
-                <li>Cancellations must be made at least 24 hours in advance.</li>
-                <li>Late cancellations may incur a cancellation fee.</li>
+                <li>Cancellations can only be made by the admin within 24 hours of the reservation time.</li>
+                <li>Customers are not allowed to cancel reservations once confirmed.</li>
             </ul>
         </li>
-        <li><strong>Order Changes</strong>
+        <li><strong>No Order Changes</strong>
             <ul>
-                <li>Changes to reservations must be communicated promptly.</li>
-                <li>We reserve the right to decline modifications made less than 12 hours before the reservation time.</li>
+                <li>Order reservations cannot be changed once confirmed.</li>
+                <li>We reserve the right to enforce the original reservation details as booked.</li>
             </ul>
         </li>
         <li><strong>Special Requests</strong>
