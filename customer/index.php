@@ -86,18 +86,18 @@ if ($_SESSION['attempts'] >= 3 && (time() - $_SESSION['last_failed_attempt']) < 
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
-    <title>Rio Management System - Login</title>
+    <title>Rio Management System</title>
     <link rel="shortcut icon" type="image/x-icon" href="assets/img/a.jpg">
     <link rel="stylesheet" href="assets/css/bootstrap.min.css">
     <link rel="stylesheet" href="assets/css/font-awesome.min.css">
     <link rel="stylesheet" href="assets/css/style.css">
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    
-    <!-- reCAPTCHA API with explicit render -->
-    <script src="https://www.google.com/recaptcha/api.js?render=explicit" async defer></script>
+    <!-- Add reCAPTCHA API -->
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 
     <style type="text/css">
+        /* Apply the fullscreen background color */
         body {
             background-color: #2a2f5b;
             color: white;
@@ -138,12 +138,14 @@ if ($_SESSION['attempts'] >= 3 && (time() - $_SESSION['last_failed_attempt']) < 
             margin-right: 5px;
         }
 
+        /* reCAPTCHA container styling */
         .recaptcha-container {
             margin-bottom: 20px;
             display: flex;
             justify-content: center;
         }
 
+        /* Adjust position and size on mobile devices */
         @media (max-width: 450px) {
             .back-button {
                 top: 10px;
@@ -176,16 +178,16 @@ if ($_SESSION['attempts'] >= 3 && (time() - $_SESSION['last_failed_attempt']) < 
                 <img src="assets/img/1bg.jpg" class="img-fluid" alt="Sample image">
             </div>
             <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
-                <form method="post" id="login-form">
+                <form method="post">
                     <div class="d-flex flex-row align-items-center justify-content-center justify-content-lg-start">
-                        <div class="d-flex align-items-center mb-3 pb-1">
+                        <div class="d-flex align-items e-center mb-3 pb-1">
                             <span class="h1 fw-bold mb-0" style="color: #FEA116;">Customer Login</span>
                         </div>
                     </div>
                  
                     <div class="form-outline mb-4">
                         <label class="form-label" for="user">Email</label>
-                        <input type="email" name="uname" id="user" class="form-control form-control-lg" placeholder="Enter email" required />
+                        <input type="text" name="uname" id="user" class="form-control form-control-lg" placeholder="Enter email" required />
                     </div>
 
                     <div class="form-outline mb-3">
@@ -200,14 +202,16 @@ if ($_SESSION['attempts'] >= 3 && (time() - $_SESSION['last_failed_attempt']) < 
                         <span style="margin-left: 5px;">Show password</span>
                     </div>
 
+
+                    <!-- Forgot Password Link -->
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <a href="forgot_password.php" style="color: #FEA116;">Forgot Password?</a>
                         <span id="countdown-timer" style="margin-right: 20px; font-weight: bold; color: #ff0000;"></span>
                     </div>
 
-                    <!-- reCAPTCHA -->
-                    <div class="recaptcha-container">
-                        <div id="recaptcha-container"></div>
+                     <!-- reCAPTCHA -->
+                     <div class="recaptcha-container">
+                        <div class="g-recaptcha" data-sitekey="6LcGl4kqAAAAAB6yVfa6va0KJEnZ5nBZjW9G9was"></div>
                     </div>
 
                     <div class="d-flex justify-content-between align-items-center">
@@ -230,6 +234,16 @@ if ($_SESSION['attempts'] >= 3 && (time() - $_SESSION['last_failed_attempt']) < 
 <!-- Include SweetAlert -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+<script>
+<?php if (!empty($sweetalert_error)): ?>
+    Swal.fire({
+        icon: 'error',
+        title: 'Login Failed',
+        text: '<?php echo $sweetalert_error; ?>',
+    });
+<?php endif; ?>
+</script>
+
 <!-- jQuery -->
 <script src="assets/js/jquery-3.2.1.min.js"></script>
 <!-- Bootstrap Core JS -->
@@ -239,15 +253,6 @@ if ($_SESSION['attempts'] >= 3 && (time() - $_SESSION['last_failed_attempt']) < 
 <script src="assets/js/script.js"></script>
 
 <script type="text/javascript">
-    // reCAPTCHA Explicit Render
-    document.addEventListener('DOMContentLoaded', function() {
-        grecaptcha.render('recaptcha-container', {
-            'sitekey': '6LcGl4kqAAAAAB6yVfa6va0KJEnZ5nBZjW9G9was',
-            'size': 'normal'
-        });
-    });
-
-    // Password Show/Hide Toggle
     function myFunction() {
         var x = document.getElementById("psw");
         if (x.type === "password") {
@@ -283,15 +288,6 @@ if ($_SESSION['attempts'] >= 3 && (time() - $_SESSION['last_failed_attempt']) < 
         const timerInterval = setInterval(updateTimer, 1000);
         updateTimer();
     }
-
-    // SweetAlert for errors
-    <?php if (!empty($sweetalert_error)): ?>
-        Swal.fire({
-            icon: 'error',
-            title: 'Login Failed',
-            text: '<?php echo $sweetalert_error; ?>',
-        });
-    <?php endif; ?>
 </script>
 
 </body>
