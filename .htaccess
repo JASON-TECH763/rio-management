@@ -4,13 +4,17 @@ php_value display_errors 1
 
 RewriteEngine On
 
-# Allow index.php to execute normally without redirection
+# Allow index.php to execute normally
 RewriteRule ^index\.php$ - [L]
 
-# If you want to serve the default page when accessing the domain root
+# Serve default page when accessing domain root
 RewriteRule ^$ index.php [L]
-RewriteEngine On
 
+# Remove .php extension
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^(.*)$ $1.php [L]
+
+# Redirect .php URLs to clean URLs
+RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ /([^.]+)\.php\ HTTP
+RewriteRule ^([^.]+)\.php$ /$1 [R=301,L]
