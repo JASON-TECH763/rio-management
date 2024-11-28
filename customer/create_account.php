@@ -314,41 +314,42 @@ function formatName(input) {
                     </button>
                 </div>
                 <div class="modal-body">
-                    <h6>Room Reservation and Restaurant Management System Terms of Service</h6>
-                    <ol>
-                        <li><strong>Account Usage</strong>
-                            <ul>
-                                <li>You must provide accurate and current information during registration.</li>
-                                <li>You are responsible for maintaining the confidentiality of your account credentials.</li>
-                            </ul>
-                        </li>
-                        <li><strong>Reservation Policies</strong>
-                            <ul>
-                                <li>Reservations are subject to availability and confirmation.</li>
-                                <li>Cancellations must be made at least 24 hours in advance.</li>
-                                <li>Late cancellations may incur a cancellation fee.</li>
-                            </ul>
-                        </li>
-                        <li><strong>Privacy and Data Protection</strong>
-                            <ul>
-                                <li>Personal information will be handled in accordance with our privacy policy.</li>
-                                <li>We do not share personal data with third parties without consent.</li>
-                            </ul>
-                        </li>
-                        <li><strong>Restaurant Dining Terms</strong>
-                            <ul>
-                                <li>Menu items and prices are subject to change without notice.</li>
-                                <li>Special dietary requirements must be communicated in advance.</li>
-                            </ul>
-                        </li>
-                        <li><strong>Liability Disclaimer</strong>
-                            <ul>
-                                <li>We are not liable for any inconvenience caused by circumstances beyond our control.</li>
-                                <li>Customers are responsible for their personal belongings.</li>
-                            </ul>
-                        </li>
-                    </ol>
-                </div>
+    <h6>Food and Drinks Reservation Terms of Service</h6>
+    <ol>
+        <li><strong>Reservation Policies</strong>
+            <ul>
+                <li>Reservations for food and drinks are subject to availability and confirmation.</li>
+                <li>Cancellations must be made at least 24 hours in advance.</li>
+                <li>Late cancellations may incur a cancellation fee.</li>
+            </ul>
+        </li>
+        <li><strong>Order Changes</strong>
+            <ul>
+                <li>Changes to reservations must be communicated promptly.</li>
+                <li>We reserve the right to decline modifications made less than 12 hours before the reservation time.</li>
+            </ul>
+        </li>
+        <li><strong>Special Requests</strong>
+            <ul>
+                <li>Special dietary requirements or custom orders must be communicated in advance.</li>
+                <li>We will make reasonable efforts to accommodate special requests but cannot guarantee availability.</li>
+            </ul>
+        </li>
+        <li><strong>Pricing and Payment</strong>
+            <ul>
+                <li>All menu items are priced as displayed at the time of reservation.</li>
+                <li>Payment accept must be arrival upon confirmation of the reservation.</li>
+            </ul>
+        </li>
+        <li><strong>Liability Disclaimer</strong>
+            <ul>
+                <li>We are not liable for any inconvenience caused by unforeseen circumstances.</li>
+                <li>Customers are responsible for their personal belongings during the reservation.</li>
+            </ul>
+        </li>
+    </ol>
+</div>
+
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 </div>
