@@ -1,15 +1,11 @@
-# Enable rewrite engine
+# HTID:23422420: DO NOT REMOVE OR MODIFY THIS LINE AND THE LINES BELOW
+php_value display_errors 1
+# DO NOT REMOVE OR MODIFY THIS LINE AND THE LINES ABOVE HTID:23422420:
+
 RewriteEngine On
 
-# Remove .php extension while preserving query parameters
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteCond %{REQUEST_FILENAME}\.php -f
-RewriteRule ^(.*)$ $1.php [QSA,L]
+# Allow index.php to execute normally without redirection
+RewriteRule ^index\.php$ - [L]
 
-# Redirect .php URLs to clean URLs with query string preservation
-RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ /([^.]+)\.php\?(.*)\ HTTP
-RewriteRule ^([^.]+)\.php$ /%1?%2 [R=301,L]
-
-# Redirect .php URLs without query string
-RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ /([^.]+)\.php\ HTTP
-RewriteRule ^([^.]+)\.php$ /%1 [R=301,L]
+# If you want to serve the default page when accessing the domain root
+RewriteRule ^$ index.php [L]
