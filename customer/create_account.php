@@ -319,7 +319,7 @@ function formatName(input) {
     <li><strong>Reservation Policies</strong>
             <ul>
                 <li>Reservations for food and drinks are subject to availability and confirmation.</li>
-                <li>Cancellations can only be made by the admin within 24 hours of the reservation time.</li>
+                <li>Cancellations can only be made by the admin and the staff within 24 hours of the reservation time.</li>
                 <li>Customers are not allowed to cancel reservations once confirmed.</li>
             </ul>
         </li>
@@ -329,16 +329,16 @@ function formatName(input) {
                 <li>We reserve the right to enforce the original reservation details as booked.</li>
             </ul>
         </li>
-        <li><strong>Special Requests</strong>
+        <li><strong>Privacy and Data Protection</strong>
             <ul>
-                <li>Special dietary requirements or custom orders must be communicated in advance.</li>
-                <li>We will make reasonable efforts to accommodate special requests but cannot guarantee availability.</li>
+                <li>Personal information will be handled in accordance with our privacy policy.</li>
+                <li>We do not share personal data with third parties without consent.</li>
             </ul>
         </li>
-        <li><strong>Pricing and Payment</strong>
+        <li><strong>Payment Policies</strong>
             <ul>
-                <li>All menu items are priced as displayed at the time of reservation.</li>
-                <li>Payment accept must be arrival upon confirmation of the reservation.</li>
+                <li>Payment for room reservations is applicable in our company and will be accepted upon arrival.</li>
+                <li>Failure to complete payment may result in the cancellation of the reservation.</li>
             </ul>
         </li>
         <li><strong>Liability Disclaimer</strong>

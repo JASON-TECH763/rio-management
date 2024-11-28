@@ -457,41 +457,36 @@ if (isset($_GET['room_id'])) {
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="color: white;"></button>
             </div>
             <div class="modal-body" style="color: white;">
-                <h6 style="color: white;">Room Reservation and Restaurant Management System Terms of Service</h6>
-                <ol>
-                    <li><strong>Account Usage</strong>
-                        <ul>
-                            <li>You must provide accurate and current information during registration.</li>
-                            <li>You are responsible for maintaining the confidentiality of your account credentials.</li>
-                        </ul>
-                    </li>
-                    <li><strong>Reservation Policies</strong>
-                        <ul>
-                            <li>Reservations are subject to availability and confirmation.</li>
-                            <li>Cancellations must be made at least 24 hours in advance.</li>
-                            <li>Late cancellations may incur a cancellation fee.</li>
-                        </ul>
-                    </li>
-                    <li><strong>Privacy and Data Protection</strong>
-                        <ul>
-                            <li>Personal information will be handled in accordance with our privacy policy.</li>
-                            <li>We do not share personal data with third parties without consent.</li>
-                        </ul>
-                    </li>
-                    <li><strong>Restaurant Dining Terms</strong>
-                        <ul>
-                            <li>Menu items and prices are subject to change without notice.</li>
-                            <li>Special dietary requirements must be communicated in advance.</li>
-                        </ul>
-                    </li>
-                    <li><strong>Liability Disclaimer</strong>
-                        <ul>
-                            <li>We are not liable for any inconvenience caused by circumstances beyond our control.</li>
-                            <li>Customers are responsible for their personal belongings.</li>
-                        </ul>
-                    </li>
-                </ol>
-            </div>
+    <h6 style="color: white;">Room Reservation Terms and Conditions</h6>
+    <ol>
+        <li><strong>Reservation Policies</strong>
+            <ul>
+                <li>Reservations are subject to availability and confirmation.</li>
+                <li>Only the admin and staff can cancel a room reservation within 24 hours of the booking time.</li>
+                <li>Room reservations cannot be edited or modified once booked.</li>
+            </ul>
+        </li>
+        <li><strong>Payment Policies</strong>
+            <ul>
+                <li>Payment for room reservations is applicable in our company and will be accepted upon arrival.</li>
+                <li>Failure to complete payment at check-in may result in the cancellation of the reservation.</li>
+            </ul>
+        </li>
+        <li><strong>Privacy and Data Protection</strong>
+            <ul>
+                <li>Personal information will be handled in accordance with our privacy policy.</li>
+                <li>We do not share personal data with third parties without consent.</li>
+            </ul>
+        </li>
+        <li><strong>Liability Disclaimer</strong>
+            <ul>
+                <li>We are not liable for any inconvenience caused by circumstances beyond our control.</li>
+                <li>Customers are responsible for their personal belongings.</li>
+            </ul>
+        </li>
+    </ol>
+</div>
+
             <div class="modal-footer" style="border-top: 1px solid rgba(255, 255, 255, 0.1);">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
