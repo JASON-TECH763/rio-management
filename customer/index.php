@@ -30,7 +30,7 @@ if ($_SESSION['attempts'] >= 3 && (time() - $_SESSION['last_failed_attempt']) < 
         } else {
             $user = $_REQUEST['uname'];
             $pass = $_REQUEST['pass'];
-
+            
             // Sanitize input
             $user = mysqli_real_escape_string($conn, $user);
 
