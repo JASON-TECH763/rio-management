@@ -23,7 +23,8 @@ if ($_SESSION['attempts'] >= $max_attempts) {
             'success' => false,
             'error' => "Too many login attempts. Please try again in " . ceil($remaining_lockout_time / 60) . " minutes.",
             'disable' => true,
-            'time_remaining' => $remaining_lockout_time
+            'time_remaining' => $remaining_lockout_time,
+            'reset_captcha' => true
         ]);
         exit();
     } else {
@@ -31,11 +32,16 @@ if ($_SESSION['attempts'] >= $max_attempts) {
     }
 }
 
+// Check if this is an AJAX request
+if (!isset($_SERVER['HTTP_X_REQUESTED_WITH']) || strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) != 'xmlhttprequest') {
+    die('Invalid request');
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
     // Validate CSRF token
     if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
         $error = "Invalid CSRF token!";
-        echo json_encode(['success' => false, 'error' => $error]);
+        echo json_encode(['success' => false, 'error' => $error, 'reset_captcha' => true]);
         exit();
     }
 
@@ -45,7 +51,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
     if (empty($recaptcha_response)) {
         echo json_encode([
             'success' => false, 
-            'error' => 'Please complete the reCAPTCHA verification'
+            'error' => 'Please complete the reCAPTCHA verification',
+            'reset_captcha' => true
         ]);
         exit();
     }
@@ -72,7 +79,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
     if (!$response_data->success) {
         echo json_encode([
             'success' => false, 
-            'error' => 'reCAPTCHA verification failed'
+            'error' => 'reCAPTCHA verification failed',
+            'reset_captcha' => true
         ]);
         exit();
     }
@@ -117,7 +125,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
         'success' => false, 
         'error' => $error,
         'disable' => $_SESSION['attempts'] >= $max_attempts,
-        'time_remaining' => $_SESSION['attempts'] >= $max_attempts ? $lockout_time : null
+        'time_remaining' => $_SESSION['attempts'] >= $max_attempts ? $lockout_time : null,
+        'reset_captcha' => true
     ]);
 }
 ?>
