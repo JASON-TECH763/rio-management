@@ -5,7 +5,11 @@ include('config/connect.php');
 // Initialize session variables if not set
 if (!isset($_SESSION['attempts'])) {
     $_SESSION['attempts'] = 0;
-    $_SESSION['last_failed_attempt'] = time();
+}
+
+// Ensure last_failed_attempt is set with a default value if not exists
+if (!isset($_SESSION['last_failed_attempt'])) {
+    $_SESSION['last_failed_attempt'] = 0;
 }
 
 // SweetAlert error variable
