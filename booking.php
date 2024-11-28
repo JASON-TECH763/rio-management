@@ -78,7 +78,14 @@ if (substr($request, -4) == '.php') {
 }
 
 ?>
-
+<?php
+$request = $_SERVER['REQUEST_URI'];
+if (substr($request, -4) == '.php') {
+    $new_url = substr($request, 0, -4);
+    header("Location: $new_url", true, 301);
+    exit();
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -190,14 +197,7 @@ if (substr($request, -4) == '.php') {
         <!-- Header Start -->
         <?php include("header.php");?>
         <!-- Header End -->
-        <?php
-$request = $_SERVER['REQUEST_URI'];
-if (substr($request, -4) == '.php') {
-    $new_url = substr($request, 0, -4);
-    header("Location: $new_url", true, 301);
-    exit();
-}
-?>
+
           <!-- Booking Start -->
             <div class="container-xxl py-5">
                 <div class="container">
