@@ -82,16 +82,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
     $pass = trim($_POST['pass']);
 
     if (!empty($user) && !empty($pass)) {
-        // Query the database for the provided username
+        // Securely query the database using prepared statements
         $stmt = $conn->prepare("SELECT uname, password FROM admin WHERE uname = ?");
-        $stmt->bind_param("s", $user);
+        if ($stmt === false) {
+            die("Prepare failed: " . $conn->error); // Log error in production
+        }
+
+        $stmt->bind_param("s", $user); // Bind parameters
         $stmt->execute();
         $result = $stmt->get_result();
 
         if ($result->num_rows === 1) {
             $row = $result->fetch_assoc();
 
-            // Verify the password
+            // Verify the password securely
             if (password_verify($pass, $row['password'])) {
                 session_regenerate_id(true); // Regenerate session ID
                 $_SESSION['uname'] = $user;
