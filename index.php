@@ -2,16 +2,14 @@
 session_start();
 include('config/connect.php');
 
-
 // Set security headers
 header("Strict-Transport-Security: max-age=31536000; includeSubDomains; preload");
 header("Content-Security-Policy: default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; img-src 'self' data:; font-src 'self' https://fonts.googleapis.com https://cdn.jsdelivr.net; frame-ancestors 'none'; form-action 'self'; base-uri 'self';");
+header("Permissions-Policy: geolocation=(), camera=(), microphone=(), payment=(), usb=(), battery=(), interest-cohort=()");
 header("X-Frame-Options: DENY");
 header("X-Content-Type-Options: nosniff");
 header("Referrer-Policy: strict-origin-when-cross-origin");
 ?>
-
-
 
 
 <!DOCTYPE html>
