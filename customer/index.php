@@ -126,13 +126,7 @@ if ($_SESSION['attempts'] >= 3 && (time() - $_SESSION['last_failed_attempt']) < 
             margin-right: 5px;
         }
 
-        /* reCAPTCHA container styling */
-        .recaptcha-container {
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: center;
-        }
-
+      
         /* Adjust position and size on mobile devices */
         @media (max-width: 450px) {
             .back-button {
@@ -142,11 +136,6 @@ if ($_SESSION['attempts'] >= 3 && (time() - $_SESSION['last_failed_attempt']) < 
             }
             .back-button i {
                 font-size: 0.9rem;
-            }
-            .recaptcha-container {
-                transform: scale(0.9);
-                transform-origin: center;
-                margin-bottom: 10px;
             }
         }
     </style>
