@@ -28,13 +28,22 @@ if ($_SESSION['attempts'] >= $max_attempts) {
     }
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
-    // Validate CSRF token
-    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
-        $error = "Invalid CSRF token!";
-        echo json_encode(['success' => false, 'error' => $error]);
-        exit();
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $recaptchaSecret = 'YOUR_SECRET_KEY';
+    $recaptchaResponse = $_POST['g-recaptcha-response'];
+
+    $recaptchaUrl = 'https://www.google.com/recaptcha/api/siteverify';
+    $response = file_get_contents($recaptchaUrl . '?secret=' . $recaptchaSecret . '&response=' . $recaptchaResponse);
+    $responseKeys = json_decode($response, true);
+
+    if ($responseKeys['success']) {
+        // Proceed with the login logic
+    } else {
+        // Handle invalid reCAPTCHA
+        echo json_encode(['success' => false, 'error' => 'reCAPTCHA validation failed.']);
     }
+}
+
 
 
     $verify_options = [
@@ -93,5 +102,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
         'disable' => $_SESSION['attempts'] >= $max_attempts,
         'time_remaining' => $_SESSION['attempts'] >= $max_attempts ? $lockout_time : null
     ]);
-}
 ?>

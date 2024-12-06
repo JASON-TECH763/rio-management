@@ -176,41 +176,46 @@ function togglePassword() {
 }
 
 document.getElementById('loginForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    var formData = new FormData(this);
-    formData.append('login', '1');
+    e.preventDefault(); // Prevent the form from submitting immediately
+    grecaptcha.ready(function() {
+        grecaptcha.execute('6LcXBZQqAAAAAOHJGRgXUsIXpoe44YNomw8bjD5o', { action: 'login' }).then(function(token) {
+            // Append the token to the form data
+            var formData = new FormData(document.getElementById('loginForm'));
+            formData.append('g-recaptcha-response', token); // Add the token to form data
 
-    fetch('login.php', {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-        },
-        credentials: 'same-origin'
-    })
-    .then(response => response.json())
-    .then(data => {
-        const loginButton = document.querySelector('button[name="login"]');
+            // Send the form data to the server
+            fetch('login.php', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                credentials: 'same-origin'
+            })
+            .then(response => response.json())
+            .then(data => {
+                const loginButton = document.querySelector('button[name="login"]');
+                if (data.success) {
+                    window.location.href = data.redirect;
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Login Failed',
+                        text: data.error,
+                        confirmButtonText: 'Try Again',
+                        timer: 5000
+                    });
 
-        if (data.success) {
-            window.location.href = data.redirect;
-        } else {
-            Swal.fire({
-                icon: 'error',
-                title: 'Login Failed',
-                text: data.error,
-                confirmButtonText: 'Try Again',
-                timer: 5000
+                    if (data.disable) {
+                        loginButton.disabled = true;
+                        startTimer(data.time_remaining, loginButton);
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
             });
-
-            if (data.disable) {
-                loginButton.disabled = true;
-                startTimer(data.time_remaining, loginButton);
-            }
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
+        });
     });
 });
 
