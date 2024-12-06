@@ -25,9 +25,9 @@ if ($_SESSION['attempts'] >= 3 && (time() - $_SESSION['last_failed_attempt']) < 
 } else {
     if (isset($_POST['login'])) {
         // Verify reCAPTCHA v3
-        $recaptcha_response = $_POST['g-recaptcha-response'];
+        
         $verify_response = file_get_contents('https://www.google.com/recaptcha/api/siteverify?secret='.$recaptcha_secret_key.'&response='.$recaptcha_response);
-        $response_data = json_decode($verify_response);
+        
 
         // Check reCAPTCHA score
         if (!$response_data->success || $response_data->score <= 0.5) {
