@@ -7,7 +7,6 @@ if (!isset($_SESSION['csrf_token'])) {
 }
 
 // Set security headers
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -22,7 +21,6 @@ if (!isset($_SESSION['csrf_token'])) {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 
     <style type="text/css">
     body {
@@ -89,7 +87,6 @@ if (!isset($_SESSION['csrf_token'])) {
         }
     }
 
-    /* Modified: Remove display: none from recaptcha-container */
     .recaptcha-container {
         margin-bottom: 15px;
     }
@@ -140,11 +137,6 @@ if (!isset($_SESSION['csrf_token'])) {
             >
             <input class="p-2" type="checkbox" onclick="togglePassword()" style="margin-left: 10px; margin-top: 13px;">
             <span style="margin-left: 5px;">Show password</span>
-          </div>
-
-          <!-- Modified: Remove id from container since we don't need to toggle visibility -->
-          <div class="recaptcha-container mb-3">
-            <div class="g-recaptcha" data-sitekey="6LcGl4kqAAAAAB6yVfa6va0KJEnZ5nBZjW9G9was"></div>
           </div>
 
           <div class="d-flex justify-content-between align-items-center">
