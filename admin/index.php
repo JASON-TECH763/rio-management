@@ -22,7 +22,9 @@ if (!isset($_SESSION['csrf_token'])) {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+   
+     <!-- Add reCAPTCHA v3 API -->
+     <script src="https://www.google.com/recaptcha/api.js?render=6LcXBZQqAAAAAOHJGRgXUsIXpoe44YNomw8bjD5o"></script>
 
     <style type="text/css">
     body {
@@ -89,10 +91,6 @@ if (!isset($_SESSION['csrf_token'])) {
         }
     }
 
-    /* Modified: Remove display: none from recaptcha-container */
-    .recaptcha-container {
-        margin-bottom: 15px;
-    }
 </style>
 
 </head>
@@ -142,11 +140,6 @@ if (!isset($_SESSION['csrf_token'])) {
             <span style="margin-left: 5px;">Show password</span>
           </div>
 
-          <!-- Modified: Remove id from container since we don't need to toggle visibility -->
-          <div class="recaptcha-container mb-3">
-            <div class="g-recaptcha" data-sitekey="6LcGl4kqAAAAAB6yVfa6va0KJEnZ5nBZjW9G9was"></div>
-          </div>
-
           <div class="d-flex justify-content-between align-items-center">
             <button type="submit" name="login" class="btn btn-warning btn-lg enter" style="background-color: #1572e8; color: white; padding-left: 2.5rem; padding-right: 2.5rem;">Login</button>
             <a href="forgot_password.php" class="">Forgot password?</a>
@@ -162,6 +155,19 @@ if (!isset($_SESSION['csrf_token'])) {
 <script src="assets/js/popper.min.js"></script>
 <script src="assets/js/bootstrap.min.js"></script>
 <script src="assets/js/script.js"></script>
+
+<script>
+    // Generate reCAPTCHA token before submitting the form
+    document.getElementById('login-form').addEventListener('submit', function(event) {
+        event.preventDefault();
+        grecaptcha.ready(function() {
+            grecaptcha.execute('6LcXBZQqAAAAAOHJGRgXUsIXpoe44YNomw8bjD5o', { action: 'login' }).then(function(token) {
+                document.getElementById('g-recaptcha-response').value = token;
+                document.getElementById('login-form').submit();
+            });
+        });
+    });
+</script>
 
 <script>
 function togglePassword() {

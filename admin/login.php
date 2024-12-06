@@ -6,9 +6,6 @@ $error = "";
 $max_attempts = 3;       // Maximum number of login attempts
 $lockout_time = 180;     // Lockout time in seconds (3 minutes)
 
-// reCAPTCHA secret key
-$recaptcha_secret = '6LcGl4kqAAAAAMDe4J1_HVSJ1xpMETM4cwxWIpG-';
-
 // Initialize session variables for tracking attempts
 if (!isset($_SESSION['attempts'])) {
     $_SESSION['attempts'] = 0;
@@ -39,23 +36,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
         exit();
     }
 
-    // Always verify reCAPTCHA first
-    $recaptcha_response = $_POST['g-recaptcha-response'] ?? '';
-    
-    if (empty($recaptcha_response)) {
-        echo json_encode([
-            'success' => false, 
-            'error' => 'Please complete the reCAPTCHA verification'
-        ]);
-        exit();
-    }
-    
-    // Verify reCAPTCHA response
-    $verify_url = 'https://www.google.com/recaptcha/api/siteverify';
-    $verify_data = [
-        'secret' => $recaptcha_secret,
-        'response' => $recaptcha_response
-    ];
 
     $verify_options = [
         'http' => [
@@ -69,18 +49,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
     $verify_response = file_get_contents($verify_url, false, $verify_context);
     $response_data = json_decode($verify_response);
     
-    if (!$response_data->success) {
-        echo json_encode([
-            'success' => false, 
-            'error' => 'reCAPTCHA verification failed'
-        ]);
-        exit();
-    }
 
-    // If reCAPTCHA passed, proceed with login
-    $user = trim($_POST['uname']);
-    $pass = trim($_POST['pass']);
-
+   
     if (!empty($user) && !empty($pass)) {
         // Securely query the database using prepared statements
         $stmt = $conn->prepare("SELECT uname, password FROM admin WHERE uname = ?");
