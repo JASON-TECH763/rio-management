@@ -29,7 +29,10 @@ if ($_SESSION['attempts'] >= 3 && (time() - $_SESSION['last_failed_attempt']) < 
         $verify_response = file_get_contents($verify_url . '?secret=' . $recaptcha_secret_key . '&response=' . $recaptcha_token);
         $response_data = json_decode($verify_response);
 
-      
+        if (!$response_data->success || $response_data->score < 0.5) {
+            $sweetalert_error = 'ReCAPTCHA verification failed. Please try again.';
+        }
+            
             // Sanitize input
             $user = mysqli_real_escape_string($conn, $user);
 
@@ -66,18 +69,12 @@ if ($_SESSION['attempts'] >= 3 && (time() - $_SESSION['last_failed_attempt']) < 
                         $_SESSION['attempts']++;
                         $_SESSION['last_failed_attempt'] = time();
                         $sweetalert_error = '* Invalid Email or Password';
-                    }
-                } else {
-                    $_SESSION['attempts']++;
-                    $_SESSION['last_failed_attempt'] = time();
-                    $sweetalert_error = '* Invalid Email or Password';
-                }
-            } else {
+                    } else {
                 $sweetalert_error = '* Please fill all the fields!';
             }
         }
     }
-
+}
 ?>
 
 
@@ -252,7 +249,7 @@ if ($_SESSION['attempts'] >= 3 && (time() - $_SESSION['last_failed_attempt']) < 
 <?php if (!empty($sweetalert_error)): ?>
     Swal.fire({
         icon: 'error',
-        title: 'Login Failed',
+        title: 'Error',
         text: '<?php echo $sweetalert_error; ?>',
     });
 <?php endif; ?>
