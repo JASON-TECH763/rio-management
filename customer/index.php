@@ -16,8 +16,8 @@ if (!isset($_SESSION['last_failed_attempt'])) {
 $sweetalert_error = "";
 
 // reCAPTCHA v3 configuration
-$recaptcha_site_key = 'YOUR_RECAPTCHA_V3_SITE_KEY'; // Replace with your v3 site key
-$recaptcha_secret_key = 'YOUR_RECAPTCHA_V3_SECRET_KEY'; // Replace with your v3 secret key
+$recaptcha_site_key = '6LcXBZQqAAAAAOHJGRgXUsIXpoe44YNomw8bjD5o'; // Replace with your v3 site key
+$recaptcha_secret_key = '6LcXBZQqAAAAAP_LICTltGOdriycre62m05G5yCp'; // Replace with your v3 secret key
 
 // Check if login button should be disabled
 if ($_SESSION['attempts'] >= 3 && (time() - $_SESSION['last_failed_attempt']) < 180) {
