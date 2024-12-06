@@ -29,12 +29,7 @@ if ($_SESSION['attempts'] >= 3 && (time() - $_SESSION['last_failed_attempt']) < 
         $verify_response = file_get_contents($verify_url . '?secret=' . $recaptcha_secret_key . '&response=' . $recaptcha_token);
         $response_data = json_decode($verify_response);
 
-        if (!$response_data->success || $response_data->score < 0.5) {
-            $sweetalert_error = 'ReCAPTCHA verification failed. Please try again.';
-        } else {
-            $user = $_REQUEST['uname'];
-            $pass = $_REQUEST['pass'];
-            
+      
             // Sanitize input
             $user = mysqli_real_escape_string($conn, $user);
 
