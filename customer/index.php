@@ -77,7 +77,7 @@ if ($_SESSION['attempts'] >= 3 && (time() - $_SESSION['last_failed_attempt']) < 
             }
         }
     }
-}
+
 ?>
 
 
