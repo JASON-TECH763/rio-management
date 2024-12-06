@@ -15,71 +15,59 @@ if (!isset($_SESSION['last_failed_attempt'])) {
 // SweetAlert error variable
 $sweetalert_error = "";
 
-// reCAPTCHA v3 configuration
-$recaptcha_secret_key = '6LcXBZQqAAAAAP_LICTltGOdriycre62m05G5yCp'; // Replace with your secret key
-
 // Check if login button should be disabled
 if ($_SESSION['attempts'] >= 3 && (time() - $_SESSION['last_failed_attempt']) < 180) {
     $sweetalert_error = 'You have reached the maximum login attempts. Please try again after 3 minutes.';
 } else {
     if (isset($_POST['login'])) {
-        // Verify reCAPTCHA v3
-        $recaptcha_token = $_POST['g-recaptcha-response'];
-        $verify_url = 'https://www.google.com/recaptcha/api/siteverify';
-        $verify_response = file_get_contents($verify_url . '?secret=' . $recaptcha_secret_key . '&response=' . $recaptcha_token);
-        $response_data = json_decode($verify_response);
+        // Sanitize input
+        $user = mysqli_real_escape_string($conn, $_POST['uname']);
+        $pass = $_POST['pass'];
 
-        if (!$response_data->success || $response_data->score < 0.5) {
-            $sweetalert_error = 'ReCAPTCHA verification failed. Please try again.';
-        } else {
-            // Sanitize input
-            $user = mysqli_real_escape_string($conn, $_POST['uname']);
-            $pass = $_POST['pass'];
+        if (!empty($user) && !empty($pass)) {
+            // Prepare statement for login
+            $query = "SELECT email, password, verified FROM customer WHERE email=?";
+            $stmt = mysqli_prepare($conn, $query);
+            mysqli_stmt_bind_param($stmt, "s", $user);
+            mysqli_stmt_execute($stmt);
+            $result = mysqli_stmt_get_result($stmt);
 
-            if (!empty($user) && !empty($pass)) {
-                // Prepare statement for login
-                $query = "SELECT email, password, verified FROM customer WHERE email=?";
-                $stmt = mysqli_prepare($conn, $query);
-                mysqli_stmt_bind_param($stmt, "s", $user);
-                mysqli_stmt_execute($stmt);
-                $result = mysqli_stmt_get_result($stmt);
+            $row = mysqli_fetch_array($result);
 
-                $row = mysqli_fetch_array($result);
+            if ($row) {
+                // Check if password is correct
+                if (password_verify($pass, $row['password'])) {
+                    // Reset attempts on successful login
+                    $_SESSION['attempts'] = 0;
+                    $_SESSION['last_failed_attempt'] = time();
 
-                if ($row) {
-                    // Check if password is correct
-                    if (password_verify($pass, $row['password'])) {
-                        // Reset attempts on successful login
-                        $_SESSION['attempts'] = 0;
-                        $_SESSION['last_failed_attempt'] = time();
-
-                        // Check if account is verified
-                        if ($row['verified'] == 1) {
-                            $_SESSION['email'] = $row['email'];
-                            $_SESSION['verified'] = $row['verified'];
-                            header("Location: order.php");
-                            exit();
-                        } else {
-                            $_SESSION['status'] = "error";
-                            $_SESSION['message'] = "Your account is not verified. Please use a verified email account.";
-                            header("Location: index.php");
-                            exit();
-                        }
+                    // Check if account is verified
+                    if ($row['verified'] == 1) {
+                        $_SESSION['email'] = $row['email'];
+                        $_SESSION['verified'] = $row['verified'];
+                        header("Location: order.php");
+                        exit();
                     } else {
-                        $_SESSION['attempts']++;
-                        $_SESSION['last_failed_attempt'] = time();
-                        $sweetalert_error = '* Invalid Email or Password';
+                        $_SESSION['status'] = "error";
+                        $_SESSION['message'] = "Your account is not verified. Please use a verified email account.";
+                        header("Location: index.php");
+                        exit();
                     }
                 } else {
+                    $_SESSION['attempts']++;
+                    $_SESSION['last_failed_attempt'] = time();
                     $sweetalert_error = '* Invalid Email or Password';
                 }
             } else {
-                $sweetalert_error = '* Please fill all the fields!';
+                $sweetalert_error = '* Invalid Email or Password';
             }
+        } else {
+            $sweetalert_error = '* Please fill all the fields!';
         }
     }
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -211,8 +199,6 @@ if ($_SESSION['attempts'] >= 3 && (time() - $_SESSION['last_failed_attempt']) < 
 
                     
                     
-        <!-- Hidden reCAPTCHA token input -->
-        <input type="hidden" name="g-recaptcha-response" id="g-recaptcha-response">
 
 
                     <div class="d-flex justify-content-between align-items-center">
