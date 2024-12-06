@@ -268,8 +268,11 @@ if ($_SESSION['attempts'] >= 3 && (time() - $_SESSION['last_failed_attempt']) < 
     const loginButton = document.getElementById('login-btn');
     const countdownTimer = document.getElementById('countdown-timer');
 
+    // If attempts are more than or equal to 3 and the lockout time has not expired
     if (attemptCount >= 3 && lockoutTimeRemaining > 0) {
         let remainingTime = lockoutTimeRemaining;
+        loginButton.disabled = true; // Disable the button
+
         const updateTimer = () => {
             const minutes = Math.floor(remainingTime / 60);
             const seconds = remainingTime % 60;
@@ -278,15 +281,14 @@ if ($_SESSION['attempts'] >= 3 && (time() - $_SESSION['last_failed_attempt']) < 
             if (remainingTime > 0) {
                 remainingTime--;
             } else {
-                loginButton.disabled = false;
+                loginButton.disabled = false; // Enable the button after lockout
                 countdownTimer.textContent = '';
-                clearInterval(timerInterval);
+                clearInterval(timerInterval); // Stop the timer
             }
         };
 
-        loginButton.disabled = true;
         const timerInterval = setInterval(updateTimer, 1000);
-        updateTimer();
+        updateTimer(); // Run immediately to show the time
     }
 </script>
 
