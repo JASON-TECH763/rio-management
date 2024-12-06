@@ -239,7 +239,7 @@ function startTimer(duration, button) {
 }
 </script>
 
-<!--<script>
+<script>
 // Disable right-click
         document.addEventListener('contextmenu', function (e) {
             e.preventDefault();
@@ -270,7 +270,7 @@ function startTimer(duration, button) {
         document.onselectstart = function (e) {
             e.preventDefault();
         };
-</script>-->
+</script>
 
 </body>
 </html>
