@@ -105,7 +105,63 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- Add Font Awesome CSS if not included -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-</head>
+
+    <style type="text/css">
+   /* Apply the fullscreen background color */
+   body {
+        background-color: #2a2f5b;
+        color: white;
+        margin: 0; /* Remove default margin */
+        padding: 0; /* Remove default padding */
+        height: 100%; /* Ensure the body covers the full screen */
+    }
+
+    .divider:after,
+    .divider:before {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: #eee;
+    }
+    .h-custom {
+        height: calc(100% - 73px);
+    }
+    @media (max-width: 450px) {
+        .h-custom {
+            height: 100%;
+        }
+    }
+    .back-button {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        background-color: #1572e8;
+        color: white;
+        padding: 8px 12px;
+        border-radius: 4px;
+        display: inline-flex;
+        align-items: center;
+        text-decoration: none;
+    }
+    .back-button i {
+        font-size: 1rem;
+        margin-right: 5px;
+    }
+
+    /* Adjust position and size on mobile devices */
+    @media (max-width: 450px) {
+        .back-button {
+            top: 10px;
+            left: 10px;
+            padding: 6px 10px; /* Slightly smaller padding */
+        }
+        .back-button i {
+            font-size: 0.9rem; /* Slightly smaller icon size */
+        }
+    }
+</style>
+
+  </head>
 
 <body>
 <a href="https://rio-lawis.com/" class="btn btn-light back-button">
