@@ -24,53 +24,69 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_FILES['prod_img']) && $_FILES['prod_img']['error'] == UPLOAD_ERR_OK) {
         $file_name = basename($_FILES['prod_img']['name']);
         $file_ext = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
-
-        // Validate file type (allow only certain image types)
-        $allowed_exts = ['jpg', 'jpeg', 'png', 'gif'];
+    
+        // Validate file extension (allow only jpg, jpeg, and png)
+        $allowed_exts = ['jpg', 'jpeg', 'png'];
         if (in_array($file_ext, $allowed_exts)) {
-            // Generate a unique file name to prevent file overwrite
-            $new_file_name = uniqid() . '.' . $file_ext;
-            $upload_dir = 'assets/img/products/';
-            $upload_path = $upload_dir . $new_file_name;
-
-            // Move the uploaded file to the target directory
-            if (move_uploaded_file($_FILES["prod_img"]["tmp_name"], $upload_path)) {
-                // Prepare the SQL query
-                $stmt = $conn->prepare("INSERT INTO rpos_products (prod_id, prod_name, prod_price, prod_img) VALUES (?, ?, ?, ?)");
-                $stmt->bind_param("ssds", $prod_id, $prod_name, $prod_price, $new_file_name);
-
-                if ($stmt->execute()) {
-                    echo '<script>
-                            window.onload = function() {
-                                Swal.fire({
-                                    title: "Success!",
-                                    text: "Data added successfully",
-                                    icon: "success"
-                                }).then((result) => {
-                                    if (result.isConfirmed) {
-                                        window.location.href = "product.php";
-                                    }
-                                });
-                            };
-                          </script>';
+            // Validate MIME type
+            $mime_type = mime_content_type($_FILES['prod_img']['tmp_name']);
+            $allowed_mime_types = ['image/jpeg', 'image/png'];
+    
+            if (in_array($mime_type, $allowed_mime_types)) {
+                // Generate a unique file name to prevent file overwrite
+                $new_file_name = uniqid() . '.' . $file_ext;
+                $upload_dir = 'assets/img/products/';
+                $upload_path = $upload_dir . $new_file_name;
+    
+                // Move the uploaded file to the target directory
+                if (move_uploaded_file($_FILES["prod_img"]["tmp_name"], $upload_path)) {
+                    // Prepare the SQL query
+                    $stmt = $conn->prepare("INSERT INTO rpos_products (prod_id, prod_name, prod_price, prod_img) VALUES (?, ?, ?, ?)");
+                    $stmt->bind_param("ssds", $prod_id, $prod_name, $prod_price, $new_file_name);
+    
+                    if ($stmt->execute()) {
+                        echo '<script>
+                                window.onload = function() {
+                                    Swal.fire({
+                                        title: "Success!",
+                                        text: "Data added successfully",
+                                        icon: "success"
+                                    }).then((result) => {
+                                        if (result.isConfirmed) {
+                                            window.location.href = "product.php";
+                                        }
+                                    });
+                                };
+                              </script>';
+                    } else {
+                        echo '<script>
+                                window.onload = function() {
+                                    Swal.fire({
+                                        title: "Error!",
+                                        text: "Failed to add data.",
+                                        icon: "error"
+                                    });
+                                };
+                              </script>';
+                    }
+                    $stmt->close();
                 } else {
                     echo '<script>
                             window.onload = function() {
                                 Swal.fire({
                                     title: "Error!",
-                                    text: "Failed to add data.",
+                                    text: "Failed to upload image.",
                                     icon: "error"
                                 });
                             };
                           </script>';
                 }
-                $stmt->close();
             } else {
                 echo '<script>
                         window.onload = function() {
                             Swal.fire({
-                                title: "Error!",
-                                text: "Failed to upload image.",
+                                title: "Invalid File Type!",
+                                text: "Please upload a valid image file (JPEG, PNG only).",
                                 icon: "error"
                             });
                         };
@@ -81,7 +97,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     window.onload = function() {
                         Swal.fire({
                             title: "Invalid File Type!",
-                            text: "Please upload a valid image file.",
+                            text: "Only JPG, JPEG, and PNG files are allowed.",
                             icon: "error"
                         });
                     };
@@ -98,7 +114,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 };
               </script>';
     }
-}
+}    
 ?>
 
 <!DOCTYPE html>
