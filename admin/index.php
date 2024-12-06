@@ -22,9 +22,7 @@ if (!isset($_SESSION['csrf_token'])) {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-   
-     <!-- Add reCAPTCHA v3 API -->
-     <script src="https://www.google.com/recaptcha/api.js?render=6LcXBZQqAAAAAOHJGRgXUsIXpoe44YNomw8bjD5o"></script>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 
     <style type="text/css">
     body {
@@ -91,6 +89,10 @@ if (!isset($_SESSION['csrf_token'])) {
         }
     }
 
+    /* Modified: Remove display: none from recaptcha-container */
+    .recaptcha-container {
+        margin-bottom: 15px;
+    }
 </style>
 
 </head>
@@ -140,6 +142,11 @@ if (!isset($_SESSION['csrf_token'])) {
             <span style="margin-left: 5px;">Show password</span>
           </div>
 
+          <!-- Modified: Remove id from container since we don't need to toggle visibility -->
+          <div class="recaptcha-container mb-3">
+            <div class="g-recaptcha" data-sitekey="6LcGl4kqAAAAAB6yVfa6va0KJEnZ5nBZjW9G9was"></div>
+          </div>
+
           <div class="d-flex justify-content-between align-items-center">
             <button type="submit" name="login" class="btn btn-warning btn-lg enter" style="background-color: #1572e8; color: white; padding-left: 2.5rem; padding-right: 2.5rem;">Login</button>
             <a href="forgot_password.php" class="">Forgot password?</a>
@@ -157,65 +164,47 @@ if (!isset($_SESSION['csrf_token'])) {
 <script src="assets/js/script.js"></script>
 
 <script>
-    // Generate reCAPTCHA token before submitting the form
-    document.getElementById('login-form').addEventListener('submit', function(event) {
-        event.preventDefault();
-        grecaptcha.ready(function() {
-            grecaptcha.execute('6LcXBZQqAAAAAOHJGRgXUsIXpoe44YNomw8bjD5o', { action: 'login' }).then(function(token) {
-                document.getElementById('g-recaptcha-response').value = token;
-                document.getElementById('login-form').submit();
-            });
-        });
-    });
-</script>
-
-<script>
 function togglePassword() {
     var x = document.getElementById("psw");
     x.type = x.type === "password" ? "text" : "password";
 }
 
 document.getElementById('loginForm').addEventListener('submit', function(e) {
-    e.preventDefault(); // Prevent the form from submitting immediately
-    grecaptcha.ready(function() {
-        grecaptcha.execute('6LcXBZQqAAAAAOHJGRgXUsIXpoe44YNomw8bjD5o', { action: 'login' }).then(function(token) {
-            // Append the token to the form data
-            var formData = new FormData(document.getElementById('loginForm'));
-            formData.append('g-recaptcha-response', token); // Add the token to form data
+    e.preventDefault();
+    var formData = new FormData(this);
+    formData.append('login', '1');
 
-            // Send the form data to the server
-            fetch('login.php', {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                credentials: 'same-origin'
-            })
-            .then(response => response.json())
-            .then(data => {
-                const loginButton = document.querySelector('button[name="login"]');
-                if (data.success) {
-                    window.location.href = data.redirect;
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Login Failed',
-                        text: data.error,
-                        confirmButtonText: 'Try Again',
-                        timer: 5000
-                    });
+    fetch('login.php', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        credentials: 'same-origin'
+    })
+    .then(response => response.json())
+    .then(data => {
+        const loginButton = document.querySelector('button[name="login"]');
 
-                    if (data.disable) {
-                        loginButton.disabled = true;
-                        startTimer(data.time_remaining, loginButton);
-                    }
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
+        if (data.success) {
+            window.location.href = data.redirect;
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Login Failed',
+                text: data.error,
+                confirmButtonText: 'Try Again',
+                timer: 5000
             });
-        });
+
+            if (data.disable) {
+                loginButton.disabled = true;
+                startTimer(data.time_remaining, loginButton);
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
     });
 });
 
