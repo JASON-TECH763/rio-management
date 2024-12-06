@@ -31,10 +31,10 @@ if ($_SESSION['attempts'] >= 3 && (time() - $_SESSION['last_failed_attempt']) < 
 
         if (!$response_data->success || $response_data->score < 0.5) {
             $sweetalert_error = 'ReCAPTCHA verification failed. Please try again.';
-        }
-            
+        } else {
             // Sanitize input
-            $user = mysqli_real_escape_string($conn, $user);
+            $user = mysqli_real_escape_string($conn, $_POST['uname']);
+            $pass = $_POST['pass'];
 
             if (!empty($user) && !empty($pass)) {
                 // Prepare statement for login
@@ -69,14 +69,17 @@ if ($_SESSION['attempts'] >= 3 && (time() - $_SESSION['last_failed_attempt']) < 
                         $_SESSION['attempts']++;
                         $_SESSION['last_failed_attempt'] = time();
                         $sweetalert_error = '* Invalid Email or Password';
-                    } else {
+                    }
+                } else {
+                    $sweetalert_error = '* Invalid Email or Password';
+                }
+            } else {
                 $sweetalert_error = '* Please fill all the fields!';
             }
         }
     }
 }
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
