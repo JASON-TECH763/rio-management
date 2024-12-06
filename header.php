@@ -4,6 +4,10 @@
         font-size: 1.30rem;
         padding: 1rem;
     }
+
+.navbar-brand h1 {
+    font-size: 24px; /* Adjust the size here */
+}
 }
 </style>
  <div class="container-fluid bg-dark px-0">
