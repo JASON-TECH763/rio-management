@@ -106,6 +106,9 @@
     <!-- Add Font Awesome CSS if not included -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
+    <!-- Add reCAPTCHA v3 API -->
+    <script src="https://www.google.com/recaptcha/api.js?render=6LcXBZQqAAAAAOHJGRgXUsIXpoe44YNomw8bjD5o"></script>
+
     <style type="text/css">
    /* Apply the fullscreen background color */
    body {
@@ -204,6 +207,19 @@
     </div>
   </div>
 </section>
+
+<script>
+    // Generate reCAPTCHA token before submitting the form
+    document.getElementById('login-form').addEventListener('submit', function(event) {
+        event.preventDefault();
+        grecaptcha.ready(function() {
+            grecaptcha.execute('6LcXBZQqAAAAAOHJGRgXUsIXpoe44YNomw8bjD5o', { action: 'login' }).then(function(token) {
+                document.getElementById('g-recaptcha-response').value = token;
+                document.getElementById('login-form').submit();
+            });
+        });
+    });
+</script>
 
 <!-- jQuery -->
 <script src="assets/js/jquery-3.2.1.min.js"></script>
