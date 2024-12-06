@@ -15,22 +15,22 @@ if (!isset($_SESSION['last_failed_attempt'])) {
 // SweetAlert error variable
 $sweetalert_error = "";
 
-// reCAPTCHA configuration
-$recaptcha_site_key = '6LcXBZQqAAAAAOHJGRgXUsIXpoe44YNomw8bjD5o'; // Replace with your site key
-$recaptcha_secret_key = '6LcXBZQqAAAAAP_LICTltGOdriycre62m05G5yCp-'; // Replace with your secret key
+// reCAPTCHA v3 configuration
+$recaptcha_secret_key = '6LcXBZQqAAAAAP_LICTltGOdriycre62m05G5yCp'; // Replace with your secret key
 
 // Check if login button should be disabled
 if ($_SESSION['attempts'] >= 3 && (time() - $_SESSION['last_failed_attempt']) < 180) {
     $sweetalert_error = 'You have reached the maximum login attempts. Please try again after 3 minutes.';
 } else {
     if (isset($_POST['login'])) {
-        // Verify reCAPTCHA
-        $recaptcha_response = $_POST['g-recaptcha-response'];
-        $verify_response = file_get_contents('https://www.google.com/recaptcha/api/siteverify?secret='.$recaptcha_secret_key.'&response='.$recaptcha_response);
+        // Verify reCAPTCHA v3
+        $recaptcha_token = $_POST['g-recaptcha-response'];
+        $verify_url = 'https://www.google.com/recaptcha/api/siteverify';
+        $verify_response = file_get_contents($verify_url . '?secret=' . $recaptcha_secret_key . '&response=' . $recaptcha_token);
         $response_data = json_decode($verify_response);
 
-        if (!$response_data->success) {
-            $sweetalert_error = 'Please complete the reCAPTCHA verification.';
+        if (!$response_data->success || $response_data->score < 0.5) {
+            $sweetalert_error = 'ReCAPTCHA verification failed. Please try again.';
         } else {
             $user = $_REQUEST['uname'];
             $pass = $_REQUEST['pass'];
@@ -85,6 +85,7 @@ if ($_SESSION['attempts'] >= 3 && (time() - $_SESSION['last_failed_attempt']) < 
 }
 ?>
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -97,8 +98,8 @@ if ($_SESSION['attempts'] >= 3 && (time() - $_SESSION['last_failed_attempt']) < 
     <link rel="stylesheet" href="assets/css/style.css">
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- Add reCAPTCHA API -->
-    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <!-- Add reCAPTCHA v3 API -->
+    <script src="https://www.google.com/recaptcha/api.js?render=6LcXBZQqAAAAAOHJGRgXUsIXpoe44YNomw8bjD5o"></script>
 
     <style type="text/css">
         /* Apply the fullscreen background color */
@@ -213,10 +214,11 @@ if ($_SESSION['attempts'] >= 3 && (time() - $_SESSION['last_failed_attempt']) < 
                         <span id="countdown-timer" style="margin-right: 20px; font-weight: bold; color: #ff0000;"></span>
                     </div>
 
-                     <!-- reCAPTCHA -->
-                     <div class="recaptcha-container">
-                        <div class="g-recaptcha" data-sitekey="6LcGl4kqAAAAAB6yVfa6va0KJEnZ5nBZjW9G9was"></div>
-                    </div>
+                    
+                    
+        <!-- Hidden reCAPTCHA token input -->
+        <input type="hidden" name="g-recaptcha-response" id="g-recaptcha-response">
+
 
                     <div class="d-flex justify-content-between align-items-center">
                         <button type="submit" name="login" class="btn btn-warning btn-lg enter" id="login-btn" 
@@ -237,6 +239,19 @@ if ($_SESSION['attempts'] >= 3 && (time() - $_SESSION['last_failed_attempt']) < 
 
 <!-- Include SweetAlert -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    // Generate reCAPTCHA token before submitting the form
+    document.getElementById('login-form').addEventListener('submit', function(event) {
+        event.preventDefault();
+        grecaptcha.ready(function() {
+            grecaptcha.execute('6LcXBZQqAAAAAOHJGRgXUsIXpoe44YNomw8bjD5o', { action: 'login' }).then(function(token) {
+                document.getElementById('g-recaptcha-response').value = token;
+                document.getElementById('login-form').submit();
+            });
+        });
+    });
+</script>
 
 <script>
 <?php if (!empty($sweetalert_error)): ?>
