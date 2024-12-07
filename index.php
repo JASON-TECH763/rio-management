@@ -17,7 +17,7 @@ header("Referrer-Policy: strict-origin-when-cross-origin");
 
 <head>
     <meta charset="utf-8">
-    <title>Rio Management System</title>
+    <title>Rio Managemen System</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="" name="keywords">
     <meta content="" name="description">
