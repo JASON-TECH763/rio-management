@@ -69,7 +69,7 @@ header("Referrer-Policy: strict-origin-when-cross-origin");
                 <img class="w-100 carousel-image" src="img/carousel1.jpg" alt="Image">
                 <div class="carousel-caption d-flex flex-column align-items-center justify-content-center">
                     <div class="p-3" style="max-width: 700px;">
-                        <h6 class="section-title text-white text-uppercase mb-3 animated slideInDown">illing</h6>
+                        <h6 class="section-title text-white text-uppercase mb-3 animated slideInDown">Chilling</h6>
                         <h1 class="display-3 text-white mb-4 animated slideInDown">Discover An Affordable GuestHouse</h1>
                         <a href="room.php" class="btn btn-primary py-md-3 px-md-5 me-3 animated slideInLeft">Book A Room</a>
                     </div>
