@@ -398,7 +398,7 @@ if ($result->num_rows > 0) {
     <!-- Template Javascript -->
     <script src="js/main.js"></script>
 
-    <script>
+    <!--<script>
 // Disable right-click
         document.addEventListener('contextmenu', function (e) {
             e.preventDefault();
@@ -428,7 +428,7 @@ if ($result->num_rows > 0) {
         document.onselectstart = function (e) {
             e.preventDefault();
         };
-</script>
+</script>-->
 </body>
 
 </html>
