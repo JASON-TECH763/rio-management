@@ -121,11 +121,11 @@ if (!isset($_SESSION['csrf_token'])) {
           </div>
 
           <div class="form-outline mb-4">
-            <label class="form-label" for="user">Username</label>
+            <label class="form-label" for="user">Usname</label>
             <input type="text" name="uname" id="user" class="form-control form-control-lg" placeholder="Enter username" required autocomplete="username">
           </div>
           <div class="form-outline mb-3">
-            <label class="form-label" for="pass">word</label>
+            <label class="form-label" for="pass">Password</label>
             <input  
                 type="password" 
                 name="pass" 
