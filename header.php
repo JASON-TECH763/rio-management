@@ -75,7 +75,7 @@
            </a> 
            <div class="dropdown-divider"></div>
            <a class="dropdown-item" href="customer">
-             <i class="fas fa-users"></i> Custome
+             <i class="fas fa-users"></i> Customer
            </a>
          </div>
        </ul>
