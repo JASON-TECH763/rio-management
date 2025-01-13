@@ -1,0 +1,16 @@
+# HTID:23422420: DO NOT REMOVE OR MODIFY THIS LINE AND THE LINES BELOW
+php_value display_errors 1
+# DO NOT REMOVE OR MODIFY THIS LINE AND THE LINES ABOVE HTID:23422420:
+
+RewriteEngine On
+
+# Allow index.php to execute normally without redirection
+RewriteRule ^index\.php$ - [L]
+
+# If you want to serve the default page when accessing the domain root
+RewriteRule ^$ index.php [L]
+RewriteEngine On
+
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^(.*)$ $1.php [L]
